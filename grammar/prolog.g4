@@ -59,14 +59,16 @@ termlist
 /**********************Grammar Extention**********************/
 
 
-func_def : VARIABLE func_args '::' tuple; 
+func_def : VARIABLE func_args '::' tuple '.'; 
 
 func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
+
 tuple : '(' (tuple_entry ((',' | ';') tuple_entry)*)? ')';
 
 tuple_entry 
     : expr
-    | binding;
+    | binding
+    ;
 
 binding : VARIABLE '<-' expr ; 
 
@@ -79,11 +81,6 @@ expr
 
 invoc : VARIABLE tuple;
 
-/*
-*   tuple(L); if L is a list of tuple_entries
-*   tuple([]).
-*   tuple(Head|Tail) :- tuple_entry(Tail), tuple_enries(Tail)).
-*/
 
 term
     : VARIABLE     # variable
@@ -98,6 +95,12 @@ term
     | '{' termlist '}'                    # curly_bracketed_term
     | atom                                # atom_term
     ;
+
+/*
+ *   tuple(L); if L is a list of tuple_entries
+ *   tuple([]).
+ *   tuple(Head|Tail) :- tuple_entry(Tail), tuple_enries(Tail)).
+ */
 
 /*****************************/
 

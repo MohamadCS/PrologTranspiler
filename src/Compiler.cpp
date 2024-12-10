@@ -25,7 +25,8 @@ void Compiler::genProlog(prologParser& parser) {
     progRestoreV.visit(programStartCtx);
     auto progList = progRestoreV.programStmtList;
 
-    auto outputPath = m_targetPath.replace_extension("").concat("_out.pl");
+    auto outputPath = m_targetPath;
+    outputPath.replace_extension("").concat("_out.pl");
 
     std::ofstream outputFile(outputPath);
 
@@ -46,7 +47,8 @@ void Compiler::genAst(prologParser& parser) {
     parser.reset();
     auto* programStartCtx = parser.p_text();
 
-    auto outputPath = m_targetPath.replace_extension("").concat("_ast.out");
+    auto outputPath = m_targetPath;
+    outputPath.replace_extension("").concat("_ast.out");
 
     std::ofstream outputFile(outputPath);
 
@@ -75,11 +77,11 @@ void Compiler::varNumCheck(prologParser& parser) {
 void Compiler::compile(const std::filesystem::path& path, const std::set<Flag>& flags) {
     m_targetPath = path;
 
-
     std::ifstream targetFile{path};
 
     if (!targetFile) {
         std::cerr << std::format("Error opening the file: {}\n", path.string());
+        exit(-1);
     }
 
     antlr4::ANTLRInputStream input(targetFile);

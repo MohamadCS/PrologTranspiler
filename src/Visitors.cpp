@@ -8,7 +8,7 @@
 #include <map>
 
 namespace Prolog::Visitors {
-static bool isEntryTuple(prologParser::Tuple_entryContext* ctx);
+static bool entryIsTuple(prologParser::Tuple_entryContext* ctx);
 
 std::any ProgramRestoreVisitor::visitClause(prologParser::ClauseContext* ctx) {
     CHECK_NULL(ctx);
@@ -60,7 +60,7 @@ std::any ProgramRestoreVisitor::visitTuple(prologParser::TupleContext* ctx) {
     std::vector<std::string> nonEmptyEntries;
     for (auto* pEntry : ctx->tuple_entry()) {
         // If its a term, or an non-empty tuple then add it.
-        if (!isEntryTuple(pEntry) || !emptyTuples.value().get(pEntry->expr()->tuple())) {
+        if (!entryIsTuple(pEntry) || !emptyTuples.value().get(pEntry->expr()->tuple())) {
             visit(pEntry);
             programStmtList.back().push_back(",");
         }
@@ -93,7 +93,7 @@ std::any VariableSemanticVisitor::visitVariable(prologParser::VariableContext* c
     return visitChildren(ctx);
 }
 
-static bool isEntryTuple(prologParser::Tuple_entryContext* ctx) {
+static bool entryIsTuple(prologParser::Tuple_entryContext* ctx) {
     CHECK_NULL(ctx);
     if (ctx->expr() != nullptr && ctx->expr()->tuple() != nullptr) {
         return true;
@@ -111,7 +111,7 @@ std::any MarkEmptyTuplesVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     bool isEmpty = true; // Base: if there are no entries then the for won't do any iteration.
     for (auto* pEntry : entryVec) {
-        if (isEntryTuple(pEntry)) { // This is a tuple.
+        if (entryIsTuple(pEntry)) { // This is a tuple.
             if (!emptyTuples.get(pEntry->expr()->tuple())) {
                 isEmpty = false;
                 break;

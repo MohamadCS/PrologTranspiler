@@ -111,6 +111,9 @@ BUILD_DIRS:
 
 .PHONY: clean
 clean:
+
+	$(verb) rm $(TEST_DIR)/*.out
+	$(verb) rm $(TEST_DIR)/*_ast.out
 	$(brief)
 	$(verb) rm -rf $(BUILD_DIR)/* $(TARGET)
 	$(verb) rm -rf $(TEST_DIR)/output*
