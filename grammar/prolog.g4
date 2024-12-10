@@ -47,7 +47,7 @@ directive
     ; // also 3.58
 
 clause
-    : term | tuple '.'
+    : term '.'
     ; // also 3.33
 
 // Abstract Syntax (6.3): terms formed from tokens
@@ -58,30 +58,32 @@ termlist
 
 /**********************Grammar Extention**********************/
 
+
 func_def : VARIABLE func_args '::' tuple; 
 
-tuple: '(' (tuple_entry ((',' | ';') tuple_entry)*)?  ')';
+func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
+tuple : '(' (tuple_entry ((',' | ';') tuple_entry)*)? ')';
 
-(VARIABLE ( ',' VARIABLE)*) ? ')'
+tuple_entry 
+    : expr
+    | binding;
 
-tuple_entry :- expresssion|binding;
-binding: VARIABLE '<-' expression; 
-expresssion :- tuple | term | invocation | VARIABLE; 
-invocation: VARIABLE tuple;
+binding : VARIABLE '<-' expr ; 
 
+expr 
+    : tuple 
+    | term
+    | invoc
+    | VARIABLE
+    ; 
 
-% tuple(L); if L is a list of tuple_entries
+invoc : VARIABLE tuple;
 
-tuple([]).
-tuple(Head|Tail) :- tuple_entry(Tail), tuple_enries(Tail)).
-tuple
-    : '(' (tuple_entry (',' tuple_entry)* )? ')' 
-    ;
-
-tuple_entry    
-    : term 
-    | tuple
-    ;
+/*
+*   tuple(L); if L is a list of tuple_entries
+*   tuple([]).
+*   tuple(Head|Tail) :- tuple_entry(Tail), tuple_enries(Tail)).
+*/
 
 term
     : VARIABLE     # variable
@@ -95,7 +97,6 @@ term
     | '[' termlist ( '|' term)? ']'       # list_term
     | '{' termlist '}'                    # curly_bracketed_term
     | atom                                # atom_term
-    | call                                #func_call   /******* Extention *******/
     ;
 
 /*****************************/
