@@ -27,6 +27,7 @@ struct FunctionSemanticsVisitor : public prologBaseVisitor {
     std::any visitTuple(prologParser::TupleContext* ctx) override;
 };
 
+// TODO: Delete this class. 
 struct VariableSemanticVisitor : public prologBaseVisitor {
     std::any visitVariable(prologParser::VariableContext* ctx) override;
     std::map<std::string, std::uint8_t> varTbl;
