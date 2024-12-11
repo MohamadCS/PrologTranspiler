@@ -121,3 +121,7 @@ clean:
 .PHONY: test
 test: $(TARGET)
 	$(verb) ./$(TARGET) --run-tests
+
+.PHONY: leaks
+leaks: $(TARGET)
+	$(verb) leaks --atExit -- ./$(TARGET) --run-tests
