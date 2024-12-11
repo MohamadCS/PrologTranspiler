@@ -5,7 +5,10 @@
 #include "tree/TerminalNode.h"
 #include <cctype>
 #include <format>
+#include <functional>
+#include <iterator>
 #include <map>
+#include <unistd.h>
 
 namespace Prolog::Visitors {
 static bool entryIsTuple(prologParser::Tuple_entryContext* ctx);
@@ -93,14 +96,6 @@ std::any VariableSemanticVisitor::visitVariable(prologParser::VariableContext* c
     return visitChildren(ctx);
 }
 
-static bool entryIsTuple(prologParser::Tuple_entryContext* ctx) {
-    CHECK_NULL(ctx);
-    if (ctx->expr() != nullptr && ctx->expr()->tuple() != nullptr) {
-        return true;
-    }
-    return false;
-}
-
 std::any MarkEmptyTuplesVisitor::visitTuple(prologParser::TupleContext* ctx) {
     CHECK_NULL(ctx);
 
@@ -127,5 +122,96 @@ std::any MarkEmptyTuplesVisitor::visitTuple(prologParser::TupleContext* ctx) {
     LOG(std::format("{}: {}", (isEmpty) ? "Empty" : "Not Empty", ctx->getText()));
     return {};
 };
+
+std::any FunctionSemanticsVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
+    CHECK_NULL(ctx);
+
+    const std::string& funcName = ctx->VARIABLE()->getText();
+
+    bindedVars.push_back({});
+    initializedVars.push_back({});
+    functionNames.insert(funcName);
+
+    const auto& argsVec = ctx->func_args()->VARIABLE();
+    // Every argument variable is initialized.
+    for (auto* pFuncArg : argsVec) {
+        initializedVars.back().insert(pFuncArg->getText());
+    }
+
+    return visitChildren(ctx);
+}
+
+std::any FunctionSemanticsVisitor::visitBinding(prologParser::BindingContext* ctx) {
+    CHECK_NULL(ctx);
+
+    const auto* targetVar = ctx->VARIABLE();
+    CHECK_NULL(targetVar);
+
+    const std::string& varName = targetVar->getSymbol()->getText();
+
+    // First binding
+    if (auto it = bindedVars.back().find(varName); it != bindedVars.back().end()) {
+        auto& [_, count] = *it;
+        count++;
+    } else /* Was binded before*/ { // We can print an error, better to just record it then check in unit tests.
+        bindedVars.back().insert({varName, 1});
+    }
+
+    // Var is initialized
+    if (auto it = initializedVars.back().find(varName); it == initializedVars.back().end()) {
+        initializedVars.back().insert(varName);
+    }
+
+    return visitChildren(ctx);
+}
+
+std::any FunctionSemanticsVisitor::visitInvoc(prologParser::InvocContext* ctx) {
+    CHECK_NULL(ctx);
+
+    functionInvoc.insert(ctx->VARIABLE()->getText());
+
+    return visitChildren(ctx);
+}
+
+std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
+    CHECK_NULL(ctx);
+
+    // Divide into vanishing and non vanishing rules.
+
+    if (ctx->tuple_entry().empty()) {
+        return visitChildren(ctx);
+    }
+
+    std::stack<prologParser::Tuple_entryContext*> vanishingRules;
+
+    const auto& tupleEntriesVec = ctx->tuple_entry();
+
+    std::vector<bool> isVanishingVec;
+    isVanishingVec.reserve(tupleEntriesVec.size());
+
+    isVanishingVec[isVanishingVec.size() - 1] = false; // Last element does not have ',' or ';' so its not vanishing 
+
+
+    for(int i = 0 ; i < tupleEntriesVec.size() ; ++i){
+        auto* pEntry  = tupleEntriesVec[i]; 
+        if(isVanishingVec[i]){ // If its vanishing stmt, then the entry must be a binding.
+            if(pEntry->binding() == nullptr){
+                std::cerr << std::format("WARNING: {} is a vanishing statment with no binding", pEntry->getText());
+            }
+        }
+    }
+
+    return visitChildren(ctx);
+}
+
+/**** Static Functions Implementations ****/
+
+static bool entryIsTuple(prologParser::Tuple_entryContext* ctx) {
+    CHECK_NULL(ctx);
+    if (ctx->expr() != nullptr && ctx->expr()->tuple() != nullptr) {
+        return true;
+    }
+    return false;
+}
 
 } // namespace Prolog::Visitors

@@ -6,12 +6,26 @@
 #include "prologParser.h"
 #include "tree/ParseTreeProperty.h"
 #include "tree/TerminalNode.h"
+#include <cstddef>
 #include <cstdint>
 #include <list>
 #include <set>
 #include <variant>
 
 namespace Prolog::Visitors {
+
+struct FunctionSemanticsVisitor : public prologBaseVisitor {
+    std::vector<std::set<std::string>> initializedVars;
+    std::vector<std::map<std::string, std::size_t>> bindedVars; // Func arg or binded.
+
+    std::set<std::string> functionNames;
+    std::set<std::string> functionInvoc;
+
+    std::any visitFunc_def(prologParser::Func_defContext* ctx) override;
+    std::any visitBinding(prologParser::BindingContext* ctx) override;
+    std::any visitInvoc(prologParser::InvocContext* ctx) override;
+    std::any visitTuple(prologParser::TupleContext* ctx) override;
+};
 
 struct VariableSemanticVisitor : public prologBaseVisitor {
     std::any visitVariable(prologParser::VariableContext* ctx) override;
@@ -25,7 +39,8 @@ struct MarkEmptyTuplesVisitor : public prologBaseVisitor {
 };
 
 struct ProgramRestoreVisitor : public prologBaseVisitor {
-
+    std::list<std::list<std::string>> programStmtList = {{}};
+    std::optional<antlr4::tree::ParseTreeProperty<bool>> emptyTuples;
 
     // NOTE: We can use std::variant for a cleaner code for clause/directive
     std::any visitClause(prologParser::ClauseContext* ctx) override;
@@ -35,11 +50,6 @@ struct ProgramRestoreVisitor : public prologBaseVisitor {
     std::any visitTerminal(antlr4::tree::TerminalNode* ctx) override;
 
     std::any visitTuple(prologParser::TupleContext* ctx) override;
-
-    
-    std::list<std::list<std::string>> programStmtList = {{}};
-    std::optional<antlr4::tree::ParseTreeProperty<bool>> emptyTuples;
 };
-
 
 } // namespace Prolog::Visitors

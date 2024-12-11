@@ -59,7 +59,7 @@ termlist
 /**********************Grammar Extention**********************/
 
 
-func_def : VARIABLE func_args '::' tuple '.'; 
+func_def : VARIABLE func_args '::' tuple '.' ; 
 
 func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
 
@@ -79,7 +79,7 @@ expr
     | VARIABLE
     ; 
 
-invoc : VARIABLE tuple;
+invoc : VARIABLE tuple ;
 
 
 term

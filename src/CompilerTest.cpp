@@ -20,6 +20,9 @@ private:
     };
 };
 
+class SemanticsTest {
+};
+
 static SyntaxErrorListener* syntaxTest(const std::filesystem::path& path) {
     antlr4::ANTLRInputStream input;
     std::ifstream targetFile{path};
