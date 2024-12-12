@@ -3,6 +3,7 @@
 #include "gtest/gtest.h"
 #include <algorithm>
 #include <cstddef>
+#include <format>
 #include <iterator>
 
 namespace Prolog::Testing {
@@ -55,7 +56,7 @@ Status SemanticsTest::initTest() {
         if (!setDiff.empty()) {
             status = Status::FAIL;
             auto printUninitVars = [i, &funcsNames](auto&& var) {
-                std::cout << std::format("Variable {} is not initialized in function {} \n",
+                std::cerr << std::format("Variable {} is not initialized in function {} \n",
                                          std::forward<decltype(var)>(var), funcsNames[i]);
             };
 
@@ -64,6 +65,49 @@ Status SemanticsTest::initTest() {
     }
 
     return status;
+}
+
+Status SemanticsTest::bindingTest() {
+    auto pFuncV = getFunctionSemanticsData();
+
+    auto& bindedVars = pFuncV->bindedVars;
+    auto& funcsNames = pFuncV->functionNames;
+
+    EXPECT_EQ(bindedVars.size(), funcsNames.size());
+
+    auto status = Status::SUCCESS;
+    for (std::size_t i = 0; i < bindedVars.size(); ++i) {
+        for (const auto& [varName, count] : bindedVars[i]) {
+            if (count > 1) {
+                std::cerr << std::format("ERROR: Variable {} in function {} has more than one binding({}).\n", varName,
+                                         funcsNames[i], count);
+                status = Status::FAIL;
+            }
+        }
+    }
+
+    return status;
+}
+
+Status SemanticsTest::funcDefTest() {
+    auto pFuncV = getFunctionSemanticsData();
+
+    auto funcNamesSet = std::set<std::string>(pFuncV->functionNames.begin(), pFuncV->functionNames.end());
+    auto& funcsInvockSet = pFuncV->functionInvoc;
+
+    std::set<std::string> setDiff;
+
+    // Compute funcInvokeSet / funcNamesSet, if its an empty set, then all funcInvokes are legal. 
+    std::set_difference(funcsInvockSet.begin(),funcsInvockSet.end(),funcNamesSet.begin(),funcNamesSet.end(),std::inserter(setDiff, setDiff.end()));
+
+    if(setDiff.empty()){
+        return Status::SUCCESS;
+    }
+
+    for(auto& funcName : setDiff){
+        std::cerr << std::format("ERROR: Function {} is invoked but not defined.\n", funcName); 
+    }
+    return Status::FAIL;
 }
 
 } // namespace Prolog::Testing

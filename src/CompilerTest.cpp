@@ -1,5 +1,6 @@
 #include "Testing.hpp"
 #include "gtest.h"
+#include "gtest/gtest.h"
 
 using namespace Prolog::Testing;
 
@@ -62,6 +63,12 @@ TEST(TwoBindings, SyntaxTest) {
     std::filesystem::path path = std::filesystem::current_path() / ("tests/Issue15TwoBinding.pl");
     auto syntaxErrorListener = getSyntaxTestListenerPtr(path);
     EXPECT_EQ(syntaxErrorListener->getStatus(), Status::SUCCESS);
+}
+
+TEST(TwoBindings, SemanticsTest) {
+    std::filesystem::path path = std::filesystem::current_path() / ("tests/Issue15TwoBinding.pl");
+    SemanticsTest semanticsTest(path);
+    EXPECT_EQ(semanticsTest.bindingTest(), Status::FAIL);
 }
 
 TEST(UninitVars, SyntaxTest) {
