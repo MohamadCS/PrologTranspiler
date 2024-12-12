@@ -2,8 +2,11 @@
 #include "Token.h"
 #include "Utils.hpp"
 #include "prologParser.h"
+#include "support/CPPUtils.h"
 #include "tree/TerminalNode.h"
+#include <cassert>
 #include <cctype>
+#include <deque>
 #include <format>
 #include <map>
 #include <unistd.h>
@@ -126,7 +129,8 @@ std::any FunctionSemanticsVisitor::visitFunc_def(prologParser::Func_defContext* 
 
     bindedVars.push_back({});
     initializedVars.push_back({});
-    funcsVars.push_back({});;
+    funcsVars.push_back({});
+    ;
 
     functionNames.push_back(funcName);
 
@@ -187,15 +191,26 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     const auto& tupleEntriesVec = ctx->tuple_entry();
 
-    std::vector<bool> isVanishingVec;
-    isVanishingVec.reserve(tupleEntriesVec.size());
+    std::deque<bool> isVanishing;
+    for (auto& child : ctx->children) {
+        if (child->getText() == "|") {
+            isVanishing.push_back(true);
+        }
+        if (child->getText() == ",") {
+            isVanishing.push_back(false);
+        }
+    }
+    // Last element does not specify ',' or ';' which means its non-vanishing
 
-    isVanishingVec[isVanishingVec.size() - 1] = false; // Last element does not have ',' or ';' so its not vanishing
+    if (isVanishing.size() < tupleEntriesVec.size()) {
+        isVanishing.push_back(false);
+    }
 
     for (int i = 0; i < tupleEntriesVec.size(); ++i) {
         auto* pEntry = tupleEntriesVec[i];
-        if (isVanishingVec[i]) {
-            if (pEntry->binding() == nullptr) { // Meaning its a term
+        LOG(std::format("Tuple Entry: {} is {}", pEntry->getText(),(isVanishing[i] ? "vanishing" : "non-vanishing")));
+        if (isVanishing[i]) {
+            if (pEntry->expr() != nullptr) { // Meaning its a term
                 vanishingNoBinding.push_back(pEntry->expr());
             }
         }
@@ -207,7 +222,7 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
 std::any FunctionSemanticsVisitor::visitVariable(prologParser::VariableContext* ctx) {
     CHECK_NULL(ctx);
 
-    if(withinFuncCtx){
+    if (withinFuncCtx) {
         funcsVars.back().insert(ctx->getText());
     }
 

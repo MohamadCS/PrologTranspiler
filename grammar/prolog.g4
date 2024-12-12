@@ -63,7 +63,7 @@ func_def : VARIABLE func_args '::' tuple '.' ;
 
 func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
 
-tuple : '(' (tuple_entry ((',' | ';') tuple_entry)*)? ')';
+tuple : '(' ( tuple_entry  ((',' | '|') tuple_entry)*  )?  ('|')?  ')';
 
 tuple_entry 
     : expr
@@ -72,11 +72,11 @@ tuple_entry
 
 binding : VARIABLE '<-' expr ; 
 
+
 expr 
     : tuple 
-    | term
     | invoc
-    | VARIABLE
+    | term
     ; 
 
 invoc : VARIABLE tuple ;
@@ -87,7 +87,6 @@ term
     | '(' term ')' # braced_term
     | '-'? integer # integer_term //TODO: negative case should be covered by unary_operator
     | '-'? FLOAT   # float
-    // structure / compound term
     | atom '(' termlist ')'               # compound_term
     | <assoc = right> term operator_ term # binary_operator
     | operator_ term                      # unary_operator

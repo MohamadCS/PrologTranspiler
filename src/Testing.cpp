@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <format>
+#include <functional>
 #include <iterator>
 
 namespace Prolog::Testing {
@@ -107,6 +108,20 @@ Status SemanticsTest::funcDefTest() {
     for(auto& funcName : setDiff){
         std::cerr << std::format("ERROR: Function {} is invoked but not defined.\n", funcName); 
     }
+    return Status::FAIL;
+}
+
+Status SemanticsTest::vanishingNoBindingTest(){
+    auto pFuncV = getFunctionSemanticsData();
+
+    if(pFuncV->vanishingNoBinding.empty()){
+        return Status::SUCCESS;
+    }
+
+    for(auto& bindingNode : pFuncV->vanishingNoBinding ){
+        std::cout << std::format("ERROR(Useless Code): Vanishing statement {} is not a binding\n", bindingNode->getText());
+    }
+
     return Status::FAIL;
 }
 

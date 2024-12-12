@@ -32,6 +32,7 @@ public:
     Status bindingTest();
     Status initTest();
     Status funcDefTest();
+    Status vanishingNoBindingTest();
 
 private:
     const std::filesystem::path m_targetPath;

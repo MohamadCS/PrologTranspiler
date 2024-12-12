@@ -7,7 +7,7 @@ using namespace Prolog::Testing;
 TEST(FunctionsWithEmptyStmts, SyntaxTest) {
     std::filesystem::path path = std::filesystem::current_path() / ("tests/FunctionsWithEmptyStmts.pl");
     auto syntaxErrorListener = getSyntaxTestListenerPtr(path);
-    EXPECT_EQ(syntaxErrorListener->getStatus(), Status::SUCCESS);
+    EXPECT_EQ(syntaxErrorListener->getStatus(), Status::FAIL);
 }
 
 TEST(FunctionsTuples, SyntaxTest) {
@@ -81,4 +81,21 @@ TEST(UninitVars, SemanticsTest) {
     std::filesystem::path path = std::filesystem::current_path() / ("tests/UninitVars.pl");
     SemanticsTest semanticsTest(path);
     EXPECT_EQ(semanticsTest.initTest(), Status::FAIL);
+}
+
+
+TEST(VanisingNoBinding, SyntaxTest) {
+    std::filesystem::path path = std::filesystem::current_path() / ("tests/VanishingNoBinding.pl");
+    auto syntaxErrorListener = getSyntaxTestListenerPtr(path);
+    EXPECT_EQ(syntaxErrorListener->getStatus(), Status::SUCCESS);
+}
+
+TEST(VanisingNoBinding, SemanticsTest) {
+    std::filesystem::path path = std::filesystem::current_path() / ("tests/VanishingNoBinding.pl");
+    SemanticsTest semanticsTest(path);
+
+    EXPECT_EQ(semanticsTest.initTest(), Status::FAIL);
+    EXPECT_EQ(semanticsTest.funcDefTest(), Status::SUCCESS);
+    EXPECT_EQ(semanticsTest.bindingTest(), Status::SUCCESS);
+    EXPECT_EQ(semanticsTest.vanishingNoBindingTest(), Status::FAIL);
 }
