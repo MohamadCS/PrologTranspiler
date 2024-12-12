@@ -1,13 +1,11 @@
 #pragma once
 
-#include <filesystem>
-#include <fstream>
-#include <list>
-#include <variant>
-
-#include "Utils.hpp"
-
+#include "prologLexer.h"
 #include "prologParser.h"
+#include "tree/ParseTree.h"
+#include <filesystem>
+#include <memory>
+
 namespace Prolog {
 
 /**
@@ -15,6 +13,18 @@ namespace Prolog {
  * @brief Main class of the prolog compiler
  *
  */
+
+struct Parser {
+    Parser(const std::filesystem::path& path);
+    antlr4::tree::ParseTree* getStartingRuleNode() const;
+
+    std::filesystem::path pTargetPath;
+    std::unique_ptr<antlr4::ANTLRInputStream> pInputStream;
+    std::unique_ptr<prologLexer> pLexer;
+    std::unique_ptr<antlr4::CommonTokenStream> pTokenStream;
+    std::unique_ptr<prologParser> pParser;
+};
+
 class Compiler {
 public:
     enum class Flag {

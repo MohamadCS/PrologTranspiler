@@ -119,9 +119,9 @@ clean:
 	$(verb) rm -rf $(TEST_DIR)/output*
 
 .PHONY: test
-test: $(TARGET)
+test: 
 	$(verb) ./$(TARGET) --run-tests
 
 .PHONY: leaks
-leaks: $(TARGET)
+leaks:
 	$(verb) leaks --atExit -- ./$(TARGET) --run-tests

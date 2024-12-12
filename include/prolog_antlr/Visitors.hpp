@@ -17,7 +17,7 @@ namespace Prolog::Visitors {
 
 /**
  * @class FunctionSemanticsVisitor
- * @brief Checks if the semantics of the functions are correct
+ * @brief Provides data about the functions semantics. 
  *
  */
 struct FunctionSemanticsVisitor : public prologBaseVisitor {

@@ -1,4 +1,6 @@
 #include "Compiler.hpp"
+#include "ANTLRInputStream.h"
+#include "Lexer.h"
 #include "Visitors.hpp"
 #include "prologLexer.h"
 #include "prologParser.h"
@@ -93,6 +95,23 @@ void Compiler::compile(const std::filesystem::path& path, const std::set<Flag>& 
     varNumCheck(parser);
     genAst(parser);
     genProlog(parser);
+}
+
+antlr4::tree::ParseTree* Parser::getStartingRuleNode() const{
+    pParser->reset();
+    return pParser->p_text(); 
+}
+
+Parser::Parser(const std::filesystem::path& path)
+    : pTargetPath(path) {
+    std::ifstream targetFile{path};
+    if (!targetFile) {
+        std::cerr << std::format("Error opening the file: {}\n", path.string());
+    }
+    pInputStream = std::make_unique<antlr4::ANTLRInputStream>(targetFile);
+    pLexer = std::make_unique<prologLexer>(pInputStream.get());
+    pTokenStream = std::make_unique<antlr4::CommonTokenStream>(pLexer.get());
+    pParser = std::make_unique<prologParser>(pTokenStream.get());
 }
 
 } // namespace Prolog

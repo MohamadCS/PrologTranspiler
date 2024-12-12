@@ -194,9 +194,9 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     for(int i = 0 ; i < tupleEntriesVec.size() ; ++i){
         auto* pEntry  = tupleEntriesVec[i]; 
-        if(isVanishingVec[i]){ // If its vanishing stmt, then the entry must be a binding.
-            if(pEntry->binding() == nullptr){
-                std::cerr << std::format("WARNING: {} is a vanishing statment with no binding", pEntry->getText());
+        if(isVanishingVec[i]){ 
+            if(pEntry->binding() == nullptr){ // Meaning its a term
+                vanishingNoBinding.push_back(pEntry->expr());
             }
         }
     }
