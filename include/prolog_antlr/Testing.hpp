@@ -1,25 +1,27 @@
-
-#include "Compiler.hpp"
 #include "BaseErrorListener.h"
-#include "Utils.hpp"
+#include "Compiler.hpp"
 #include "Visitors.hpp"
-#include "gtest.h"
-#include "prologLexer.h"
-#include "prologParser.h"
 #include <filesystem>
 #include <memory>
 
+namespace Prolog::Testing {
+enum class Status {
+    ERROR = 0,
+    FAIL,
+    SUCCESS
+};
+
 class SyntaxErrorListener : public antlr4::BaseErrorListener {
 public:
-    bool isError() const {
-        return m_syntaxError;
+    Status getStatus() const {
+        return m_testStatus;
     }
 
 private:
-    bool m_syntaxError = false;
+    Status m_testStatus = Status::SUCCESS;
     void syntaxError(antlr4::Recognizer* recognizer, antlr4::Token* offendingSymbol, size_t line,
                      size_t charPositionInLine, const std::string& msg, std::exception_ptr e) override {
-        m_syntaxError = true;
+        m_testStatus = Status::FAIL;
     };
 };
 
@@ -27,10 +29,14 @@ class SemanticsTest {
 public:
     SemanticsTest(const std::filesystem::path& path);
     std::unique_ptr<Prolog::Visitors::FunctionSemanticsVisitor> getFunctionSemanticsData();
+    Status bindingTest();
+    Status initTest();
+    Status funcDefTest();
 
 private:
     const std::filesystem::path m_targetPath;
-    Prolog::Parser m_parser;
+    Prolog::ParsingManager m_parser;
 };
 
-std::unique_ptr<SyntaxErrorListener> getSyntaxTestListenerPtr(const std::filesystem::path& path) ;
+std::unique_ptr<SyntaxErrorListener> getSyntaxTestListenerPtr(const std::filesystem::path& path);
+}; // namespace Prolog::Testing

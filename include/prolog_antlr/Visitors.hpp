@@ -15,9 +15,11 @@
 
 namespace Prolog::Visitors {
 
+// NOTE: Any functions that begins with "visit" is an ANTLR generated function.
+
 /**
  * @class FunctionSemanticsVisitor
- * @brief Provides data about the functions semantics. 
+ * @brief Provides data about the functions semantics.
  *
  */
 struct FunctionSemanticsVisitor : public prologBaseVisitor {
@@ -29,7 +31,13 @@ struct FunctionSemanticsVisitor : public prologBaseVisitor {
     std::vector<std::set<std::string>> initializedVars;
 
     /**
-     * @brief Each entry in the vector is a for a different function, containing a map 
+     * @brief Each entry in the vector is a for a different function, containing a
+     *  set of all variables that appear in the function.
+     */
+    std::vector<std::set<std::string>> funcsVars; // Func arg or binded.
+
+    /**
+     * @brief Each entry in the vector is a for a different function, containing a map
      * that maps a variable to the number of bindings it has.
      */
     std::vector<std::map<std::string, std::size_t>> bindedVars; // Func arg or binded.
@@ -37,7 +45,7 @@ struct FunctionSemanticsVisitor : public prologBaseVisitor {
     /**
      * @brief A set of the function names.
      */
-    std::set<std::string> functionNames;
+    std::vector<std::string> functionNames;
 
     /**
      * @brief A set of invoked function, even if the function is not defined.
@@ -47,15 +55,18 @@ struct FunctionSemanticsVisitor : public prologBaseVisitor {
     /**
      * @brief A list of expr's within a vanishing entry context.
      */
-    std::list<antlr4::ParserRuleContext*> vanishingNoBinding; 
+    std::list<antlr4::ParserRuleContext*> vanishingNoBinding;
+
+    bool withinFuncCtx = false;
 
     std::any visitFunc_def(prologParser::Func_defContext* ctx) override;
     std::any visitBinding(prologParser::BindingContext* ctx) override;
     std::any visitInvoc(prologParser::InvocContext* ctx) override;
     std::any visitTuple(prologParser::TupleContext* ctx) override;
+    std::any visitVariable(prologParser::VariableContext* ctx) override;
 };
 
-// TODO: Delete this class. 
+// TODO: Delete this class.
 struct VariableSemanticVisitor : public prologBaseVisitor {
     std::any visitVariable(prologParser::VariableContext* ctx) override;
 
@@ -65,8 +76,8 @@ struct VariableSemanticVisitor : public prologBaseVisitor {
 
 struct MarkEmptyTuplesVisitor : public prologBaseVisitor {
     /**
-     * @brief A property that gives wither a tuple is empty or not. 
-     * An empty tuple is '()', or a tuple of empty tuples. 
+     * @brief A property that gives wither a tuple is empty or not.
+     * An empty tuple is '()', or a tuple of empty tuples.
      */
     antlr4::tree::ParseTreeProperty<bool> emptyTuples;
 

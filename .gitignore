@@ -6,3 +6,4 @@ build.out
 compile_commands.json
 *.o
 .project
+prog

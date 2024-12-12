@@ -14,8 +14,8 @@ namespace Prolog {
  *
  */
 
-struct Parser {
-    Parser(const std::filesystem::path& path);
+struct ParsingManager {
+    ParsingManager(const std::filesystem::path& path);
     antlr4::tree::ParseTree* getStartingRuleNode() const;
 
     std::filesystem::path pTargetPath;

@@ -5,8 +5,6 @@
 #include "tree/TerminalNode.h"
 #include <cctype>
 #include <format>
-#include <functional>
-#include <iterator>
 #include <map>
 #include <unistd.h>
 
@@ -118,8 +116,6 @@ std::any MarkEmptyTuplesVisitor::visitTuple(prologParser::TupleContext* ctx) {
     }
 
     emptyTuples.put(ctx, isEmpty);
-
-    LOG(std::format("{}: {}", (isEmpty) ? "Empty" : "Not Empty", ctx->getText()));
     return {};
 };
 
@@ -130,15 +126,20 @@ std::any FunctionSemanticsVisitor::visitFunc_def(prologParser::Func_defContext* 
 
     bindedVars.push_back({});
     initializedVars.push_back({});
-    functionNames.insert(funcName);
+    funcsVars.push_back({});;
+
+    functionNames.push_back(funcName);
 
     const auto& argsVec = ctx->func_args()->VARIABLE();
     // Every argument variable is initialized.
     for (auto* pFuncArg : argsVec) {
         initializedVars.back().insert(pFuncArg->getText());
+        funcsVars.back().insert(pFuncArg->getText());
     }
-
-    return visitChildren(ctx);
+    withinFuncCtx = true;
+    visitChildren(ctx);
+    withinFuncCtx = false;
+    return {};
 }
 
 std::any FunctionSemanticsVisitor::visitBinding(prologParser::BindingContext* ctx) {
@@ -189,16 +190,25 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
     std::vector<bool> isVanishingVec;
     isVanishingVec.reserve(tupleEntriesVec.size());
 
-    isVanishingVec[isVanishingVec.size() - 1] = false; // Last element does not have ',' or ';' so its not vanishing 
+    isVanishingVec[isVanishingVec.size() - 1] = false; // Last element does not have ',' or ';' so its not vanishing
 
-
-    for(int i = 0 ; i < tupleEntriesVec.size() ; ++i){
-        auto* pEntry  = tupleEntriesVec[i]; 
-        if(isVanishingVec[i]){ 
-            if(pEntry->binding() == nullptr){ // Meaning its a term
+    for (int i = 0; i < tupleEntriesVec.size(); ++i) {
+        auto* pEntry = tupleEntriesVec[i];
+        if (isVanishingVec[i]) {
+            if (pEntry->binding() == nullptr) { // Meaning its a term
                 vanishingNoBinding.push_back(pEntry->expr());
             }
         }
+    }
+
+    return visitChildren(ctx);
+}
+
+std::any FunctionSemanticsVisitor::visitVariable(prologParser::VariableContext* ctx) {
+    CHECK_NULL(ctx);
+
+    if(withinFuncCtx){
+        funcsVars.back().insert(ctx->getText());
     }
 
     return visitChildren(ctx);

@@ -78,31 +78,21 @@ void Compiler::varNumCheck(prologParser& parser) {
 
 void Compiler::compile(const std::filesystem::path& path, const std::set<Flag>& flags) {
     m_targetPath = path;
+    auto parsingManager = ParsingManager(path);
 
-    std::ifstream targetFile{path};
-
-    if (!targetFile) {
-        std::cerr << std::format("Error opening the file: {}\n", path.string());
-        exit(-1);
-    }
-
-    antlr4::ANTLRInputStream input(targetFile);
-    prologLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    prologParser parser(&tokens);
-
+    auto* pParser = parsingManager.pParser.get(); 
     // PERF: Maybe we can change the implementation to some map: Flag -> Func.
-    varNumCheck(parser);
-    genAst(parser);
-    genProlog(parser);
+    varNumCheck(*pParser);
+    genAst(*pParser);
+    genProlog(*pParser);
 }
 
-antlr4::tree::ParseTree* Parser::getStartingRuleNode() const{
+antlr4::tree::ParseTree* ParsingManager::getStartingRuleNode() const{
     pParser->reset();
     return pParser->p_text(); 
 }
 
-Parser::Parser(const std::filesystem::path& path)
+ParsingManager::ParsingManager(const std::filesystem::path& path)
     : pTargetPath(path) {
     std::ifstream targetFile{path};
     if (!targetFile) {
