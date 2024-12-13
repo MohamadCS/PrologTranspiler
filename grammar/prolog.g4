@@ -37,6 +37,10 @@ grammar prolog;
 
 // Prolog text and data formed from terms (6.2)
 
+
+@members{
+    int tupleCount = 0;
+}
 p_text
     : (func_def | directive | clause)* EOF
     ;
@@ -63,10 +67,11 @@ func_def : VARIABLE func_args '::' tuple '.' ;
 
 func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
 
-tuple : '(' ( tuple_entry  ((',' | '|') tuple_entry)*  )?  ('|')?  ')';
+tuple : {++tupleCount;}'(' ( tuple_entry  ((',' | ';') tuple_entry)*  )?  (';')?  ')' {--tupleCount;};
+
 
 tuple_entry 
-    : expr
+    : expr 
     | binding
     ;
 
@@ -77,6 +82,7 @@ expr
     : tuple 
     | invoc
     | term
+    // Removed Variable, since term already produces it.
     ; 
 
 invoc : VARIABLE tuple ;
@@ -84,7 +90,7 @@ invoc : VARIABLE tuple ;
 
 term
     : VARIABLE     # variable
-    | '(' term ')' # braced_term
+    // | '(' term ')' # braced_term // I think that should reduce to tuple in our implemenation.
     | '-'? integer # integer_term //TODO: negative case should be covered by unary_operator
     | '-'? FLOAT   # float
     | atom '(' termlist ')'               # compound_term
@@ -94,12 +100,6 @@ term
     | '{' termlist '}'                    # curly_bracketed_term
     | atom                                # atom_term
     ;
-
-/*
- *   tuple(L); if L is a list of tuple_entries
- *   tuple([]).
- *   tuple(Head|Tail) :- tuple_entry(Tail), tuple_enries(Tail)).
- */
 
 /*****************************/
 
@@ -114,9 +114,9 @@ operator_
     | 'multifile'
     | 'discontiguous'
     | 'public' //TODO: move operators used in directives to "built-in" definition of dialect
-    | ';'
+    |{tupleCount == 0}? ';'
     | '->'
-    | ','
+    |{tupleCount == 0}? ','
     | '\\+'
     | '='
     | '\\='

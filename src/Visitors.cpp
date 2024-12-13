@@ -193,7 +193,7 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     std::deque<bool> isVanishing;
     for (auto& child : ctx->children) {
-        if (child->getText() == "|") {
+        if (child->getText() == ";") {
             isVanishing.push_back(true);
         }
         if (child->getText() == ",") {
@@ -208,7 +208,7 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     for (int i = 0; i < tupleEntriesVec.size(); ++i) {
         auto* pEntry = tupleEntriesVec[i];
-        LOG(std::format("Tuple Entry: {} is {}", pEntry->getText(),(isVanishing[i] ? "vanishing" : "non-vanishing")));
+        // LOG(std::format("Tuple Entry: {} is {}", pEntry->getText(),(isVanishing[i] ? "vanishing" : "non-vanishing")));
         if (isVanishing[i]) {
             if (pEntry->expr() != nullptr) { // Meaning its a term
                 vanishingNoBinding.push_back(pEntry->expr());
