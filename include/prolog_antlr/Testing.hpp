@@ -28,10 +28,34 @@ private:
 class SemanticsTest {
 public:
     SemanticsTest(const std::filesystem::path& path);
+
+    /**
+     * @brief Applies FunctionSemanticsVisitor and returns a pointer to it.
+     */
     std::unique_ptr<Prolog::Visitors::FunctionSemanticsVisitor> getFunctionSemanticsData();
+    /**
+     * @brief Tests if each variable was binded at most once.
+     * @return Status::FAIL if some variable was binded more than one time,
+     * otherwise Status::SUCCESS.
+     */
     Status bindingTest();
+    /**
+     * @brief Tests if each variable in a function definition was initialized(A
+     * function arg or binded).
+     * @return Status::FAIL if some variable was not initialized,
+     * otherwise Status::SUCCESS.
+     */
     Status initTest();
+    /**
+     * @brief Tests if each function invocation has a function definition somewhere. 
+     * @return 
+     */
     Status funcDefTest();
+    /**
+     * @brief Tests if each vanishing statement in a Tuple(Ending with ';') is a binding
+     *
+     * @return 
+     */
     Status vanishingNoBindingTest();
 
 private:
