@@ -39,8 +39,9 @@ grammar prolog;
 
 
 @members{
-    int tupleCount = 0;
+    std::size_t tupleCount = 0; // 0 iff we are not in a tuple.
 }
+
 p_text
     : (func_def | directive | clause)* EOF
     ;
@@ -61,7 +62,6 @@ termlist
     ;
 
 /**********************Grammar Extention**********************/
-
 
 func_def : VARIABLE func_args '::' tuple '.' ; 
 
@@ -114,9 +114,9 @@ operator_
     | 'multifile'
     | 'discontiguous'
     | 'public' //TODO: move operators used in directives to "built-in" definition of dialect
-    |{tupleCount == 0}? ';'
+    | {tupleCount == 0}? ';' // If we are in a tuple then stop parsing the as an operator rule.
     | '->'
-    |{tupleCount == 0}? ','
+    | {tupleCount == 0}? ',' // If we are in a tuple then stop parsing the as an operator rule. 
     | '\\+'
     | '='
     | '\\='

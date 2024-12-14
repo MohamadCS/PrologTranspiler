@@ -56,7 +56,7 @@ BUILD_DIR := $(ROOT)/build
 GRAMMAR_DIR := $(ROOT)/grammar
 INCLUDE_DIRS := \
     -I $(ROOT)/include \
-	-I $(ROOT)/include/prolog_antlr \
+	-I $(ROOT)/include/prolog \
     -I $(ROOT)/include/antlr4-runtime \
     -I $(ROOT)/include/gtest \
 	-I $(BUILD_DIR)/include
@@ -112,11 +112,11 @@ BUILD_DIRS:
 .PHONY: clean
 clean:
 
-	$(verb) rm $(TEST_DIR)/*.out
-	$(verb) rm $(TEST_DIR)/*_ast.out
 	$(brief)
-	$(verb) rm -rf $(BUILD_DIR)/* $(TARGET)
-	$(verb) rm -rf $(TEST_DIR)/output*
+	$(verb) rm -rf $(BUILD_DIR)/* $(TARGET) 2> /dev/null
+	$(verb) rm -rf $(TEST_DIR)/output* 2> /dev/null
+	$(verb) rm -rf $(TEST_DIR)/*.out 2> /dev/null
+	$(verb) rm -rf $(TEST_DIR)/*_ast.out 2> /dev/null
 
 .PHONY: test
 test: 
