@@ -57,21 +57,14 @@ struct FunctionSemanticsVisitor : public prologBaseVisitor {
      */
     std::list<antlr4::ParserRuleContext*> vanishingNoBinding;
 
-    bool withinFuncCtx = false;
-
     std::any visitFunc_def(prologParser::Func_defContext* ctx) override;
     std::any visitBinding(prologParser::BindingContext* ctx) override;
     std::any visitInvoc(prologParser::InvocContext* ctx) override;
     std::any visitTuple(prologParser::TupleContext* ctx) override;
     std::any visitVariable(prologParser::VariableContext* ctx) override;
-};
 
-// TODO: Delete this class.
-struct VariableSemanticVisitor : public prologBaseVisitor {
-    std::any visitVariable(prologParser::VariableContext* ctx) override;
-
-    std::map<std::string, std::uint8_t> varTbl;
-    static constexpr std::size_t VAR_COUNT = 2;
+private:
+    bool m_withinFuncCtx = false;
 };
 
 struct MarkEmptyTuplesVisitor : public prologBaseVisitor {
@@ -106,4 +99,12 @@ struct ProgramRestoreVisitor : public prologBaseVisitor {
     std::any visitTuple(prologParser::TupleContext* ctx) override;
 };
 
+// TODO: Delete this class.
+// struct VariableSemanticVisitor : public prologBaseVisitor {
+//     std::any visitVariable(prologParser::VariableContext* ctx) override;
+//
+//     std::map<std::string, std::uint8_t> varTbl;
+//     static constexpr std::size_t VAR_COUNT = 2;
+// };
+//
 } // namespace Prolog::Visitors
