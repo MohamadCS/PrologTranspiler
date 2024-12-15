@@ -41,7 +41,7 @@ void Compiler::genProlog(prologParser& parser) {
     }
 }
 
-void Compiler::checkSemantics() const {
+inline void Compiler::checkSemantics() const {
     SemanticChecker semanticChecker(m_targetPath);
     semanticChecker.checkUniqueBinding();
     semanticChecker.checkFuncInitVariables();
@@ -49,7 +49,7 @@ void Compiler::checkSemantics() const {
     semanticChecker.checkVanishingImpliesBinding();
 }
 
-void Compiler::compile(const std::filesystem::path& path, const std::set<Flag>& flags) {
+void Compiler::compile(const std::filesystem::path& path) {
     m_targetPath = path;
     auto parsingManager = ParsingManager(path);
 

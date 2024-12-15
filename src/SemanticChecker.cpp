@@ -1,5 +1,4 @@
 #include "SemanticChecker.hpp"
-#include "Utils.hpp"
 #include <functional>
 
 namespace Prolog {
@@ -65,7 +64,7 @@ SemanticChecker::Status SemanticChecker::checkUniqueBinding() const {
     return status;
 }
 
-SemanticChecker::Status SemanticChecker::checkInvocImpliesDefine() const{
+SemanticChecker::Status SemanticChecker::checkInvocImpliesDefine() const {
 
     auto funcNamesSet = std::set<std::string>(m_funcV.functionNames.begin(), m_funcV.functionNames.end());
     auto& funcsInvockSet = m_funcV.functionInvoc;
@@ -80,22 +79,21 @@ SemanticChecker::Status SemanticChecker::checkInvocImpliesDefine() const{
         return Status::SUCCESS;
     }
 
-    for (auto& funcName : setDiff) {
+    for (const auto& funcName : setDiff) {
         std::cerr << std::format("ERROR: Function {} is invoked but not defined.\n", funcName);
     }
 
     return Status::FAIL;
 }
 
-SemanticChecker::Status SemanticChecker::checkVanishingImpliesBinding() const{
+SemanticChecker::Status SemanticChecker::checkVanishingImpliesBinding() const {
 
     if (m_funcV.vanishingNoBinding.empty()) {
         return Status::SUCCESS;
     }
 
     for (auto& bindingNode : m_funcV.vanishingNoBinding) {
-        std::cerr << std::format("WARNING: Vanishing statement {} is not a binding.\n",
-                                 bindingNode->getText());
+        std::cerr << std::format("WARNING: Vanishing statement {} is not a binding.\n", bindingNode->getText());
     }
 
     return Status::FAIL;

@@ -43,7 +43,7 @@ public:
      */
     Status checkVanishingImpliesBinding() const;
 
-    const Visitors::FunctionSemanticsVisitor& getFuncVisitor() const;
+    [[nodiscard]] const Visitors::FunctionSemanticsVisitor& getFuncVisitor() const;
 
 protected:
     const std::filesystem::path m_targetPath;

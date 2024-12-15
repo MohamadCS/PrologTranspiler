@@ -2,7 +2,7 @@
 
 # Compiler and Linker Options
 export CXX := clang++
-export CXXFLAGS := -Wall -std=c++2b $(GTEST_FLAGS) -g
+export CXXFLAGS := -Wall -std=c++23 $(GTEST_FLAGS) -g
 export ANTLR_CMD := antlr -Dlanguage=Cpp -visitor
 export GTEST_FLAGS := -lgtest -lgtest_main -pthread
 
@@ -59,6 +59,7 @@ INCLUDE_DIRS := \
 	-I $(ROOT)/include/prolog \
     -I $(ROOT)/include/antlr4-runtime \
     -I $(ROOT)/include/gtest \
+    -I $(ROOT)/include/CLI \
 	-I $(BUILD_DIR)/include
 
 # Build Directory, Don't Change!!

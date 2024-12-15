@@ -2,12 +2,10 @@
 #include "Token.h"
 #include "Utils.hpp"
 #include "prologParser.h"
-#include "support/CPPUtils.h"
 #include "tree/TerminalNode.h"
 #include <cassert>
 #include <cctype>
 #include <deque>
-#include <format>
 #include <map>
 #include <unistd.h>
 
@@ -78,25 +76,6 @@ std::any ProgramRestoreVisitor::visitTuple(prologParser::TupleContext* ctx) {
     return {};
 };
 
-std::any VariableSemanticVisitor::visitVariable(prologParser::VariableContext* ctx) {
-    CHECK_NULL(ctx);
-
-    const std::string& varName = ctx->getText();
-
-    if (varName == "_") {
-        return visitChildren(ctx);
-    }
-
-    if (auto it = varTbl.find(varName); it != varTbl.end()) {
-        auto& [_, count] = *it;
-        ++count;
-    } else {
-        varTbl.insert({varName, 1});
-    }
-
-    return visitChildren(ctx);
-}
-
 std::any MarkEmptyTuplesVisitor::visitTuple(prologParser::TupleContext* ctx) {
     CHECK_NULL(ctx);
 
@@ -140,9 +119,10 @@ std::any FunctionSemanticsVisitor::visitFunc_def(prologParser::Func_defContext* 
         initializedVars.back().insert(pFuncArg->getText());
         funcsVars.back().insert(pFuncArg->getText());
     }
-    withinFuncCtx = true;
+
+    m_withinFuncCtx = true;
     visitChildren(ctx);
-    withinFuncCtx = false;
+    m_withinFuncCtx = false;
     return {};
 }
 
@@ -155,7 +135,7 @@ std::any FunctionSemanticsVisitor::visitBinding(prologParser::BindingContext* ct
     const std::string& varName = targetVar->getSymbol()->getText();
 
     // First binding
-    if (auto it = bindedVars.back().find(varName); it != bindedVars.back().end()) {
+    if (auto it = bindedVars.back().find(varName); it != bindedVars.back().end()) [[likely]] {
         auto& [_, count] = *it;
         count++;
     } else /* Was binded before*/ { // We can print an error, better to just record it then check in unit tests.
@@ -208,7 +188,8 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     for (int i = 0; i < tupleEntriesVec.size(); ++i) {
         auto* pEntry = tupleEntriesVec[i];
-        // LOG(std::format("Tuple Entry: {} is {}", pEntry->getText(),(isVanishing[i] ? "vanishing" : "non-vanishing")));
+        // LOG(std::format("Tuple Entry: {} is {}", pEntry->getText(),(isVanishing[i] ? "vanishing" :
+        // "non-vanishing")));
         if (isVanishing[i]) {
             if (pEntry->expr() != nullptr) { // Meaning its a term
                 vanishingNoBinding.push_back(pEntry->expr());
@@ -222,12 +203,31 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
 std::any FunctionSemanticsVisitor::visitVariable(prologParser::VariableContext* ctx) {
     CHECK_NULL(ctx);
 
-    if (withinFuncCtx) {
+    if (m_withinFuncCtx) {
         funcsVars.back().insert(ctx->getText());
     }
 
     return visitChildren(ctx);
 }
+
+// std::any VariableSemanticVisitor::visitVariable(prologParser::VariableContext* ctx) {
+//     CHECK_NULL(ctx);
+//
+//     const std::string& varName = ctx->getText();
+//
+//     if (varName == "_") {
+//         return visitChildren(ctx);
+//     }
+//
+//     if (auto it = varTbl.find(varName); it != varTbl.end()) {
+//         auto& [_, count] = *it;
+//         ++count;
+//     } else {
+//         varTbl.insert({varName, 1});
+//     }
+//
+//     return visitChildren(ctx);
+// }
 
 /**** Static Functions Implementations ****/
 
