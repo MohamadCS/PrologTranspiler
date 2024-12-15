@@ -55,6 +55,7 @@ inline void Compiler::checkSemantics() const {
     semanticChecker.checkFuncInitVariables();
     semanticChecker.checkInvocImpliesDefine();
     semanticChecker.checkVanishingImpliesBinding();
+    semanticChecker.checkUniqueFuncDef();
 }
 
 void Compiler::compile(const std::filesystem::path& path, const std::optional<std::filesystem::path>& outputPath) {

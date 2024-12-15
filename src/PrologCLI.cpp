@@ -4,6 +4,7 @@
 #include "Compiler.hpp"
 
 #include "gtest.h"
+#include <optional>
 namespace Prolog {
 
 CLITool::CLITool()
@@ -12,7 +13,8 @@ CLITool::CLITool()
 
 int CLITool::run(int argc, const char** argv) {
 
-    std::filesystem::path inputPath, outputPath;
+    std::filesystem::path inputPath;
+    std::optional<std::filesystem::path> outputPath;
     auto* pInputFlagOpt =
         m_app.add_option(CLITool::INPUT_FLAG, inputPath, "Input file path to compile")->check(CLI::ExistingFile);
 
@@ -24,9 +26,9 @@ int CLITool::run(int argc, const char** argv) {
     m_app.add_flag(CLITool::WARNING_AS_ERRORS_FLAG, warningsAsErrors, "Treat warnings as errors");
 
     CLI11_PARSE(m_app, argc, argv);
-    Prolog::Compiler compiler;
 
     if (pInputFlagOpt->count()) {
+        Prolog::Compiler compiler;
         compiler.compile(inputPath,outputPath);
     }
 

@@ -43,6 +43,12 @@ public:
      */
     Status checkVanishingImpliesBinding() const;
 
+    /**
+     * @brief Checks if each function is defined once.
+     * @return 
+     */
+    Status checkUniqueFuncDef() const;
+
     [[nodiscard]] const Visitors::FunctionSemanticsVisitor& getFuncVisitor() const;
 
 protected:

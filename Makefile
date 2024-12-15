@@ -121,7 +121,7 @@ clean:
 
 .PHONY: test
 test: 
-	$(verb) ./$(TARGET) --run-tests
+	$(verb) ./$(TARGET) --run-tests 2> /dev/null  
 
 .PHONY: leaks
 leaks:

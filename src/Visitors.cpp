@@ -109,14 +109,16 @@ std::any FunctionSemanticsVisitor::visitFunc_def(prologParser::Func_defContext* 
     bindedVars.push_back({});
     initializedVars.push_back({});
     funcsVars.push_back({});
-    ;
 
     functionNames.push_back(funcName);
 
     const auto& argsVec = ctx->func_args()->VARIABLE();
     // Every argument variable is initialized.
+    initializedVars.back().insert(ctx->VARIABLE()->getText());
+    funcsVars.back().insert(ctx->VARIABLE()->getText());
+
     for (auto* pFuncArg : argsVec) {
-        initializedVars.back().insert(pFuncArg->getText());
+        initializedVars.back().emplace(pFuncArg->getText());
         funcsVars.back().insert(pFuncArg->getText());
     }
 

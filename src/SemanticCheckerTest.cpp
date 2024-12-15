@@ -49,4 +49,12 @@ TEST(VanisingNoBinding, SemanticsTest) {
 }
 
 
+TEST(DoubleFuncDef, SemanticsTest) {
+    std::filesystem::path path = std::filesystem::current_path() / ("tests/DoubleFuncDef.pl");
+    SemanticChecker semanticChecker(path);
+    testFuncVisitorValidity(semanticChecker.getFuncVisitor());
+
+    EXPECT_EQ(semanticChecker.checkUniqueFuncDef(), SemanticChecker::Status::FAIL);
+}
+
 }; // namespace Prolog::Testing

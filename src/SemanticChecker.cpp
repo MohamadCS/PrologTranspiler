@@ -1,5 +1,4 @@
 #include "SemanticChecker.hpp"
-#include <functional>
 
 namespace Prolog {
 SemanticChecker::SemanticChecker(const std::filesystem::path& targetPath)
@@ -97,6 +96,24 @@ SemanticChecker::Status SemanticChecker::checkVanishingImpliesBinding() const {
     }
 
     return Status::FAIL;
+}
+
+SemanticChecker::Status SemanticChecker::checkUniqueFuncDef() const {
+    auto& funcsNameVec = m_funcV.functionNames;
+
+    std::set<std::string> funcsNamesSet;
+    Status status = Status::SUCCESS;
+
+    for (auto& funcName : funcsNameVec) {
+        if (funcsNamesSet.find(funcName) != funcsNamesSet.end()) {
+            status = Status::FAIL;
+            std::cerr << std::format("ERROR: Function {} is already defined.\n", funcName);
+        } else{
+            funcsNamesSet.insert(funcName);
+        }
+    }
+
+    return status;
 }
 
 }; // namespace Prolog
