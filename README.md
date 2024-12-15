@@ -3,6 +3,7 @@
 
 ```bash
 make 
-./prog <target> # Prolog -> Prolog
-./prog --run-tests # Runs the tests defined in src/*Test.cpp
+./prog -i <input_file> -o <output_file>
+./prog --run_tests
+
 ```

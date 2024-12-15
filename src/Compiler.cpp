@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <optional>
 #include <util.h>
 #include <utility>
 
@@ -20,12 +21,19 @@ void Compiler::genProlog(prologParser& parser) {
 
     markEmptyTuplesV.visit(programStartCtx);
 
-    progRestoreV.emptyTuples = markEmptyTuplesV.emptyTuples;
+    // progRestoreV.emptyTuples = markEmptyTuplesV.emptyTuples;
     progRestoreV.visit(programStartCtx);
     auto progList = progRestoreV.programStmtList;
 
-    auto outputPath = m_targetPath;
-    outputPath.replace_extension("").concat("_out.pl");
+    std::filesystem::path outputPath;
+
+    if(m_outputPath.has_value()){
+        outputPath = m_outputPath.value();
+    } else{
+        outputPath = m_targetPath;
+        outputPath.replace_extension("").concat("_out.pl");
+    }
+
 
     std::ofstream outputFile(outputPath);
 
@@ -49,16 +57,20 @@ inline void Compiler::checkSemantics() const {
     semanticChecker.checkVanishingImpliesBinding();
 }
 
-void Compiler::compile(const std::filesystem::path& path) {
+void Compiler::compile(const std::filesystem::path& path, const std::optional<std::filesystem::path>& outputPath) {
     m_targetPath = path;
+    m_outputPath = outputPath;
     auto parsingManager = ParsingManager(path);
 
-    SyntaxChecker(path).checkSyntax();
+    if(SyntaxChecker(path).checkSyntax() == SyntaxChecker::Status::FAIL){
+        std::cerr << "ERROR: Invalid Syntax\n";
+        exit(-1);
+    }
 
     checkSemantics();
+    genProlog(*parsingManager.pParser);
 }
 
 /**************************************************************************/
-
 
 } // namespace Prolog

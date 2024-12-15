@@ -27,10 +27,12 @@ public:
      * @param pathToTheFile: path to the target file to compile.
      * @param flags
      */
-    void compile(const std::filesystem::path& pathToTheFile);
+    void compile(const std::filesystem::path& pathToTheFile,
+                 const std::optional<std::filesystem::path>& outputPath = std::nullopt);
 
 private:
     std::filesystem::path m_targetPath;
+    std::optional<std::filesystem::path> m_outputPath;
 
     void genProlog(prologParser& parser);
     inline void checkSemantics() const;

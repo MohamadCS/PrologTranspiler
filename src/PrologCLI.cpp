@@ -12,30 +12,30 @@ CLITool::CLITool()
 
 int CLITool::run(int argc, const char** argv) {
 
+    std::filesystem::path inputPath, outputPath;
     auto* pInputFlagOpt =
-        m_app.add_option(CLITool::INPUT_FLAG + ",--input", m_inputPath, "Input file path to compile")->check(CLI::ExistingFile);
+        m_app.add_option(CLITool::INPUT_FLAG, inputPath, "Input file path to compile")->check(CLI::ExistingFile);
 
-    m_app.add_option(CLITool::OUTPUT_FLAG + ",--output", m_outputPath, "Output file path for compiled prolog")
-        ->needs(pInputFlagOpt);
+    m_app.add_option(CLITool::OUTPUT_FLAG, outputPath, "Output file path for compiled prolog")->needs(pInputFlagOpt);
 
-    bool runTests = false,warningsAsErrors = false;
-    m_app.add_flag(CLITool::RUN_TESTS_FLAG + ",-t",runTests ,"Run tests");
-    m_app.add_flag(CLITool::WARNING_AS_ERRORS_FLAG,warningsAsErrors,"Treat warnings as errors");
+    bool runTests = false, warningsAsErrors = false;
+
+    m_app.add_flag(CLITool::RUN_TESTS_FLAG, runTests, "Run tests");
+    m_app.add_flag(CLITool::WARNING_AS_ERRORS_FLAG, warningsAsErrors, "Treat warnings as errors");
 
     CLI11_PARSE(m_app, argc, argv);
     Prolog::Compiler compiler;
 
-    if (m_inputPath.has_value()) {
-        compiler.compile(m_inputPath.value());
+    if (pInputFlagOpt->count()) {
+        compiler.compile(inputPath,outputPath);
     }
 
-    if(runTests){
-        m_app.get_option("-t");
+    if (runTests) {
         testing::InitGoogleTest();
         return RUN_ALL_TESTS();
     }
 
-    if(warningsAsErrors){
+    if (warningsAsErrors) {
     }
 
     return 0;
