@@ -3,7 +3,6 @@
 #include "BaseErrorListener.h"
 #include "ParsingManager.hpp"
 #include <filesystem>
-#include <memory>
 
 namespace Prolog {
 

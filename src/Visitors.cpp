@@ -7,6 +7,7 @@
 #include <cctype>
 #include <deque>
 #include <map>
+#include <optional>
 #include <unistd.h>
 
 namespace Prolog::Visitors {
@@ -186,6 +187,7 @@ std::any FunctionSemanticsVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     if (isVanishing.size() < tupleEntriesVec.size()) {
         isVanishing.push_back(false);
+        std::make_optional(0);
     }
 
     for (int i = 0; i < tupleEntriesVec.size(); ++i) {
