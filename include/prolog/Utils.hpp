@@ -10,9 +10,20 @@
 #define LOG(line)
 #endif
 
-
-#define CHECK_NULL(ptr)   \
-    if (ptr == nullptr) { \
-        LOG("Nullptr"); \
-        throw std::invalid_argument("Null pointer exception"); \
+#define CHECK_NULL(ptr)                                                                                                \
+    if (ptr == nullptr) {                                                                                              \
+        LOG("Nullptr");                                                                                                \
+        throw std::invalid_argument("Null pointer exception");                                                         \
     }
+
+
+
+
+#include "BaseStructs.hpp"
+#include "prologParser.h"
+
+
+
+namespace Prolog::Utility {
+    Prolog::Tuple createTuple(prologParser::TupleContext* ctx);
+}

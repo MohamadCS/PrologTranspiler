@@ -10,7 +10,7 @@ struct ParsingManager {
     antlr4::tree::ParseTree* getStartingRuleNode() const;
     void parse() const;
 
-    std::filesystem::path pTargetPath;
+    std::filesystem::path targetPath;
     std::unique_ptr<antlr4::ANTLRInputStream> pInputStream;
     std::unique_ptr<prologLexer> pLexer;
     std::unique_ptr<antlr4::CommonTokenStream> pTokenStream;

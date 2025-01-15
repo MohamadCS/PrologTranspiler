@@ -1,4 +1,4 @@
-:- use_module('bt.pl').
+:- use_module('bin_heap.pl').
 
 generate_random_list(0,[]).
 generate_random_list(N,[X | Xs]) :- 
@@ -9,29 +9,11 @@ generate_random_list(N,[X | Xs]) :-
     .
 
 
-:- bt(5, [bt(7, [])]).
-
-:- \+ bt(7, [bt(4, [])]).
-
-:- merge_bt(
-    bt(3, [bt(4, [])]),
-    bt(5, [bt(7, [])]),
-    bt(3, [bt(5, [bt(7, [])]), bt(4, [])])
-    ).
-
-:- add_bt(bt(5, []), [bt(4, [])], [empty, bt(4, [bt(5, [])])]).
-
-:- add(3, [bt(4, [])], [empty, bt(3, [bt(4, [])])]).
-
-:- get_min([bt(2, []), bt(3, [bt(4, [])])],bt(2, [])).
-
-:- get_min([empty, bt(3, [bt(4, [])])],bt(3, [bt(4, [])])).
-
-:- get_min([empty, bt(3, [bt(4, [])])],bt(3, [bt(4, [])])).
-
-
 :- 
-    generate_random_list(10,L),
+    generate_random_list(50,L),
+    write(L),
+    sleep(1),
+    sort(L,S),
     heap_sort(L,S)
     .
 

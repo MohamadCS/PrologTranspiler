@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ParsingManager.hpp"
-#include "Visitors.hpp"
+#include "FrontEndVisitors.hpp"
 #include <filesystem>
 
 namespace Prolog {

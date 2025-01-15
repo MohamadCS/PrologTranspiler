@@ -133,7 +133,8 @@ pop_min(X,H,Y) :-
     get_min(H,bt(X,L)),
     remove_bt(bt(X,L),H,R),
     remove_empty(R,R1),
-    add_bt(L,R1,Y)
+    add_bt(L,R1,Y),
+    write("pop_min")
     .
 
 

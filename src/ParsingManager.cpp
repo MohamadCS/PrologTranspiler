@@ -7,7 +7,7 @@ antlr4::tree::ParseTree* ParsingManager::getStartingRuleNode() const {
     return pParser->p_text();
 }
 ParsingManager::ParsingManager(const std::filesystem::path& path)
-    : pTargetPath(path) {
+    : targetPath(path) {
     std::ifstream targetFile{path};
     if (!targetFile) {
         std::cerr << std::format("ERROR: can't open the file {}\n", path.string());

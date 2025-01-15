@@ -12,6 +12,7 @@ SyntaxChecker::SyntaxChecker(const std::filesystem::path& path)
 SyntaxChecker::Status SyntaxChecker::checkSyntax() const {
     auto syntaxErrorListener = SyntaxErrorListener();
     // m_parsingManager.pParser->removeErrorListeners(); 
+    //
 
     m_parsingManager.pParser->addErrorListener(&syntaxErrorListener);
     m_parsingManager.parse(); 

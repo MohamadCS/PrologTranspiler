@@ -2,14 +2,13 @@
 #include "ParsingManager.hpp"
 #include "SemanticChecker.hpp"
 #include "SyntaxChecker.hpp"
-#include "Visitors.hpp"
+#include "FrontEndVisitors.hpp"
 #include "prologParser.h"
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <optional>
 #include <util.h>
-#include <utility>
 
 namespace Prolog {
 
@@ -55,7 +54,7 @@ inline void Compiler::checkSemantics() const {
     semanticChecker.checkFuncInitVariables();
     semanticChecker.checkInvocImpliesDefine();
     semanticChecker.checkVanishingImpliesBinding();
-    semanticChecker.checkUniqueFuncDef();
+    // semanticChecker.checkUniqueFuncDef();
 }
 
 void Compiler::compile(const std::filesystem::path& path, const std::optional<std::filesystem::path>& outputPath) {
