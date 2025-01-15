@@ -18,7 +18,7 @@ struct Predicate {
     std::string returnVar;
 };
 
-struct TupleEntry : public prologParser::Tuple_entryContext {
+struct TupleEntry {
     std::string var;
 };
 

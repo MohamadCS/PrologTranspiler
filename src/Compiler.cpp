@@ -4,6 +4,8 @@
 #include "SyntaxChecker.hpp"
 #include "FrontEndVisitors.hpp"
 #include "prologParser.h"
+#include "CodeGen.hpp"
+
 #include <filesystem>
 #include <format>
 #include <fstream>
@@ -15,14 +17,11 @@ namespace Prolog {
 void Compiler::genProlog(prologParser& parser) {
     parser.reset();
     auto* programStartCtx = parser.p_text();
-    Visitors::ProgramRestoreVisitor progRestoreV;
-    Visitors::MarkEmptyTuplesVisitor markEmptyTuplesV;
 
-    markEmptyTuplesV.visit(programStartCtx);
+    CodeGen::CodeGenVisitor codeGenV;
 
-    // progRestoreV.emptyTuples = markEmptyTuplesV.emptyTuples;
-    progRestoreV.visit(programStartCtx);
-    auto progList = progRestoreV.programStmtList;
+    codeGenV.visit(programStartCtx);
+    auto progList = codeGenV.getCodeBuffer();
 
     std::filesystem::path outputPath;
 
@@ -42,7 +41,7 @@ void Compiler::genProlog(prologParser& parser) {
 
     for (auto& stmtList : progList) {
         for (auto& stmt : stmtList) {
-            outputFile << stmt << " ";
+            outputFile << stmt;
         }
         outputFile << '\n';
     }
@@ -50,10 +49,10 @@ void Compiler::genProlog(prologParser& parser) {
 
 inline void Compiler::checkSemantics() const {
     SemanticChecker semanticChecker(m_targetPath);
-    semanticChecker.checkUniqueBinding();
-    semanticChecker.checkFuncInitVariables();
-    semanticChecker.checkInvocImpliesDefine();
-    semanticChecker.checkVanishingImpliesBinding();
+    // semanticChecker.checkUniqueBinding();
+    // semanticChecker.checkFuncInitVariables();
+    // semanticChecker.checkInvocImpliesDefine();
+    // semanticChecker.checkVanishingImpliesBinding();
     // semanticChecker.checkUniqueFuncDef();
 }
 

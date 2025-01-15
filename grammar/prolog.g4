@@ -82,7 +82,6 @@ expr
     : tuple 
     | invoc
     | term
-    // Removed Variable, since term already produces it.
     ; 
 
 invoc : VARIABLE tuple ;
@@ -127,7 +126,7 @@ operator_
     | '@>'
     | '@>='
     | '=..'
-    | 'is'
+    | ' is '
     | '=:='
     | '=\\='
     | '<'
@@ -142,8 +141,8 @@ operator_
     | '*'
     | '/'
     | '//'
-    | 'rem'
-    | 'mod'
+    | ' rem '
+    | ' mod '
     | '<<'
     | '>>' //TODO: '/' cannot be used as atom because token here not in GRAPHIC. only works because , is operator too. example: swipl/filesex.pl:177
     | '**'

@@ -2,12 +2,11 @@
 #include <vector>
 
 namespace Prolog::Utility {
-Prolog::Tuple createTuple(prologParser::TupleContext* ctx) {
+
+std::deque<bool> isVanishingEntryList(prologParser::TupleContext* ctx) {
 
     const auto& tupleEntriesVec = ctx->tuple_entry();
 
-    std::vector<std::string> vanishingStmts;
-    std::vector<std::string> nonVanishingStmts;
 
     std::deque<bool> isVanishing;
 
@@ -19,23 +18,18 @@ Prolog::Tuple createTuple(prologParser::TupleContext* ctx) {
             isVanishing.push_back(false);
         }
     }
+    DEBUG(print(isVanishing));
 
     // Last element does not specify ',' or ';' which means its non-vanishing
     if (isVanishing.size() < tupleEntriesVec.size()) {
+        LOG("Last does not specify operator");
         isVanishing.push_back(false);
     }
+    DEBUG(print(isVanishing));
 
-    // PERF: reserve storage before filling the vec.
-    for (int i = 0; i < tupleEntriesVec.size(); ++i) {
-        auto* pEntry = tupleEntriesVec[i];
-        if (isVanishing[i]) {
-            vanishingStmts.push_back(pEntry->getText());
-        } else {
-            nonVanishingStmts.push_back(pEntry->getText());
-        }
-    }
+    assert(isVanishing.size() == tupleEntriesVec.size());
 
-    return Prolog::Tuple(std::move(vanishingStmts), std::move(nonVanishingStmts));
+    return isVanishing;
 }
 
 } // namespace Prolog::Utility
