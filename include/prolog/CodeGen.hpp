@@ -12,7 +12,7 @@ namespace Prolog::CodeGen {
 
 struct Node {
     std::string var;
-    bool isTerm = false;
+    bool isVar = false;
 };
 
 struct CodeGenVisitor : public prologBaseVisitor {

@@ -1,11 +1,14 @@
+
+
+
+
+
+    
+
 Max(X,Y) ::(
-    if X >= Y then (
-        R <- X;
-    ) else (
-        R<- Y;
-    );
+    if X >= Y then (R <- X) else (R<- Y);
     R
-)
+   )
 .
 
 
@@ -25,13 +28,6 @@ MaxItem(List) :: (
     );
     R
 ).
-
-
-
-
-
-
-
 
 
 

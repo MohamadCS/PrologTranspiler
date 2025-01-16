@@ -40,6 +40,7 @@ grammar prolog;
 
 @members{
     std::size_t tupleCount = 0; // 0 iff we are not in a tuple.
+    bool insideIfCond = false;
 }
 
 p_text
@@ -69,7 +70,6 @@ func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
 
 tuple : <assoc = left> {++tupleCount;}  '(' ( tuple_entry  ((',' | ';') tuple_entry)*  )?  (';')?  ')' {--tupleCount;};
 
-
 tuple_entry 
     : expr 
     | binding
@@ -79,9 +79,9 @@ tuple_entry
 
 binding : VARIABLE '<-' expr ; 
 
-if: 'if' term 'then' tuple;
+if: 'if' {insideIfCond= true;} term {insideIfCond = false;} 'then' tuple;
 
-if_else: 'if' term 'then' tuple 'else' tuple;
+if_else: 'if' {insideIfCond= true;} term {insideIfCond = false;}'then' tuple 'else' tuple;
 
 expr 
     : tuple 
@@ -91,15 +91,15 @@ expr
 
 invoc : VARIABLE tuple ;
 
-
 term
-    : VARIABLE     # variable
-    // | '(' term ')' # braced_term // I think that should reduce to tuple in our implemenation.
-    | '-'? integer # integer_term //TODO: negative case should be covered by unary_operator
+    : 
+      '(' term ')' # braced_term // I think that should reduce to tuple in our implemenation.
+     |'-'? integer # integer_term //TODO: negative case should be covered by unary_operator
     | '-'? FLOAT   # float
     | atom '(' termlist ')'               # compound_term
     | <assoc = right> term operator_ term # binary_operator
     | operator_ term                      # unary_operator
+    | VARIABLE                            # variable
     | '[' termlist ( '|' term)? ']'       # list_term
     | '{' termlist '}'                    # curly_bracketed_term
     | atom                                # atom_term
@@ -118,9 +118,9 @@ operator_
     | 'multifile'
     | 'discontiguous'
     | 'public' //TODO: move operators used in directives to "built-in" definition of dialect
-    | {tupleCount == 0}? ';' // If we are in a tuple then stop parsing the as an operator rule.
+    | {tupleCount == 0 || insideIfCond }? ';' // If we are in a tuple then stop parsing the as an operator rule.
     | '->'
-    | {tupleCount == 0}? ',' // If we are in a tuple then stop parsing the as an operator rule. 
+    | {tupleCount == 0 || insideIfCond }? ',' // If we are in a tuple then stop parsing the as an operator rule. 
     | '\\+'
     | '='
     | '\\='
@@ -146,8 +146,8 @@ operator_
     | '*'
     | '/'
     | '//'
-    | ' rem '
-    | ' mod '
+    | 'rem'
+    | 'mod'
     | '<<'
     | '>>' //TODO: '/' cannot be used as atom because token here not in GRAPHIC. only works because , is operator too. example: swipl/filesex.pl:177
     | '**'

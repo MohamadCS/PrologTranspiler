@@ -209,6 +209,8 @@ std::any CodeGenVisitor::visitVariable(prologParser::VariableContext* ctx) {
 
     Node node;
 
+    node.isVar = true;
+
     node.var = ctx->getText();
     return node;
 }
@@ -226,6 +228,7 @@ std::any CodeGenVisitor::visitExpr(prologParser::ExprContext* ctx) {
 
     std::any value = visit(ctx->children[0]);
 
+
     // For now, if it does not have value, then its a term but not a variable.
     if (value.has_value()) {
         Node resultNode = std::any_cast<Node>(value);
@@ -233,7 +236,6 @@ std::any CodeGenVisitor::visitExpr(prologParser::ExprContext* ctx) {
         m_codeBuffer.push_back(result);
     } else {
         m_codeBuffer.push_back(std::format("{},", exprStr));
-        node.isTerm = true;
     }
 
     return node;
