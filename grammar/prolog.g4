@@ -57,7 +57,7 @@ clause
 
 // Abstract Syntax (6.3): terms formed from tokens
 
-termlist
+    termlist
     : term (',' term)*
     ;
 
@@ -67,16 +67,21 @@ func_def : VARIABLE func_args '::' tuple '.' ;
 
 func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
 
-tuple : {++tupleCount;}'(' ( tuple_entry  ((',' | ';') tuple_entry)*  )?  (';')?  ')' {--tupleCount;};
+tuple : <assoc = left> {++tupleCount;}  '(' ( tuple_entry  ((',' | ';') tuple_entry)*  )?  (';')?  ')' {--tupleCount;};
 
 
 tuple_entry 
     : expr 
     | binding
+    | if
+    | if_else
     ;
 
 binding : VARIABLE '<-' expr ; 
 
+if: 'if' term 'then' tuple;
+
+if_else: 'if' term 'then' tuple 'else' tuple;
 
 expr 
     : tuple 

@@ -39,6 +39,9 @@ public:
 
     std::any visitExpr(prologParser::ExprContext* ctx) override;
 
+    std::any visitIf(prologParser::IfContext* ctx) override;
+
+    std::any visitIf_else(prologParser::If_elseContext* ctx) override ;
 
 private:
     bool m_withinFuncCtx = false;

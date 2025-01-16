@@ -39,6 +39,42 @@ static std::string funcToPredCode(const std::string& predName, const std::vector
     return result;
 }
 
+std::any CodeGenVisitor::visitIf(prologParser::IfContext* ctx) {
+    CHECK_NULL(ctx);
+
+    auto* conditionTerm = ctx->term();
+    m_codeBuffer.push_back(std::format("{} -> (", conditionTerm->getText()));
+
+    Node tupleNode = std::any_cast<Node>(visit(ctx->tuple()));
+
+    m_codeBuffer.push_back(" true;true),");
+
+    return tupleNode;
+}
+
+std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
+    CHECK_NULL(ctx);
+
+    Node node;
+    node.var = genVar();
+
+    auto* conditionTerm = ctx->term();
+    m_codeBuffer.push_back(std::format("({} -> (", conditionTerm->getText()));
+
+    auto* ifBodyTuple = ctx->tuple()[0];
+    auto* elseBodyTuple = ctx->tuple()[1];
+
+    Node ifTupleNode = std::any_cast<Node>(visit(ifBodyTuple));
+    m_codeBuffer.push_back(std::format("{} = {})", node.var, ifTupleNode.var));
+    m_codeBuffer.push_back(";(");
+
+    Node elseBodyNode = std::any_cast<Node>(visit(elseBodyTuple));
+    m_codeBuffer.push_back(std::format("{} = {})", node.var, elseBodyNode.var));
+    m_codeBuffer.push_back("),");
+    return node;
+
+}
+
 std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
     CHECK_NULL(ctx);
 
@@ -115,9 +151,16 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
     tupleNode.var = genVar();
 
     auto itemFormatFunc = [](decltype(varValuesVec.begin()) it) { return *it; };
-    m_codeBuffer.push_back(std::format("{} = tpl( {} ),", tupleNode.var,
-                                       Prolog::Utility::convertContainerToListStr<decltype(varValuesVec.begin())>(
-                                           varValuesVec.begin(), varValuesVec.end(), itemFormatFunc)));
+    std::string resultStr;
+
+    if (varValuesVec.size() == 1) {
+        resultStr = std::format("{} = {},", tupleNode.var, varValuesVec[0]);
+    } else {
+        resultStr = std::format("{} = std_tuple( {} ),", tupleNode.var,
+                                Prolog::Utility::convertContainerToListStr<decltype(varValuesVec.begin())>(
+                                    varValuesVec.begin(), varValuesVec.end(), itemFormatFunc));
+    }
+    m_codeBuffer.push_back(resultStr);
 
     return tupleNode;
 }
@@ -183,12 +226,12 @@ std::any CodeGenVisitor::visitExpr(prologParser::ExprContext* ctx) {
 
     std::any value = visit(ctx->children[0]);
 
-    if(value.has_value()){
+    // For now, if it does not have value, then its a term but not a variable.
+    if (value.has_value()) {
         Node resultNode = std::any_cast<Node>(value);
         std::string result = std::format("{} = {},", node.var, resultNode.var);
         m_codeBuffer.push_back(result);
-    }
-    else  {
+    } else {
         m_codeBuffer.push_back(std::format("{},", exprStr));
         node.isTerm = true;
     }
