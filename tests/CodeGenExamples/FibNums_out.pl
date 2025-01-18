@@ -1,4 +1,4 @@
-fib(N,Var0) :- 
+fib1(N,Var0) :- 
 ( (N=0 -> (
 Var1 is 0,
 R = Var1,
@@ -11,10 +11,10 @@ Var4 = tuple(  ),
 true);true)),
 ( (N>1 -> (
 Var5 is N-1,
-fib(Var5,Var6),
+fib1(Var5,Var6),
 F1 = Var6,
 Var7 is N-2,
-fib(Var7,Var8),
+fib1(Var7,Var8),
 F2 = Var8,
 Var9 is F1+F2,
 Var10 = Var9,
@@ -23,4 +23,25 @@ Var11 = tuple(  ),
 true);true)),
 Var12 = R,
 Var0 = Var12
+.
+fib2(N,Var13) :- 
+(N=<1 -> (
+R = N,
+Var15 = tuple(  ),
+Var14 = Var15)
+;(
+Var16 is N-1,
+fib2(Var16,Var17),
+F1 = Var17,
+Var18 is N-2,
+fib2(Var18,Var19),
+F2 = Var19,
+Var20 is F1+F2,
+Var21 = Var20,
+R = Var21,
+Var22 = tuple(  ),
+Var14 = Var22)
+),
+Var23 = R,
+Var13 = Var23
 .

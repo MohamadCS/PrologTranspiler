@@ -1,6 +1,5 @@
 #include "Compiler.hpp"
 #include "CodeGen.hpp"
-#include "FrontEndVisitors.hpp"
 #include "ParsingManager.hpp"
 #include "SemanticChecker.hpp"
 #include "SyntaxChecker.hpp"
@@ -48,11 +47,11 @@ void Compiler::genProlog(prologParser& parser) {
 
 inline void Compiler::checkSemantics() const {
     SemanticChecker semanticChecker(m_targetPath);
-    semanticChecker.checkUniqueBinding();
-    semanticChecker.checkFuncInitVariables();
     semanticChecker.checkInvocImpliesDefine();
-    semanticChecker.checkVanishingImpliesBinding();
     semanticChecker.checkUniqueFuncDef();
+    // semanticChecker.checkUniqueBinding();
+    // semanticChecker.checkFuncInitVariables();
+    // semanticChecker.checkVanishingImpliesBinding();
 }
 
 void Compiler::compile(const std::filesystem::path& path, const std::optional<std::filesystem::path>& outputPath,

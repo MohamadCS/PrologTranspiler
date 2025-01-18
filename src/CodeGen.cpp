@@ -69,12 +69,12 @@ std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
     std::any returnValue;
 
     Node ifRetValue = std::any_cast<Node>(visit(ifBodyTuple));
-    m_codeBuffer.push_back(std::format("{} = {})",node.var,ifRetValue.var));
+    m_codeBuffer.push_back(std::format("{} = {})", node.var, ifRetValue.var));
 
     m_codeBuffer.push_back(";(");
 
     Node elseRetValue = std::any_cast<Node>(visit(elseBodyTuple));
-    m_codeBuffer.push_back(std::format("{} = {})",node.var,elseRetValue.var));
+    m_codeBuffer.push_back(std::format("{} = {})", node.var, elseRetValue.var));
 
     m_codeBuffer.push_back("),");
 
@@ -315,6 +315,30 @@ std::any CodeGenVisitor::visitExpr(prologParser::ExprContext* ctx) {
         m_codeBuffer.push_back(std::format("{},", ctx->getText()));
         return {};
     }
+}
+
+std::any CodeGenVisitor::visitList_term(prologParser::List_termContext* ctx) {
+    CHECK_NULL(ctx);
+
+    Node node;
+
+    node.var = genVar();
+
+    m_codeBuffer.push_back(std::format("{} = {},", node.var, ctx->getText()));
+
+    return node;
+}
+
+std::any CodeGenVisitor::visitCompound_term(prologParser::Compound_termContext* ctx){
+    CHECK_NULL(ctx);
+
+    Node node;
+
+    node.var = genVar();
+
+    m_codeBuffer.push_back(std::format("{} = {},", node.var, ctx->getText()));
+
+    return node;
 }
 
 std::any CodeGenVisitor::visitDirective(prologParser::DirectiveContext* ctx) {

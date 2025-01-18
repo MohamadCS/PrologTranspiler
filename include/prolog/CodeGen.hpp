@@ -47,19 +47,20 @@ public:
 
     std::any visitUnary_operator(prologParser::Unary_operatorContext* ctx) override;
 
-    std::any visitFloat(prologParser::FloatContext* ctx) override; 
+    std::any visitFloat(prologParser::FloatContext* ctx) override;
 
     std::any visitInteger_term(prologParser::Integer_termContext* ctx) override;
 
-    Node generateArithCode(antlr4::RuleContext* ctx);
+    std::any visitList_term(prologParser::List_termContext* ctx) override;
 
+    std::any visitCompound_term(prologParser::Compound_termContext* ctx) override;
+    Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:
     bool m_withinFuncCtx = false;
     std::optional<Prolog::Predicate> m_currentPredicate;
     std::vector<std::string> m_codeBuffer;
     antlr4::tree::ParseTreeProperty<bool> emptyTuples;
-
 
     // Function To Predicate name translation
     std::map<std::string, std::string> m_funcToPred;

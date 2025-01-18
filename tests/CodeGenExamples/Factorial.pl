@@ -1,12 +1,22 @@
 
 
-Factorial(N) ::(
+Factorial1(N) ::(
     if N =< 1 then (
-        R is 1;
+        R <- 1;
     ) else (
-        X <- Factorial(N-1);
-        R is (X * N);
+        X <- Factorial1(N-1);
+        R <- (X * N);
     );
     R
 ).
 
+Factorial2(N) ::(
+    if N =< 1 then (
+        R <- 1;
+        R
+    ) else (
+        X <- Factorial2(N-1);
+        R <- (X * N);
+        R
+    )
+).

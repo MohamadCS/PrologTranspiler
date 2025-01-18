@@ -12,26 +12,27 @@ Var4 = R,
 Var0 = Var4
 .
 maxItem(List,Var5) :- 
-List=[L|Ls],
+Var6 = [L|Ls],
+List = Var6,
 (length(Ls,0) -> (
 R = L,
-Var7 = tuple(  ),
-Var6 = Var7)
+Var8 = tuple(  ),
+Var7 = Var8)
 ;(
-maxItem(Ls,Var8),
-T = Var8,
+maxItem(Ls,Var9),
+T = Var9,
 (T>=L -> (
 R = T,
-Var10 = tuple(  ),
-Var9 = Var10)
+Var11 = tuple(  ),
+Var10 = Var11)
 ;(
 R = L,
-Var11 = tuple(  ),
-Var9 = Var11)
-),
 Var12 = tuple(  ),
-Var6 = Var12)
+Var10 = Var12)
 ),
-Var13 = R,
-Var5 = Var13
+Var13 = tuple(  ),
+Var7 = Var13)
+),
+Var14 = R,
+Var5 = Var14
 .

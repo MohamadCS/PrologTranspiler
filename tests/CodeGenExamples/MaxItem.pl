@@ -10,7 +10,7 @@ Max(X,Y) ::(
 
 
 MaxItem(List) :: (
-    List = [L | Ls];
+    List <- [L | Ls];
     if length(Ls,0) then (
         R <- L;
     ) else(
