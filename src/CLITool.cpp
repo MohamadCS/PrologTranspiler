@@ -19,21 +19,23 @@ int CLITool::run(int argc, const char** argv) {
 
     m_app.add_option(CLITool::OUTPUT_FLAG, outputPath, "Output file path for compiled prolog")->needs(pInputFlagOpt);
 
-    bool runTests = false, warningsAsErrors = false,testStdErr = false;
+    bool runTests = false, warningsAsErrors = false, testStdErr = false, disableSemantics = false;
 
     auto* pTestingFlag = m_app.add_flag(CLITool::RUN_TESTS_FLAG, runTests, "Run tests");
-    m_app.add_flag("--stderr", testStdErr, "Enables program printing during testing")->needs(pTestingFlag);
+    m_app.add_flag(CLITool::DISABLE_STD_ERR, testStdErr, "Enables program printing during testing")
+        ->needs(pTestingFlag);
     m_app.add_flag(CLITool::WARNING_AS_ERRORS_FLAG, warningsAsErrors, "Treat warnings as errors");
+    m_app.add_flag(CLITool::DISABLE_SEMANTICS, disableSemantics, "");
 
     CLI11_PARSE(m_app, argc, argv);
 
     if (pInputFlagOpt->count()) {
         Prolog::Compiler compiler;
-        compiler.compile(inputPath,outputPath);
+        compiler.compile(inputPath, outputPath, disableSemantics);
     }
 
     if (runTests) {
-        if(!testStdErr){
+        if (!testStdErr) {
             testing::internal::CaptureStderr();
         }
         testing::InitGoogleTest();

@@ -1,10 +1,10 @@
 #include "Compiler.hpp"
+#include "CodeGen.hpp"
+#include "FrontEndVisitors.hpp"
 #include "ParsingManager.hpp"
 #include "SemanticChecker.hpp"
 #include "SyntaxChecker.hpp"
-#include "FrontEndVisitors.hpp"
 #include "prologParser.h"
-#include "CodeGen.hpp"
 
 #include <filesystem>
 #include <format>
@@ -25,13 +25,12 @@ void Compiler::genProlog(prologParser& parser) {
 
     std::filesystem::path outputPath;
 
-    if(m_outputPath.has_value()){
+    if (m_outputPath.has_value()) {
         outputPath = m_outputPath.value();
-    } else{
+    } else {
         outputPath = m_targetPath;
         outputPath.replace_extension("").concat("_out.pl");
     }
-
 
     std::ofstream outputFile(outputPath);
 
@@ -49,24 +48,28 @@ void Compiler::genProlog(prologParser& parser) {
 
 inline void Compiler::checkSemantics() const {
     SemanticChecker semanticChecker(m_targetPath);
-    // semanticChecker.checkUniqueBinding();
-    // semanticChecker.checkFuncInitVariables();
-    // semanticChecker.checkInvocImpliesDefine();
-    // semanticChecker.checkVanishingImpliesBinding();
-    // semanticChecker.checkUniqueFuncDef();
+    semanticChecker.checkUniqueBinding();
+    semanticChecker.checkFuncInitVariables();
+    semanticChecker.checkInvocImpliesDefine();
+    semanticChecker.checkVanishingImpliesBinding();
+    semanticChecker.checkUniqueFuncDef();
 }
 
-void Compiler::compile(const std::filesystem::path& path, const std::optional<std::filesystem::path>& outputPath) {
+void Compiler::compile(const std::filesystem::path& path, const std::optional<std::filesystem::path>& outputPath,
+                       bool disableSemantics) {
     m_targetPath = path;
     m_outputPath = outputPath;
     auto parsingManager = ParsingManager(path);
 
-    if(SyntaxChecker(path).checkSyntax() == SyntaxChecker::Status::FAIL){
+    if (SyntaxChecker(path).checkSyntax() == SyntaxChecker::Status::FAIL) {
         std::cerr << "ERROR: Invalid Syntax\n";
         exit(-1);
     }
 
-    checkSemantics();
+    if (!disableSemantics) {
+        checkSemantics();
+    }
+
     genProlog(*parsingManager.pParser);
 }
 

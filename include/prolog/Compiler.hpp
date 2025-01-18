@@ -28,7 +28,7 @@ public:
      * @param flags
      */
     void compile(const std::filesystem::path& pathToTheFile,
-                 const std::optional<std::filesystem::path>& outputPath = std::nullopt);
+                 const std::optional<std::filesystem::path>& outputPath = std::nullopt,bool disableSemantics = false);
 
 private:
     std::filesystem::path m_targetPath;

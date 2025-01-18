@@ -11,14 +11,14 @@ Max(X,Y) ::(
 
 MaxItem(List) :: (
     List = [L | Ls];
-    if (length(Ls,0)) then (
+    if length(Ls,0) then (
         R <- L;
     ) else(
         T <- MaxItem(Ls);
         if T >= L then (
             R <- T;
         ) else (
-                R <- L;
+            R <- L;
         );
     );
     R

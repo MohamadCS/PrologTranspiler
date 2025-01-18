@@ -1,19 +1,16 @@
 factorial(N,Var0) :- 
-(N=:=1;N=:=0 -> (
+(N=<1 -> (
 R is 1,
-Var3 = std_tuple(  ),
-Var1 = Var3)
+Var2 = R,
+Var1 = Var2)
 ;(
-N1 is N-1,
-Var6 = N1,
-factorial(Var6,Var7),
-Var5 = Var7,
-X = Var5,
+Var3 is N-1,
+factorial(Var3,Var4),
+X = Var4,
 R is (X*N),
-Var9 = std_tuple(  ),
-Var1 = Var9)
+Var5 = R,
+Var1 = Var5)
 ),
-Var10 = R,
-Var11 = Var10,
-Var0 = Var11
+Var6 = Var1,
+Var0 = Var6
 .

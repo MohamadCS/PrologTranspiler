@@ -3,6 +3,7 @@
 #include <any>
 #include <cctype>
 #include <format>
+#include <map>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -40,19 +41,20 @@ static std::string funcToPredCode(const std::string& predName, const std::vector
 }
 
 std::any CodeGenVisitor::visitIf(prologParser::IfContext* ctx) {
+    LOG("If");
     CHECK_NULL(ctx);
 
     auto* conditionTerm = ctx->term();
-    m_codeBuffer.push_back(std::format("{} -> (", conditionTerm->getText()));
+    m_codeBuffer.push_back(std::format("( ({} -> (", conditionTerm->getText()));
 
-    Node tupleNode = std::any_cast<Node>(visit(ctx->tuple()));
+    std::any result = visit(ctx->tuple());
+    m_codeBuffer.push_back("true);true)),");
 
-    m_codeBuffer.push_back(" true;true),");
-
-    return tupleNode;
+    return result;
 }
 
 std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
+    LOG("If else");
     CHECK_NULL(ctx);
 
     Node node;
@@ -64,22 +66,26 @@ std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
     auto* ifBodyTuple = ctx->tuple()[0];
     auto* elseBodyTuple = ctx->tuple()[1];
 
-    Node ifTupleNode = std::any_cast<Node>(visit(ifBodyTuple));
-    m_codeBuffer.push_back(std::format("{} = {})", node.var, ifTupleNode.var));
+    std::any returnValue;
+
+    Node ifRetValue = std::any_cast<Node>(visit(ifBodyTuple));
+    m_codeBuffer.push_back(std::format("{} = {})",node.var,ifRetValue.var));
+
     m_codeBuffer.push_back(";(");
 
-    Node elseBodyNode = std::any_cast<Node>(visit(elseBodyTuple));
-    m_codeBuffer.push_back(std::format("{} = {})", node.var, elseBodyNode.var));
-    m_codeBuffer.push_back("),");
-    return node;
+    Node elseRetValue = std::any_cast<Node>(visit(elseBodyTuple));
+    m_codeBuffer.push_back(std::format("{} = {})",node.var,elseRetValue.var));
 
+    m_codeBuffer.push_back("),");
+
+    return node;
 }
 
 std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
+    LOG("Binding");
     CHECK_NULL(ctx);
 
     Node node = std::any_cast<Node>(visit(ctx->expr()));
-
     std::string bindedVarName = ctx->VARIABLE()->getText();
 
     std::string result = std::format("{} = {},", bindedVarName, node.var);
@@ -88,7 +94,6 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
 
     Node bindingNode;
     bindingNode.var = bindedVarName;
-
     return bindingNode;
 }
 
@@ -99,6 +104,7 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
  *
  */
 std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
+    LOG("Invocation");
     CHECK_NULL(ctx);
 
     auto* tuple = ctx->tuple();
@@ -124,7 +130,6 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
         std::format("{}({}),", predicateName,
                     Prolog::Utility::convertContainerToListStr<decltype(predicateArgs.begin())>(
                         predicateArgs.begin(), predicateArgs.end(), itemFormatFunc));
-    LOG(predicateInvoc);
     m_codeBuffer.push_back(predicateInvoc);
 
     return invocNode;
@@ -132,6 +137,7 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
 
 std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
     CHECK_NULL(ctx);
+    LOG("START TUPLE");
 
     const auto isVanishingList = Utility::isVanishingEntryList(ctx);
 
@@ -139,9 +145,11 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     int i = 0;
     std::vector<std::string> varValuesVec;
+
     for (auto* child : ctx->tuple_entry()) {
-        Node value = std::any_cast<Node>(visit(child));
+        std::any returnValue = visit(child);
         if (!isVanishingList[i++]) {
+            Node value = std::any_cast<Node>(returnValue);
             varValuesVec.push_back(value.var);
         }
     }
@@ -151,21 +159,27 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
     tupleNode.var = genVar();
 
     auto itemFormatFunc = [](decltype(varValuesVec.begin()) it) { return *it; };
+
     std::string resultStr;
+
+    // If the tuple is empty then dont store it in a variable, and return an empty node.
 
     if (varValuesVec.size() == 1) {
         resultStr = std::format("{} = {},", tupleNode.var, varValuesVec[0]);
     } else {
-        resultStr = std::format("{} = std_tuple( {} ),", tupleNode.var,
+        resultStr = std::format("{} = tuple( {} ),", tupleNode.var,
                                 Prolog::Utility::convertContainerToListStr<decltype(varValuesVec.begin())>(
                                     varValuesVec.begin(), varValuesVec.end(), itemFormatFunc));
     }
+
     m_codeBuffer.push_back(resultStr);
 
+    LOG("END TUPLE");
     return tupleNode;
 }
 
 std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
+    LOG("Func def");
     CHECK_NULL(ctx);
 
     m_withinFuncCtx = true;
@@ -206,39 +220,101 @@ std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
 
 std::any CodeGenVisitor::visitVariable(prologParser::VariableContext* ctx) {
     CHECK_NULL(ctx);
+    LOG("Var");
 
     Node node;
 
-    node.isVar = true;
-
     node.var = ctx->getText();
+
     return node;
 }
 
-std::any CodeGenVisitor::visitExpr(prologParser::ExprContext* ctx) {
+// TODO: Add the rest of the aithmetic operators.
+static inline bool isArith(const std::string& op) {
+    const std::set<std::string> arithOps{
+        "+",
+        "-",
+        "*",
+    };
+
+    return arithOps.find(op) != arithOps.end();
+}
+std::any CodeGenVisitor::visitBinary_operator(prologParser::Binary_operatorContext* ctx) {
     CHECK_NULL(ctx);
-    // NewVar = Expr,
-    //
+
+    LOG("Bin op");
+    std::string op = ctx->operator_()->getText();
+
+    if (!isArith(op)) {
+        return {};
+    }
 
     Node node;
 
     node.var = genVar();
 
-    std::string exprStr = ctx->getText();
+    std::string arithExp = ctx->getText();
+
+    m_codeBuffer.push_back(std::format("{} is {},", node.var, arithExp));
+
+    return node;
+}
+
+Node CodeGenVisitor::generateArithCode(antlr4::RuleContext* ctx) {
+    Node node;
+
+    node.var = genVar();
+
+    std::string arithExp = ctx->getText();
+
+    m_codeBuffer.push_back(std::format("{} is {},", node.var, arithExp));
+
+    return node;
+}
+
+std::any CodeGenVisitor::visitUnary_operator(prologParser::Unary_operatorContext* ctx) {
+    CHECK_NULL(ctx);
+    LOG("Un op");
+
+    std::string op = ctx->operator_()->getText();
+
+    if (!isArith(op)) {
+        return {};
+    }
+
+    return generateArithCode(ctx);
+}
+
+std::any CodeGenVisitor::visitFloat(prologParser::FloatContext* ctx) {
+    CHECK_NULL(ctx);
+    LOG("Float");
+    return generateArithCode(ctx);
+}
+
+std::any CodeGenVisitor::visitInteger_term(prologParser::Integer_termContext* ctx) {
+    CHECK_NULL(ctx);
+    LOG("Int");
+    return generateArithCode(ctx);
+}
+
+std::any CodeGenVisitor::visitExpr(prologParser::ExprContext* ctx) {
+    CHECK_NULL(ctx);
+    LOG("Expr");
 
     std::any value = visit(ctx->children[0]);
 
-
     // For now, if it does not have value, then its a term but not a variable.
     if (value.has_value()) {
-        Node resultNode = std::any_cast<Node>(value);
-        std::string result = std::format("{} = {},", node.var, resultNode.var);
-        m_codeBuffer.push_back(result);
+        LOG(ctx->getText());
+        LOG("END EXP");
+        return value;
+    } else if (ctx->tuple()) {
+        LOG(ctx->getText());
+        return {};
     } else {
-        m_codeBuffer.push_back(std::format("{},", exprStr));
+        m_codeBuffer.push_back(std::format("{},", ctx->getText()));
+        return {};
     }
-
-    return node;
 }
 
 std::any CodeGenVisitor::visitDirective(prologParser::DirectiveContext* ctx) {

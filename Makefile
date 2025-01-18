@@ -11,7 +11,7 @@ export LD_FLAGS = -L $(LIB_DIR) -l $(DYLIB_NAME) $(GTEST_FLAGS) -Wl,-rpath,@load
 
 ################################################################################
 ### Project Paramaters
-TARGET := prog 
+TARGET := prolog 
 DYLIB_NAME := antlr4-runtime
 GRAMMAR_FILE = $(GRAMMAR_DIR)/prolog.g4
 

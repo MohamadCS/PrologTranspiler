@@ -1,46 +1,37 @@
 max(X,Y,Var0) :- 
 (X>=Y -> (
-Var2 = X,
-R = Var2,
-Var3 = std_tuple(  ),
+R = X,
+Var2 = tuple(  ),
+Var1 = Var2)
+;(
+R = Y,
+Var3 = tuple(  ),
 Var1 = Var3)
-;(
-Var4 = Y,
-R = Var4,
-Var5 = std_tuple(  ),
-Var1 = Var5)
 ),
-Var6 = R,
-Var7 = Var6,
-Var0 = Var7
+Var4 = R,
+Var0 = Var4
 .
-maxItem(List,Var8) :- 
+maxItem(List,Var5) :- 
 List=[L|Ls],
-((length(Ls,0)) -> (
-Var11 = L,
-R = Var11,
-Var12 = std_tuple(  ),
-Var10 = Var12)
+(length(Ls,0) -> (
+R = L,
+Var7 = tuple(  ),
+Var6 = Var7)
 ;(
-Var14 = Ls,
-maxItem(Var14,Var15),
-Var13 = Var15,
-T = Var13,
+maxItem(Ls,Var8),
+T = Var8,
 (T>=L -> (
-Var17 = T,
-R = Var17,
-Var18 = std_tuple(  ),
-Var16 = Var18)
+R = T,
+Var10 = tuple(  ),
+Var9 = Var10)
 ;(
-Var19 = L,
-R = Var19,
-Var20 = std_tuple(  ),
-Var16 = Var20)
+R = L,
+Var11 = tuple(  ),
+Var9 = Var11)
 ),
-Var21 = Var16,
-Var10 = Var21)
+Var12 = tuple(  ),
+Var6 = Var12)
 ),
-Var22 = R,
-Var23 = Var22,
-Var8 = Var23
+Var13 = R,
+Var5 = Var13
 .

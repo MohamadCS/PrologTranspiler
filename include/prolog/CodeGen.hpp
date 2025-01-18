@@ -2,9 +2,10 @@
 #pragma once
 
 #include "BaseStructs.hpp"
+#include "prologBaseVisitor.h"
+#include "tree/ParseTreeProperty.h"
 #include <cstddef>
 #include <optional>
-#include <prologBaseVisitor.h>
 #include <string>
 #include <vector>
 
@@ -12,7 +13,6 @@ namespace Prolog::CodeGen {
 
 struct Node {
     std::string var;
-    bool isVar = false;
 };
 
 struct CodeGenVisitor : public prologBaseVisitor {
@@ -41,12 +41,25 @@ public:
 
     std::any visitIf(prologParser::IfContext* ctx) override;
 
-    std::any visitIf_else(prologParser::If_elseContext* ctx) override ;
+    std::any visitIf_else(prologParser::If_elseContext* ctx) override;
+
+    std::any visitBinary_operator(prologParser::Binary_operatorContext* ctx) override;
+
+    std::any visitUnary_operator(prologParser::Unary_operatorContext* ctx) override;
+
+    std::any visitFloat(prologParser::FloatContext* ctx) override; 
+
+    std::any visitInteger_term(prologParser::Integer_termContext* ctx) override;
+
+    Node generateArithCode(antlr4::RuleContext* ctx);
+
 
 private:
     bool m_withinFuncCtx = false;
     std::optional<Prolog::Predicate> m_currentPredicate;
     std::vector<std::string> m_codeBuffer;
+    antlr4::tree::ParseTreeProperty<bool> emptyTuples;
+
 
     // Function To Predicate name translation
     std::map<std::string, std::string> m_funcToPred;
