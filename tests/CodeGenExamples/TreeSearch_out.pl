@@ -7,37 +7,37 @@ Var1 = Y)
 Var2 = Var1,
 Var0 = Var2
 .
-maxTree(Root,Var3) :- 
-Var4 = node(V,LeftChild,RightChild),
-Root = Var4,
+maxTree(Root,Var0) :- 
+Var1 = node(V,LeftChild,RightChild),
+Root = Var1,
 (LeftChild=nil,RightChild=nil -> (
-Var6 = V,
-Var5 = Var6)
+Var3 = V,
+Var2 = Var3)
 ;(
 (RightChild=nil -> (
-maxTree(LeftChild,Var8),
-max(V,Var8,Var9),
-Var10 = Var9,
-Var7 = Var10)
+maxTree(LeftChild,Var5),
+max(V,Var5,Var6),
+Var7 = Var6,
+Var4 = Var7)
 ;(
 (LeftChild=nil -> (
-maxTree(RightChild,Var12),
-max(V,Var12,Var13),
-Var14 = Var13,
-Var11 = Var14)
+maxTree(RightChild,Var9),
+max(V,Var9,Var10),
+Var11 = Var10,
+Var8 = Var11)
 ;(
-maxTree(RightChild,Var15),
-maxTree(LeftChild,Var16),
-max(Var15,Var16,Var17),
-MaxChild = Var17,
-max(MaxChild,V,Var18),
-Var19 = Var18,
-Var11 = Var19)
+maxTree(RightChild,Var12),
+maxTree(LeftChild,Var13),
+max(Var12,Var13,Var14),
+MaxChild = Var14,
+max(MaxChild,V,Var15),
+Var16 = Var15,
+Var8 = Var16)
 ),
-Var7 = Var11)
+Var4 = Var8)
 ),
-Var5 = Var7)
+Var2 = Var4)
 ),
-Var20 = Var5,
-Var3 = Var20
+Var17 = Var2,
+Var0 = Var17
 .

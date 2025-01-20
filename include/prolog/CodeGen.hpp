@@ -13,6 +13,7 @@ namespace Prolog::CodeGen {
 
 struct Node {
     std::string var;
+    bool isEmptyTuple = false;
 };
 
 struct CodeGenVisitor : public prologBaseVisitor {

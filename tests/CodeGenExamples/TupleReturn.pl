@@ -1,6 +1,5 @@
 
 
-
 F(List) :: (
     List = [L | Ls];
     if length(Ls, 0) then (

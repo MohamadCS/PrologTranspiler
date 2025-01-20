@@ -148,8 +148,11 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     for (auto* child : ctx->tuple_entry()) {
         std::any returnValue = visit(child);
-        if (!isVanishingList[i++]) {
+        if (!isVanishingList[i++] && returnValue.has_value()) {
             Node value = std::any_cast<Node>(returnValue);
+            if(value.isEmptyTuple){
+                continue;
+            }
             varValuesVec.push_back(value.var);
         }
     }
@@ -163,6 +166,11 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
     std::string resultStr;
 
     // If the tuple is empty then dont store it in a variable, and return an empty node.
+    //
+
+    if(varValuesVec.empty()){
+        tupleNode.isEmptyTuple = true;
+    }
 
     if (varValuesVec.size() == 1) {
         resultStr = std::format("{} = {},", tupleNode.var, varValuesVec[0]);
@@ -203,7 +211,7 @@ std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
     // Emit func(args) :-
     m_codeBuffer.push_back(
         funcToPredCode(m_currentPredicate->name, m_currentPredicate->args, m_currentPredicate->returnVar));
-    m_withinFuncCtx = false;
+
 
     // Fill the predicate body.
     Node result = std::any_cast<Node>(visit(ctx->tuple()));
@@ -215,6 +223,8 @@ std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
     // Finish the predicate.
     m_codeBuffer.push_back(".");
 
+    m_withinFuncCtx = false;
+    m_varCtr = 0;
     return {};
 }
 

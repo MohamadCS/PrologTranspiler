@@ -16,7 +16,6 @@
         throw std::invalid_argument("Null pointer exception");                                                         \
     }
 
-#include "BaseStructs.hpp"
 #include "prologParser.h"
 #include <functional>
 

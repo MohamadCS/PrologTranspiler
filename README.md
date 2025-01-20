@@ -58,6 +58,7 @@ especially for the else if nested statements.
 but with the first letter in lower case, it has an additional variable which will hold the result of the function, the variable type of the return value of the function, if the function's effective size is 1,
 otherwise its `tuple(E1,E2 ,... ,EN)` when `E1,...,EN` are the non-vanishing entries.
 - If the function returns no value then its result is `tuple()`.
+- If the tuple's effiective size is 0, then the tuple is a vanishing statements, wither its paired with `,` or not.
 
 More examples can be found under `tests/CodeGenExamples`.
 

@@ -24,21 +24,21 @@ true);true)),
 Var12 = R,
 Var0 = Var12
 .
-fib2(N,Var13) :- 
+fib2(N,Var0) :- 
 (N=<1 -> (
-Var15 = N,
-Var14 = Var15)
+Var2 = N,
+Var1 = Var2)
 ;(
-Var16 is N-1,
-fib2(Var16,Var17),
-F1 = Var17,
-Var18 is N-2,
-fib2(Var18,Var19),
-F2 = Var19,
-Var20 is F1+F2,
-Var21 = Var20,
-Var14 = Var21)
+Var3 is N-1,
+fib2(Var3,Var4),
+F1 = Var4,
+Var5 is N-2,
+fib2(Var5,Var6),
+F2 = Var6,
+Var7 is F1+F2,
+Var8 = Var7,
+Var1 = Var8)
 ),
-Var22 = Var14,
-Var13 = Var22
+Var9 = Var1,
+Var0 = Var9
 .
