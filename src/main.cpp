@@ -7,7 +7,6 @@
 
 using namespace antlr4;
 
-
 int main(int argc, const char** argv) {
     Prolog::CLITool cli;
 

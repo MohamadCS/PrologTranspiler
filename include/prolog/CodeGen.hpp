@@ -18,12 +18,17 @@ struct Node {
 
 struct CodeGenVisitor : public prologBaseVisitor {
 public:
+    explicit CodeGenVisitor(bool formatOutput = false)
+        : prologBaseVisitor(),
+          m_formatOutput(formatOutput) {
+    }
+
     std::string genVar();
     static std::string genPredName(std::string funcName);
 
     std::vector<std::string> getCodeBuffer() const;
 
-    void emit(const std::string&);
+    void emit(std::string&&);
 
 public:
     std::any visitFunc_def(prologParser::Func_defContext* ctx) override;
@@ -63,8 +68,9 @@ public:
     Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:
-
     bool m_insideLambda = false;
+    bool m_formatOutput = false;
+    std::size_t m_currentTabs = 0;
     std::optional<Prolog::Predicate> m_currentPredicate;
     std::vector<std::string> m_codeBuffer;
     std::vector<std::string> m_lambdasBuffer;

@@ -20,5 +20,6 @@ private:
     inline static constexpr std::string RUN_TESTS_FLAG =  "--run-tests";
     inline static constexpr std::string DISABLE_SEMANTICS =  "--no-semantics";
     inline static constexpr std::string DISABLE_STD_ERR =  "--no-stderr";
+    inline static constexpr std::string FORMAT_OUTPUT =  "--format-output";
 };
 }; // namespace Prolog

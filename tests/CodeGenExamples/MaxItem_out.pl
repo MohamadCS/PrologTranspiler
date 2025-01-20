@@ -1,27 +1,32 @@
-max(X,Y,Var0) :- 
-(X>=Y -> (
-Var2 = X,
-Var1 = Var2)
-;(
-Var3 = Y,
-Var1 = Var3)
-),
-Var4 = Var1,
-Var0 = Var4
-.
-maxItem(List,Var5) :- 
-Var6 = [L|Ls],
-List = Var6,
-(length(Ls,0) -> (
-Var8 = L,
-Var7 = Var8)
-;(
-maxItem(Ls,Var9),
-T = Var9,
-max(T,L,Var10),
-Var11 = Var10,
-Var7 = Var11)
-),
-Var12 = Var7,
-Var5 = Var12
-.
+maxItem_lambda0(X,Y,_var2) :- 
+	( X>=Y -> (
+		_var3 = X
+	)
+	;(
+		_var3 = Y
+	)
+	),
+	_var4 = _var3,
+	_var2 = _var4
+	.
+	
+
+maxItem(List,_var0) :- 
+	_var1 = maxItem_lambda0,
+	Max = _var1,
+	_var5 = [L|Ls],
+	List = _var5,
+	( length(Ls,0) -> (
+		_var6 = L
+	)
+	;(
+		maxItem(Ls,_var7),
+		call(Max,_var7,L,_var8),
+		_var6 = _var8
+	)
+	),
+	_var9 = _var6,
+	_var0 = _var9
+	.
+
+

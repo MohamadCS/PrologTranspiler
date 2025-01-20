@@ -95,6 +95,19 @@ If the tuple has one entry, and its vanishing then thery is no need
 to wrap it with parentheses, which allows for more readable syntax
 especially for the else if nested statements.
 
+## Lambdas
+
+Lambdas are expressions, they can bind to variables, or passed to
+functions.
+
+```
+X <- (X,Y) => (X + Y);
+Y <- X(1,2)  % Y matches to 3
+
+Sort(List, (X,Y) => (X >= Y));
+
+```
+
 
 ### Rules
 - In if else statement, both tuples must have the same effective size.

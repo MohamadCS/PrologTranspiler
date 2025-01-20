@@ -13,11 +13,11 @@
 
 namespace Prolog {
 
-void Compiler::genProlog(prologParser& parser) {
+void Compiler::genProlog(prologParser& parser,bool formatOutput) {
     parser.reset();
     auto* programStartCtx = parser.p_text();
 
-    CodeGen::CodeGenVisitor codeGenV;
+    CodeGen::CodeGenVisitor codeGenV(formatOutput);
 
     codeGenV.visit(programStartCtx);
     auto progList = codeGenV.getCodeBuffer();
@@ -55,7 +55,7 @@ inline void Compiler::checkSemantics() const {
 }
 
 void Compiler::compile(const std::filesystem::path& path, const std::optional<std::filesystem::path>& outputPath,
-                       bool disableSemantics) {
+                       bool disableSemantics,bool formatOutput) {
     m_targetPath = path;
     m_outputPath = outputPath;
     auto parsingManager = ParsingManager(path);
@@ -69,7 +69,7 @@ void Compiler::compile(const std::filesystem::path& path, const std::optional<st
         checkSemantics();
     }
 
-    genProlog(*parsingManager.pParser);
+    genProlog(*parsingManager.pParser,formatOutput);
 }
 
 /**************************************************************************/

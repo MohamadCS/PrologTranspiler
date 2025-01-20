@@ -11,14 +11,26 @@
 
 namespace Prolog::CodeGen {
 
+static std::string addTabs(std::string str, std::size_t num) {
+    std::stringstream result;
+    for (int i = 0; i < num; ++i) {
+        result << '\t';
+    }
+    result << str;
+    return result.str();
+}
+
 std::vector<std::string> CodeGenVisitor::getCodeBuffer() const {
     std::vector<std::string> result;
     result = m_lambdasBuffer;
-    result.insert(result.end(),m_codeBuffer.begin(),m_codeBuffer.end());
+    result.insert(result.end(), m_codeBuffer.begin(), m_codeBuffer.end());
     return result;
 }
 
-void CodeGenVisitor::emit(const std::string& line) {
+void CodeGenVisitor::emit(std::string&& line) {
+    if(m_formatOutput){
+        line = addTabs(line,m_currentTabs);
+    }
     if (m_insideLambda) {
         m_lambdasBuffer.push_back(line);
     } else {
@@ -36,7 +48,7 @@ std::string CodeGenVisitor::genPredName(std::string funcName) {
 }
 
 std::string CodeGenVisitor::genVar() {
-    return std::format("Var{}", m_varCtr++);
+    return std::format("_var{}", m_varCtr++);
 };
 
 static std::string funcToPredCode(const std::string& predName, const std::vector<std::string>& argsNames,
@@ -58,9 +70,12 @@ std::any CodeGenVisitor::visitIf(prologParser::IfContext* ctx) {
 
     auto* conditionTerm = ctx->term();
     emit(std::format("( ({} -> (", conditionTerm->getText()));
+    m_currentTabs++;
 
     std::any result = visit(ctx->cond_tuple());
-    emit("true);true)),");
+    emit("true);true)");
+    m_currentTabs--;
+    emit("),");
 
     return result;
 }
@@ -73,7 +88,8 @@ std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
     node.var = genVar();
 
     auto* conditionTerm = ctx->term();
-    emit(std::format("({} -> (", conditionTerm->getText()));
+    emit(std::format("( {} -> (", conditionTerm->getText()));
+    m_currentTabs++;
 
     auto* ifBodyTuple = ctx->cond_tuple()[0];
     auto* elseBodyTuple = ctx->cond_tuple()[1];
@@ -81,12 +97,16 @@ std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
     std::any returnValue;
 
     Node ifRetValue = std::any_cast<Node>(visit(ifBodyTuple));
-    emit(std::format("{} = {})", node.var, ifRetValue.var));
-
+    emit(std::format("{} = {}", node.var, ifRetValue.var));
+    m_currentTabs--;
+    emit(")");
     emit(";(");
+    m_currentTabs++;
 
     Node elseRetValue = std::any_cast<Node>(visit(elseBodyTuple));
-    emit(std::format("{} = {})", node.var, elseRetValue.var));
+    emit(std::format("{} = {}", node.var, elseRetValue.var));
+    m_currentTabs--;
+    emit(")");
 
     emit("),");
 
@@ -125,7 +145,6 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
 
     bool isLambdaInvoc = m_funcToPred.find(funcName) == m_funcToPred.end();
 
-
     // Evaluate arguments, and add them to the vector.
     std::vector<std::string> predicateArgs;
     for (auto* child : tuple->tuple_entry()) {
@@ -138,22 +157,19 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
     invocNode.var = genVar();
     predicateArgs.push_back(invocNode.var); // Result var
 
-    std::string predicateName = (isLambdaInvoc) ? funcName :  m_funcToPred.at(funcName);
+    std::string predicateName = (isLambdaInvoc) ? funcName : m_funcToPred.at(funcName);
 
     auto itemFormatFunc = [](decltype(predicateArgs.begin()) it) { return *it; };
     std::string args = Prolog::Utility::convertContainerToListStr<decltype(predicateArgs.begin())>(
         predicateArgs.begin(), predicateArgs.end(), itemFormatFunc);
     std::string predicateInvoc;
     if (isLambdaInvoc) {
-        predicateInvoc =
-            std::format("call({},{}),", predicateName,args);
+        predicateInvoc = std::format("call({},{}),", predicateName, args);
     } else {
-        predicateInvoc =
-            std::format("{}({}),", predicateName,args);
+        predicateInvoc = std::format("{}({}),", predicateName, args);
     }
 
-
-    emit(predicateInvoc);
+    emit(std::move(predicateInvoc));
 
     return invocNode;
 }
@@ -203,7 +219,7 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
                                     varValuesVec.begin(), varValuesVec.end(), itemFormatFunc));
     }
 
-    emit(resultStr);
+    emit(std::move(resultStr));
 
     LOG("END TUPLE");
     return tupleNode;
@@ -232,20 +248,23 @@ std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
 
     // Emit func(args) :-
     emit(funcToPredCode(m_currentPredicate->name, m_currentPredicate->args, m_currentPredicate->returnVar));
+    m_currentTabs++;
 
     // Fill the predicate body.
     Node result = std::any_cast<Node>(visit(ctx->tuple()));
 
     std::string resultStmt = std::format("{} = {}", m_currentPredicate->returnVar, result.var);
 
-    emit(resultStmt);
+    emit(std::move(resultStmt));
 
     // Finish the predicate.
     emit(".");
 
-    m_lambdasNames = {};
+    m_currentTabs--;
 
+    emit("\n");
     m_varCtr = 0;
+    m_lambdaCtr = 0;
     return {};
 }
 
@@ -377,12 +396,14 @@ std::any CodeGenVisitor::visitDirective(prologParser::DirectiveContext* ctx) {
     CHECK_NULL(ctx);
 
     emit(ctx->getText());
+    emit("\n");
     return {};
 }
 
 std::any CodeGenVisitor::visitClause(prologParser::ClauseContext* ctx) {
     CHECK_NULL(ctx);
     emit(ctx->getText());
+    emit("\n");
     return {};
 }
 
@@ -394,9 +415,10 @@ std::any CodeGenVisitor::visitLambda(prologParser::LambdaContext* ctx) {
 
     lambdaNode.var = genVar();
 
+    auto oldTabs = m_currentTabs;
+    m_currentTabs = 0;
 
-    std::string lambdaName = std::format("lambda{}", m_lambdaCtr);
-    m_lambdasNames.insert(lambdaName);
+    std::string lambdaName = std::format("{}_lambda{}", m_currentPredicate->name, m_lambdaCtr);
 
     std::stringstream argsStr;
 
@@ -409,13 +431,17 @@ std::any CodeGenVisitor::visitLambda(prologParser::LambdaContext* ctx) {
     argsStr << resultVar;
 
     emit(std::format("{}({}) :- ", lambdaName, argsStr.str()));
+    m_currentTabs++;
 
     Node resultNode = std::any_cast<Node>(visit(ctx->tuple()));
 
-    emit(std::format("{} = {}",resultVar,resultNode.var));
+    emit(std::format("{} = {}", resultVar, resultNode.var));
     emit(".");
+    emit("\n");
 
     m_insideLambda = false;
+
+    m_currentTabs = oldTabs;
 
     emit(std::format("{} = {},", lambdaNode.var, lambdaName));
 

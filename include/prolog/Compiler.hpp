@@ -28,13 +28,13 @@ public:
      * @param flags
      */
     void compile(const std::filesystem::path& pathToTheFile,
-                 const std::optional<std::filesystem::path>& outputPath = std::nullopt,bool disableSemantics = false);
+                 const std::optional<std::filesystem::path>& outputPath = std::nullopt,bool disableSemantics = false,bool formatOutput = false);
 
 private:
     std::filesystem::path m_targetPath;
     std::optional<std::filesystem::path> m_outputPath;
 
-    void genProlog(prologParser& parser);
+    void genProlog(prologParser& parser,bool formatOutput);
     inline void checkSemantics() const;
 };
 } // namespace Prolog
