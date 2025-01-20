@@ -27,6 +27,49 @@ and is not counted in _effective tuple size_.
 
 If the last entry is not paired, then its non-vanishing.
 
+## Invocation
+
+We can invoke the function by `Func(E1,E2, ... , EN)`.
+
+When `Ei` is one of the following:
+- Invocation.
+- Arithmetic expr.
+- Variable.
+- Predicate call.
+
+```
+Max(X,Y) % ok
+Max(1,Y) % ok
+Max(Max(3*5,X),Y) % ok
+```
+
+## Binding
+Used to bind variables with function invocations, it works on arithemtic 
+expr, lists, predicate and functions. This allows for a uniform binding 
+syntax 
+
+```
+X <- 1 % ok
+X <- Y * 100 % ok
+X <- Max(X,Y) % ok
+X <- Y = 10 % error
+```
+
+Note that `X <- Expr` assigns `Expr` to `X` then it evalutes to `X`  so
+something like
+
+```
+(X <- Expr, 1)
+```
+
+Evaluates to 
+
+```
+(X,1)
+```
+
+So if you want a binding only, be sure to pair the binding with `;`.
+
 ## Conditionals
 
 Conditionals are a tuple entry, and they have the following syntax
@@ -51,6 +94,7 @@ We can use if else to evaluate one of the tuples
 If the tuple has one entry, and its vanishing then thery is no need
 to wrap it with parentheses, which allows for more readable syntax
 especially for the else if nested statements.
+
 
 ### Rules
 - In if else statement, both tuples must have the same effective size.

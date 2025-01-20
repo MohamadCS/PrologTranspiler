@@ -23,6 +23,8 @@ public:
 
     std::vector<std::string> getCodeBuffer() const;
 
+    void emit(const std::string&);
+
 public:
     std::any visitFunc_def(prologParser::Func_defContext* ctx) override;
 
@@ -56,12 +58,17 @@ public:
 
     std::any visitCompound_term(prologParser::Compound_termContext* ctx) override;
 
+    std::any visitLambda(prologParser::LambdaContext* ctx) override;
+
     Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:
-    bool m_withinFuncCtx = false;
+
+    bool m_insideLambda = false;
     std::optional<Prolog::Predicate> m_currentPredicate;
     std::vector<std::string> m_codeBuffer;
+    std::vector<std::string> m_lambdasBuffer;
+    std::set<std::string> m_lambdasNames;
     antlr4::tree::ParseTreeProperty<bool> emptyTuples;
 
     // Function To Predicate name translation
@@ -69,6 +76,7 @@ private:
 
 private:
     static inline std::size_t m_varCtr = 0;
+    static inline std::size_t m_lambdaCtr = 0;
 };
 
 } // namespace Prolog::CodeGen

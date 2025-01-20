@@ -48,6 +48,7 @@ p_text
     ;
 
 
+
 directive
     : ':-' term '.'
     ; // also 3.58
@@ -72,6 +73,8 @@ tuple : <assoc = left> {++tupleCount;}
                                  ('(' ( tuple_entry  ((',' | ';') tuple_entry)*  )?  (';')?  ')' )
                         {--tupleCount;};
 
+lambda: func_args '=>' tuple;
+
 tuple_entry 
     : expr 
     | binding
@@ -91,6 +94,7 @@ expr
     : tuple 
     | invoc
     | term
+    | lambda
     ; 
 
 invoc : VARIABLE tuple ;
@@ -98,7 +102,7 @@ invoc : VARIABLE tuple ;
 term
     : 
       '(' term ')' # braced_term // I think that should reduce to tuple in our implemenation.
-     |'-'? integer # integer_term //TODO: negative case should be covered by unary_operator
+    |'-'? integer # integer_term //TODO: negative case should be covered by unary_operator
     | '-'? FLOAT   # float
     | atom '(' termlist ')'               # compound_term
     | <assoc = right> term operator_ term # binary_operator
