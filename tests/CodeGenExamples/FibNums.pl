@@ -18,15 +18,15 @@ Fib1(N) :: (
 )
 .
 
+
 Fib2(N) :: (
     if N =< 1 then (
-        R <- N;
+        N
     ) else (
         F1 <- Fib2(N-1);
         F2 <- Fib2(N-2);
-        R <- (F1 + F2); 
-    );
-    R
+        F1 + F2; 
+    )
 )
 .
 

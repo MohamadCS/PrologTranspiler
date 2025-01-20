@@ -26,6 +26,7 @@ MergeBt(Bt1,  Bt2) :: (
 
 )
 .
+
 MergeBt2(Bt1, Bt2) :: (
 
     Bt1 <- bt(Value1, List1);
@@ -39,6 +40,8 @@ MergeBt2(Bt1, Bt2) :: (
 
 )
 .
+
+
 
 
 

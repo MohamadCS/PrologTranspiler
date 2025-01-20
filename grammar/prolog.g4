@@ -68,7 +68,9 @@ func_def : VARIABLE func_args '::' tuple '.' ;
 
 func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
 
-tuple : <assoc = left> {++tupleCount;}  '(' ( tuple_entry  ((',' | ';') tuple_entry)*  )?  (';')?  ')' {--tupleCount;};
+tuple : <assoc = left> {++tupleCount;} 
+                                 ('(' ( tuple_entry  ((',' | ';') tuple_entry)*  )?  (';')?  ')' )
+                        {--tupleCount;};
 
 tuple_entry 
     : expr 
@@ -79,9 +81,11 @@ tuple_entry
 
 binding : VARIABLE '<-' expr ; 
 
-if: 'if' {insideIfCond= true;} term {insideIfCond = false;} 'then' tuple;
+cond_tuple: tuple_entry | tuple;
 
-if_else: 'if' {insideIfCond= true;} term {insideIfCond = false;}'then' tuple 'else' tuple;
+if: 'if' {insideIfCond= true;} term {insideIfCond = false;} 'then' cond_tuple;
+
+if_else: <assoc = right> 'if' {insideIfCond= true;} term {insideIfCond = false;} 'then'  cond_tuple  'else' cond_tuple;
 
 expr 
     : tuple 

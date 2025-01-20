@@ -47,7 +47,7 @@ std::any CodeGenVisitor::visitIf(prologParser::IfContext* ctx) {
     auto* conditionTerm = ctx->term();
     m_codeBuffer.push_back(std::format("( ({} -> (", conditionTerm->getText()));
 
-    std::any result = visit(ctx->tuple());
+    std::any result = visit(ctx->cond_tuple());
     m_codeBuffer.push_back("true);true)),");
 
     return result;
@@ -63,8 +63,8 @@ std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
     auto* conditionTerm = ctx->term();
     m_codeBuffer.push_back(std::format("({} -> (", conditionTerm->getText()));
 
-    auto* ifBodyTuple = ctx->tuple()[0];
-    auto* elseBodyTuple = ctx->tuple()[1];
+    auto* ifBodyTuple = ctx->cond_tuple()[0];
+    auto* elseBodyTuple = ctx->cond_tuple()[1];
 
     std::any returnValue;
 
@@ -235,6 +235,7 @@ static inline bool isArith(const std::string& op) {
         "+",
         "-",
         "*",
+        "/",
     };
 
     return arithOps.find(op) != arithOps.end();

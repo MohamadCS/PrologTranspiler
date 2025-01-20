@@ -54,6 +54,7 @@ public:
     std::any visitList_term(prologParser::List_termContext* ctx) override;
 
     std::any visitCompound_term(prologParser::Compound_termContext* ctx) override;
+
     Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:

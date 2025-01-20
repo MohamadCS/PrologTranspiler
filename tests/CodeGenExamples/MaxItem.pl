@@ -1,28 +1,15 @@
-Max(X,Y) ::(
-    if X >= Y then (
-        R <- X;
-    ) else (
-        R <- Y;
-    );
-    R
-)
-.
-
+Max(X,Y) ::( if X >= Y then (X) else (Y) ) .
 
 MaxItem(List) :: (
     List <- [L | Ls];
-    if length(Ls,0) then (
-        R <- L;
-    ) else(
+    if length(Ls,0) then ( 
+        L   
+    ) else (
         T <- MaxItem(Ls);
-        if T >= L then (
-            R <- T;
-        ) else (
-            R <- L;
-        );
-    );
-    R
-).
+        Max(T,L)
+    )
+)
+.
 
 
 

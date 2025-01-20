@@ -26,8 +26,7 @@ Var0 = Var12
 .
 fib2(N,Var13) :- 
 (N=<1 -> (
-R = N,
-Var15 = tuple(  ),
+Var15 = N,
 Var14 = Var15)
 ;(
 Var16 is N-1,
@@ -37,11 +36,9 @@ Var18 is N-2,
 fib2(Var18,Var19),
 F2 = Var19,
 Var20 is F1+F2,
-Var21 = Var20,
-R = Var21,
-Var22 = tuple(  ),
-Var14 = Var22)
+Var21 = tuple(  ),
+Var14 = Var21)
 ),
-Var23 = R,
-Var13 = Var23
+Var22 = Var14,
+Var13 = Var22
 .
