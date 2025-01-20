@@ -1,49 +1,43 @@
 max(X,Y,Var0) :- 
 (X>=Y -> (
-Var2 = X,
-Var1 = Var2)
+Var1 = X)
 ;(
-Var3 = Y,
-Var1 = Var3)
+Var1 = Y)
 ),
-Var4 = Var1,
-Var0 = Var4
+Var2 = Var1,
+Var0 = Var2
 .
-maxTree(Root,Var5) :- 
-Var6 = node(V,LeftChild,RightChild),
-Root = Var6,
+maxTree(Root,Var3) :- 
+Var4 = node(V,LeftChild,RightChild),
+Root = Var4,
 (LeftChild=nil,RightChild=nil -> (
-Result = V,
-Var8 = tuple(  ),
-Var7 = Var8)
+Var6 = V,
+Var5 = Var6)
 ;(
 (RightChild=nil -> (
-maxTree(RightChild,Var10),
-max(V,Var10,Var11),
-Result = Var11,
-Var12 = tuple(  ),
-Var9 = Var12)
+maxTree(LeftChild,Var8),
+max(V,Var8,Var9),
+Var10 = Var9,
+Var7 = Var10)
 ;(
 (LeftChild=nil -> (
-maxTree(LeftChild,Var14),
-max(V,Var14,Var15),
-Result = Var15,
-Var16 = tuple(  ),
-Var13 = Var16)
+maxTree(RightChild,Var12),
+max(V,Var12,Var13),
+Var14 = Var13,
+Var11 = Var14)
 ;(
-maxTree(RightChild,Var17),
-maxTree(LeftChild,Var18),
-max(Var17,Var18,Var19),
-T = Var19,
-max(T,V,Var20),
-Result = Var20,
-Var21 = tuple(  ),
-Var13 = Var21)
+maxTree(RightChild,Var15),
+maxTree(LeftChild,Var16),
+max(Var15,Var16,Var17),
+MaxChild = Var17,
+max(MaxChild,V,Var18),
+Var19 = Var18,
+Var11 = Var19)
 ),
-Var9 = Var13)
+Var7 = Var11)
 ),
-Var7 = Var9)
+Var5 = Var7)
 ),
-Var22 = Result,
-Var5 = Var22
+Var20 = Var5,
+Var3 = Var20
 .

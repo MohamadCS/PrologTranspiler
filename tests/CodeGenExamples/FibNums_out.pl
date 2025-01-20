@@ -36,7 +36,7 @@ Var18 is N-2,
 fib2(Var18,Var19),
 F2 = Var19,
 Var20 is F1+F2,
-Var21 = tuple(  ),
+Var21 = Var20,
 Var14 = Var21)
 ),
 Var22 = Var14,

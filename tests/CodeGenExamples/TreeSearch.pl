@@ -1,21 +1,21 @@
 
 
-Max(X,Y) :: (if X >= Y then (X) else (Y)).
+Max(X,Y) :: ( if X >= Y then X else Y ).
 
-MaxTree(Root) ::(
+MaxTree(Root) :: (
+
    Root <- node(V, LeftChild,RightChild);
-   if LeftChild = nil, RightChild = nil then (
-        Result <- V;
-   ) else if RightChild = nil then (
-        Result <- Max(V,MaxTree(RightChild));
-   ) else if LeftChild = nil then (
-        Result <- Max(V,MaxTree(LeftChild));
-   ) else (
-        T <- Max(MaxTree(RightChild),MaxTree(LeftChild));
-        Result <- Max(T,V);
-   );
 
-   Result
+   if LeftChild = nil, RightChild = nil then (
+        V
+   ) else if RightChild = nil then (
+        Max(V,MaxTree(LeftChild))
+   ) else if LeftChild = nil then (
+        Max(V,MaxTree(RightChild))
+   ) else (
+        MaxChild <- Max(MaxTree(RightChild),MaxTree(LeftChild));
+        Max(MaxChild,V)
+   )
 )
 .
 
