@@ -28,8 +28,8 @@ std::vector<std::string> CodeGenVisitor::getCodeBuffer() const {
 }
 
 void CodeGenVisitor::emit(std::string&& line) {
-    if(m_formatOutput){
-        line = addTabs(line,m_currentTabs);
+    if (m_formatOutput) {
+        line = addTabs(line, m_currentTabs);
     }
     if (m_insideLambda) {
         m_lambdasBuffer.push_back(line);
@@ -69,6 +69,15 @@ std::any CodeGenVisitor::visitIf(prologParser::IfContext* ctx) {
     CHECK_NULL(ctx);
 
     auto* conditionTerm = ctx->term();
+
+    if(ctx->if_head()){
+        const auto& bindingVec = ctx->if_head()->binding();
+
+        for(auto* pBindingCtx : bindingVec){
+            visit(pBindingCtx);
+        }
+    }
+
     emit(std::format("( ({} -> (", conditionTerm->getText()));
     m_currentTabs++;
 
@@ -86,6 +95,14 @@ std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
 
     Node node;
     node.var = genVar();
+
+    if(ctx->if_head()){
+        const auto& bindingVec = ctx->if_head()->binding();
+
+        for(auto* pBindingCtx : bindingVec){
+            visit(pBindingCtx);
+        }
+    }
 
     auto* conditionTerm = ctx->term();
     emit(std::format("( {} -> (", conditionTerm->getText()));
@@ -387,6 +404,7 @@ std::any CodeGenVisitor::visitCompound_term(prologParser::Compound_termContext* 
 
     node.var = genVar();
 
+    // emit(std::format("{},", ctx->getText()));
     emit(std::format("{} = {},", node.var, ctx->getText()));
 
     return node;

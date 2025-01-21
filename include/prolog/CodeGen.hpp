@@ -65,6 +65,7 @@ public:
 
     std::any visitLambda(prologParser::LambdaContext* ctx) override;
 
+
     Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:

@@ -86,9 +86,12 @@ binding : VARIABLE '<-' expr ;
 
 cond_tuple: tuple_entry | tuple;
 
-if: 'if' {insideIfCond= true;} term {insideIfCond = false;} 'then' cond_tuple;
+if_head : (binding (';' binding)*) '|';
 
-if_else: <assoc = right> 'if' {insideIfCond= true;} term {insideIfCond = false;} 'then'  cond_tuple  'else' cond_tuple;
+
+if: 'if' {insideIfCond= true;} (if_head)? term {insideIfCond = false;} 'then' cond_tuple;
+
+if_else: <assoc = right> 'if' {insideIfCond= true;} (if_head)? term {insideIfCond = false;} 'then'  cond_tuple  'else' cond_tuple;
 
 expr 
     : tuple 
