@@ -1,9 +1,8 @@
 
 
-Max(X,Y) :: ( if X >= Y then X else Y ).
-
 MaxTree(Root) :: (
 
+   Max <- (X,Y) => (if X >= Y then X else Y);
    Root <- node(V, LeftChild,RightChild);
 
    if LeftChild = nil, RightChild = nil then (
