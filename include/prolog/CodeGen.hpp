@@ -5,8 +5,11 @@
 #include "prologBaseVisitor.h"
 #include "tree/ParseTreeProperty.h"
 #include <cstddef>
+#include <deque>
 #include <optional>
 #include <string>
+#include <unordered_set>
+#include <list>
 #include <vector>
 
 namespace Prolog::CodeGen {
@@ -26,6 +29,8 @@ public:
 
     std::string genVar();
     static std::string genPredName(std::string funcName);
+
+    std::string getModulesCode() const;
 
     std::vector<std::string> getCodeBuffer() const;
 
@@ -68,6 +73,8 @@ public:
 
     std::any visitLambda(prologParser::LambdaContext* ctx) override;
 
+    std::any visitModule(prologParser::ModuleContext* ctx) override;
+
     Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:
@@ -82,6 +89,10 @@ private:
 
     // Function To Predicate name translation
     std::map<std::string, std::string> m_funcToPred;
+
+    std::map<std::string, std::deque<Predicate>> m_modules;
+
+    std::optional<std::string> m_currentModule;
 
 private:
     static inline std::size_t m_varCtr = 0;

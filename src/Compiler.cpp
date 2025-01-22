@@ -14,6 +14,7 @@
 
 namespace Prolog {
 
+
 void Compiler::genProlog(prologParser& parser, bool formatOutput) {
     parser.reset();
     auto* programStartCtx = parser.p_text();
@@ -22,7 +23,6 @@ void Compiler::genProlog(prologParser& parser, bool formatOutput) {
     //
     // codeGenV.visit(programStartCtx);
     // auto progList = codeGenV.getCodeBuffer();
-
 
     Visitors::PreprocessorVisitor progV;
 
@@ -38,10 +38,7 @@ void Compiler::genProlog(prologParser& parser, bool formatOutput) {
         procSStr << '\n';
     }
 
-    std::cout <<procSStr.str();
-
-
-
+    std::cout << procSStr.str();
 
     ParsingManager afterPreprocessingParser(procSStr.str());
 
@@ -62,12 +59,13 @@ void Compiler::genProlog(prologParser& parser, bool formatOutput) {
         outputPath.replace_extension("").concat("_out.pl");
     }
 
-
     std::ofstream outputFile(outputPath);
 
     if (!outputFile) {
         std::cerr << std::format("ERROR: can't open the file {}\n", outputPath.string());
     }
+
+    outputFile << codeGenV.getModulesCode();
 
     for (auto& stmtList : newProgList) {
         for (auto& stmt : stmtList) {

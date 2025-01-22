@@ -40,11 +40,11 @@ grammar prolog;
 
 @members{
     std::size_t tupleCount = 0; // 0 iff we are not in a tuple.
-    bool insideIfCond = false;
+    bool enabledSep = false;
 }
 
 p_text
-    : (func_def | directive | clause)* EOF
+    : (func_def | directive | clause | module)* EOF
     ;
 
 
@@ -65,7 +65,14 @@ clause
 
 /**********************Grammar Extention**********************/
 
-func_def : VARIABLE func_args '::' tuple '.' ; 
+namespace: atom;
+
+module: 'module' namespace '{' (func_def)* '}';
+
+
+public: 'pub';
+
+func_def : (public)? VARIABLE func_args '::' tuple '.' ; 
 
 func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
 
@@ -90,9 +97,9 @@ cond_tuple: tuple_entry | tuple;
 if_head : (binding (';' binding)*) '|';
 
 
-if: 'if' {insideIfCond= true;} (if_head)? term {insideIfCond = false;} 'then' cond_tuple;
+if: 'if' {enabledSep= true;} (if_head)? term {enabledSep = false;} 'then' cond_tuple;
 
-if_else: <assoc = right> 'if' {insideIfCond= true;} (if_head)? term {insideIfCond = false;} 'then'  cond_tuple  'else' cond_tuple;
+if_else: <assoc = right> 'if' {enabledSep= true;} (if_head)? term {enabledSep = false;} 'then'  cond_tuple  'else' cond_tuple;
 
 expr 
     : tuple 
@@ -101,15 +108,15 @@ expr
     | lambda
     ; 
 
-invoc : VARIABLE tuple ;
+invoc : (namespace ':')? VARIABLE tuple ;
 
 arg_alias: '#' (NATURAL_NUM)?;
 
 term
     : 
-      '(' term ')' # braced_term // I think that should reduce to tuple in our implemenation.
-    |'-'? integer # integer_term //TODO: negative case should be covered by unary_operator
-    | '-'? FLOAT   # float
+      '(' term ')'                        # braced_term // I think that should reduce to tuple in our implemenation.
+    | '-'? integer                        # integer_term //TODO: negative case should be covered by unary_operator
+    | '-'? FLOAT                          # float
     | atom '(' termlist ')'               # compound_term
     | <assoc = right> term operator_ term # binary_operator
     | operator_ term                      # unary_operator
@@ -133,9 +140,9 @@ operator_
     | 'multifile'
     | 'discontiguous'
     | 'public' //TODO: move operators used in directives to "built-in" definition of dialect
-    | {tupleCount == 0 || insideIfCond }? ';' // If we are in a tuple then stop parsing the as an operator rule.
+    | {tupleCount == 0 || enabledSep }? ';' // If we are in a tuple then stop parsing the as an operator rule.
     | '->'
-    | {tupleCount == 0 || insideIfCond }? ',' // If we are in a tuple then stop parsing the as an operator rule. 
+    | {tupleCount == 0 || enabledSep }? ',' // If we are in a tuple then stop parsing the as an operator rule. 
     | '\\+'
     | '='
     | '\\='

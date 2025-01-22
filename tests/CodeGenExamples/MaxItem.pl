@@ -1,19 +1,16 @@
 
 
-F() <-- (
-    Z <- write(2);
-    Y <-- write(3);
-    write(1);
-    Y();
-)
-.
+MaxItem(List) :: (
 
-MaxItem(List) <-- (
-    X <- F();
-    Max(X,Y) <-- (if X >= Y then X else Y );
-    write(1);
+    Max <- (X,Y) => ( if #1 >= #2 then #1 else #2) ;
     List <- [L | Ls];
-    if length(Ls,0) then L else Max(MaxItem(Ls),L)
+
+    if L <- Length(Ls) | L = 0 then ( 
+        L   
+    ) else (
+        T <- MaxItem(Ls);
+        Max(T,L)
+    )
 )
 .
 

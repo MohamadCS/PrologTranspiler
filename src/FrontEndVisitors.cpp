@@ -53,8 +53,11 @@ std::any PreprocessorVisitor::visitLambda(prologParser::LambdaContext* ctx) {
         funcArgsStack.top().push_back(pArg->getText());
     }
 
+    std::any result  = visitChildren(ctx);
+
+
     funcArgsStack.pop();
-    return visitChildren(ctx);
+    return result;
 }
 
 std::any PreprocessorVisitor::visitDirective(prologParser::DirectiveContext* ctx) {

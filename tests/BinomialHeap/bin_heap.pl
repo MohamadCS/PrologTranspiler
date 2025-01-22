@@ -4,6 +4,7 @@
     ]
 ).
 
+
 % Binomial Tree of order 0
 bt(_, []).
 

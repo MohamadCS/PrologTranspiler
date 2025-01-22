@@ -70,6 +70,23 @@ Evaluates to
 
 So if you want a binding only, be sure to pair the binding with `;`.
 
+## Argument aliases
+
+We can refer to the `i`-th argument using `#i`, and we can refer
+to the tuple that contains the function's arguments using `#`.
+
+Example
+```
+Foo(X,Y,Z) :: (
+    #1 <- 3; % Same as X <- 3;  
+    T <- #; % Same as T <- tuple(X,Y,Z); 
+    if List = [#3 | _] then (  % same as List = [Z | _]
+        write(#3); // same as write(Z).
+    );
+)
+.
+```
+
 ## Conditionals
 
 Conditionals are a tuple entry, and they have the following syntax
@@ -116,6 +133,7 @@ but with the first letter in lower case, it has an additional variable which wil
 otherwise its `tuple(E1,E2 ,... ,EN)` when `E1,...,EN` are the non-vanishing entries.
 - If the function returns no value then its result is `tuple()`.
 - If the tuple's effiective size is 0, then the tuple is a vanishing statements, wither its paired with `,` or not.
+- Variables inside functions must not contain the prefix `_var`.
 
 More examples can be found under `tests/CodeGenExamples`.
 
@@ -132,6 +150,7 @@ make
 - [x] #i the i-th arg.
 - [x] Delete Variable after evalutating predicate. 
 - [x] Write examples using the syntax sugar.
+- [ ] Add namespaces.
 - [ ] Change `::` to `<-`.
 - [ ] Write a test program that build a binomaial tree of random size. 
 - [ ] Test delete min.
