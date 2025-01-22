@@ -128,13 +128,13 @@ make
 ```
 
 ### TODO:
+- [x] # is a sytnax sugar that returns a tuple of the function's args.
+- [x] #i the i-th arg.
+- [x] Delete Variable after evalutating predicate. 
+- [x] Write examples using the syntax sugar.
 - [ ] Change `::` to `<-`.
 - [ ] Write a test program that build a binomaial tree of random size. 
 - [ ] Test delete min.
-- [ ] # is a sytnax sugar that returns a tuple of the function's args.
-- [ ] #i the i-th arg.
-- [x] Delete Variable after evalutating predicate. 
-- [ ] Write examples using the syntax sugar.
 - [ ] Rewrite with syntax sugar.
 - [ ] Add delayed/immediate defenition.
 
