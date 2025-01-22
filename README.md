@@ -133,7 +133,7 @@ make
 - [ ] Test delete min.
 - [ ] # is a sytnax sugar that returns a tuple of the function's args.
 - [ ] #i the i-th arg.
-- [ ] Delete Variable after evalutating predicate. 
+- [x] Delete Variable after evalutating predicate. 
 - [ ] Write examples using the syntax sugar.
 - [ ] Rewrite with syntax sugar.
 - [ ] Add delayed/immediate defenition.

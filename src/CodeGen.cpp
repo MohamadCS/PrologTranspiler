@@ -70,10 +70,10 @@ std::any CodeGenVisitor::visitIf(prologParser::IfContext* ctx) {
 
     auto* conditionTerm = ctx->term();
 
-    if(ctx->if_head()){
+    if (ctx->if_head()) {
         const auto& bindingVec = ctx->if_head()->binding();
 
-        for(auto* pBindingCtx : bindingVec){
+        for (auto* pBindingCtx : bindingVec) {
             visit(pBindingCtx);
         }
     }
@@ -96,10 +96,10 @@ std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
     Node node;
     node.var = genVar();
 
-    if(ctx->if_head()){
+    if (ctx->if_head()) {
         const auto& bindingVec = ctx->if_head()->binding();
 
-        for(auto* pBindingCtx : bindingVec){
+        for (auto* pBindingCtx : bindingVec) {
             visit(pBindingCtx);
         }
     }
@@ -135,7 +135,7 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
     CHECK_NULL(ctx);
 
     Node node = std::any_cast<Node>(visit(ctx->expr()));
-    std::string bindedVarName = ctx->VARIABLE()->getText();
+    std::string bindedVarName = ctx->children[0]->getText();
 
     std::string result = std::format("{} = {},", bindedVarName, node.var);
 
@@ -143,6 +143,7 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
 
     Node bindingNode;
     bindingNode.var = bindedVarName;
+
     return bindingNode;
 }
 
@@ -204,12 +205,25 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     for (auto* child : ctx->tuple_entry()) {
         std::any returnValue = visit(child);
-        if (!isVanishingList[i++] && returnValue.has_value()) {
+
+        if (returnValue.has_value()) {
             Node value = std::any_cast<Node>(returnValue);
-            if (value.isEmptyTuple) {
-                continue;
+
+            if (value.isPredicate) {
+                emit(std::format("{},", child->getText()));
             }
-            varValuesVec.push_back(value.var);
+        }
+
+        if (!isVanishingList[i++]) {
+            if (returnValue.has_value()) {
+                Node value = std::any_cast<Node>(returnValue);
+
+                if (value.isEmptyTuple) {
+                    continue;
+                }
+
+                varValuesVec.push_back(value.var);
+            }
         }
     }
 
@@ -404,7 +418,21 @@ std::any CodeGenVisitor::visitCompound_term(prologParser::Compound_termContext* 
 
     node.var = genVar();
 
-    // emit(std::format("{},", ctx->getText()));
+    emit(std::format("{} = {},", node.var, ctx->getText()));
+    node.isPredicate = true;
+
+    return node;
+}
+
+
+
+std::any CodeGenVisitor::visitAtom_term(prologParser::Atom_termContext* ctx) {
+    CHECK_NULL(ctx);
+
+    Node node;
+
+    node.var = genVar();
+
     emit(std::format("{} = {},", node.var, ctx->getText()));
 
     return node;

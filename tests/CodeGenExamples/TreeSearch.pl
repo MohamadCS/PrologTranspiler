@@ -1,11 +1,12 @@
 
 
+
 MaxTree(Root) :: (
 
    Max <- (X,Y) => (if X >= Y then X else Y);
-   Root <- node(V, LeftChild,RightChild);
 
-   if LeftChild = nil, RightChild = nil then (
+   if #1 <- node(V, LeftChild,RightChild) | LeftChild = nil, RightChild = nil then (
+        write(V),
         V
    ) else if RightChild = nil then (
         Max(V,MaxTree(LeftChild))
@@ -15,6 +16,7 @@ MaxTree(Root) :: (
         MaxChild <- Max(MaxTree(RightChild),MaxTree(LeftChild));
         Max(MaxChild,V)
    )
+
 )
 .
 

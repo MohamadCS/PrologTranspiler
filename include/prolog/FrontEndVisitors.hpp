@@ -9,13 +9,9 @@
 #include <list>
 #include <set>
 
-
 namespace Prolog::Visitors {
 
 // NOTE: Any functions that begins with "visit" is an ANTLR generated function.
-
-
-
 
 /**
  * @class FunctionSemanticsVisitor
@@ -81,7 +77,7 @@ struct MarkEmptyTuplesVisitor : public prologBaseVisitor {
     std::any visitTuple(prologParser::TupleContext* ctx) override;
 };
 
-struct ProgramRestoreVisitor : public prologBaseVisitor {
+struct PreprocessorVisitor : public prologBaseVisitor {
     /**
      * @brief Each element of the list represents a stmt
      * A stmt is a clause | directive | func_def
@@ -93,8 +89,12 @@ struct ProgramRestoreVisitor : public prologBaseVisitor {
      */
     std::optional<antlr4::tree::ParseTreeProperty<bool>> emptyTuples;
 
+    std::stack<std::vector<std::string>> funcArgsStack;
+
     // NOTE: We can use std::variant for a cleaner code for clause/directive
     std::any visitClause(prologParser::ClauseContext* ctx) override;
+
+    std::any visitFunc_def(prologParser::Func_defContext* ctx) override;
 
     std::any visitDirective(prologParser::DirectiveContext* ctx) override;
 
@@ -103,7 +103,11 @@ struct ProgramRestoreVisitor : public prologBaseVisitor {
     // NOTE: This method comes form the super class AbstractParseTreeVisitor
     std::any visitTerminal(antlr4::tree::TerminalNode* ctx) override;
 
-    std::any visitTuple(prologParser::TupleContext* ctx) override;
+    std::any visitArg_alias(prologParser::Arg_aliasContext* ctx) override;
+
+    std::any visitLambda(prologParser::LambdaContext* ctx) override;
+
+    // std::any visitTuple(prologParser::TupleContext* ctx) override;
 };
 
 // TODO: Delete this class.

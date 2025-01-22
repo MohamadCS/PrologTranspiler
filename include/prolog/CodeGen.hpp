@@ -14,6 +14,7 @@ namespace Prolog::CodeGen {
 struct Node {
     std::string var;
     bool isEmptyTuple = false;
+    bool isPredicate = false;
 };
 
 struct CodeGenVisitor : public prologBaseVisitor {
@@ -63,8 +64,9 @@ public:
 
     std::any visitCompound_term(prologParser::Compound_termContext* ctx) override;
 
-    std::any visitLambda(prologParser::LambdaContext* ctx) override;
+    std::any visitAtom_term(prologParser::Atom_termContext* ctx) override;
 
+    std::any visitLambda(prologParser::LambdaContext* ctx) override;
 
     Node generateArithCode(antlr4::RuleContext* ctx);
 

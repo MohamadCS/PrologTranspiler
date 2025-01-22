@@ -9,20 +9,51 @@
 #include <format>
 #include <fstream>
 #include <optional>
+#include <sstream>
 #include <util.h>
 
 namespace Prolog {
 
-void Compiler::genProlog(prologParser& parser,bool formatOutput) {
+void Compiler::genProlog(prologParser& parser, bool formatOutput) {
     parser.reset();
     auto* programStartCtx = parser.p_text();
 
+    // CodeGen::CodeGenVisitor codeGenV(formatOutput);
+    //
+    // codeGenV.visit(programStartCtx);
+    // auto progList = codeGenV.getCodeBuffer();
+
+
+    Visitors::PreprocessorVisitor progV;
+
+    progV.visit(programStartCtx);
+    auto progList = progV.programStmtList;
+
+    std::stringstream procSStr;
+
+    for (auto& stmtList : progList) {
+        for (auto& stmt : stmtList) {
+            procSStr << stmt << " ";
+        }
+        procSStr << '\n';
+    }
+
+    std::cout <<procSStr.str();
+
+
+
+
+    ParsingManager afterPreprocessingParser(procSStr.str());
+
     CodeGen::CodeGenVisitor codeGenV(formatOutput);
 
-    codeGenV.visit(programStartCtx);
-    auto progList = codeGenV.getCodeBuffer();
-
     std::filesystem::path outputPath;
+
+    programStartCtx = afterPreprocessingParser.pParser->p_text();
+
+    codeGenV.visit(programStartCtx);
+
+    auto newProgList = codeGenV.getCodeBuffer();
 
     if (m_outputPath.has_value()) {
         outputPath = m_outputPath.value();
@@ -31,13 +62,14 @@ void Compiler::genProlog(prologParser& parser,bool formatOutput) {
         outputPath.replace_extension("").concat("_out.pl");
     }
 
+
     std::ofstream outputFile(outputPath);
 
     if (!outputFile) {
         std::cerr << std::format("ERROR: can't open the file {}\n", outputPath.string());
     }
 
-    for (auto& stmtList : progList) {
+    for (auto& stmtList : newProgList) {
         for (auto& stmt : stmtList) {
             outputFile << stmt;
         }
@@ -55,7 +87,7 @@ inline void Compiler::checkSemantics() const {
 }
 
 void Compiler::compile(const std::filesystem::path& path, const std::optional<std::filesystem::path>& outputPath,
-                       bool disableSemantics,bool formatOutput) {
+                       bool disableSemantics, bool formatOutput) {
     m_targetPath = path;
     m_outputPath = outputPath;
     auto parsingManager = ParsingManager(path);
@@ -69,7 +101,7 @@ void Compiler::compile(const std::filesystem::path& path, const std::optional<st
         checkSemantics();
     }
 
-    genProlog(*parsingManager.pParser,formatOutput);
+    genProlog(*parsingManager.pParser, formatOutput);
 }
 
 /**************************************************************************/

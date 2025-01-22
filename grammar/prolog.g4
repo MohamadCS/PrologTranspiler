@@ -75,6 +75,7 @@ tuple : <assoc = left> {++tupleCount;}
 
 lambda: func_args '=>' tuple;
 
+
 tuple_entry 
     : expr 
     | binding
@@ -82,7 +83,7 @@ tuple_entry
     | if_else
     ;
 
-binding : VARIABLE '<-' expr ; 
+binding : (VARIABLE | arg_alias) '<-' expr ; 
 
 cond_tuple: tuple_entry | tuple;
 
@@ -102,6 +103,8 @@ expr
 
 invoc : VARIABLE tuple ;
 
+arg_alias: '#' (NATURAL_NUM)?;
+
 term
     : 
       '(' term ')' # braced_term // I think that should reduce to tuple in our implemenation.
@@ -114,6 +117,7 @@ term
     | '[' termlist ( '|' term)? ']'       # list_term
     | '{' termlist '}'                    # curly_bracketed_term
     | atom                                # atom_term
+    | arg_alias                           # arg_alias_term
     ;
 
 /*****************************/
@@ -187,6 +191,11 @@ integer // 6.4.4
     ;
 
 // Lexer (6.4 & 6.5): Tokens formed from Characters
+
+NATURAL_NUM :
+    [1-9][0-9]*
+    ;
+
 
 LETTER_DIGIT // 6.4.2
     : SMALL_LETTER ALPHANUMERIC*

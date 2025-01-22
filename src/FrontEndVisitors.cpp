@@ -6,14 +6,16 @@
 #include <cassert>
 #include <cctype>
 #include <deque>
+#include <format>
 #include <map>
 #include <optional>
+#include <string_view>
 #include <unistd.h>
 
 namespace Prolog::Visitors {
 static bool entryIsTuple(prologParser::Tuple_entryContext* ctx);
 
-std::any ProgramRestoreVisitor::visitClause(prologParser::ClauseContext* ctx) {
+std::any PreprocessorVisitor::visitClause(prologParser::ClauseContext* ctx) {
     CHECK_NULL(ctx);
 
     programStmtList.push_back({});
@@ -21,7 +23,41 @@ std::any ProgramRestoreVisitor::visitClause(prologParser::ClauseContext* ctx) {
     return visitChildren(ctx);
 }
 
-std::any ProgramRestoreVisitor::visitDirective(prologParser::DirectiveContext* ctx) {
+std::any PreprocessorVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
+    CHECK_NULL(ctx);
+
+    programStmtList.push_back({});
+
+    funcArgsStack.push({});
+    funcArgsStack.top().reserve(ctx->func_args()->VARIABLE().size());
+
+    for (auto* pArg : ctx->func_args()->VARIABLE()) {
+        funcArgsStack.top().push_back(pArg->getText());
+    }
+
+    std::any result  = visitChildren(ctx);
+
+    funcArgsStack.pop();
+    return result;
+}
+
+std::any PreprocessorVisitor::visitLambda(prologParser::LambdaContext* ctx) {
+    CHECK_NULL(ctx);
+
+    programStmtList.push_back({});
+
+    funcArgsStack.push({});
+    funcArgsStack.top().reserve(ctx->func_args()->VARIABLE().size());
+
+    for (auto* pArg : ctx->func_args()->VARIABLE()) {
+        funcArgsStack.top().push_back(pArg->getText());
+    }
+
+    funcArgsStack.pop();
+    return visitChildren(ctx);
+}
+
+std::any PreprocessorVisitor::visitDirective(prologParser::DirectiveContext* ctx) {
     CHECK_NULL(ctx);
 
     programStmtList.push_back({});
@@ -29,13 +65,57 @@ std::any ProgramRestoreVisitor::visitDirective(prologParser::DirectiveContext* c
     return visitChildren(ctx);
 }
 
-std::any ProgramRestoreVisitor::visitCompound_term(prologParser::Compound_termContext* ctx) {
+std::any PreprocessorVisitor::visitCompound_term(prologParser::Compound_termContext* ctx) {
     CHECK_NULL(ctx);
 
-    programStmtList.back().push_back(ctx->getText());
+    programStmtList.back().push_back(std::format("{}(",ctx->atom()->getText()));
+    visit(ctx->termlist());
+    programStmtList.back().push_back(")");
+
     return {};
 }
-std::any ProgramRestoreVisitor::visitTerminal(antlr4::tree::TerminalNode* ctx) {
+
+std::any PreprocessorVisitor::visitArg_alias(prologParser::Arg_aliasContext* ctx) {
+    CHECK_NULL(ctx);
+
+    if (funcArgsStack.empty()) {
+        std::cerr << std::format("Error: Using argument alias is only allowed inside a function.\n");
+        exit(-1);
+    }
+
+    std::string aliasStr = ctx->getText();
+    std::string argReplaceStr;
+
+    const auto& funcArgsVec = funcArgsStack.top();
+
+    if (aliasStr == "#") {
+        auto itemFormatFunc = [](decltype(funcArgsVec.begin()) it) { return *it; };
+        std::string argsListStr = Prolog::Utility::convertContainerToListStr<decltype(funcArgsVec.begin())>(
+            funcArgsVec.begin(), funcArgsVec.end(), itemFormatFunc);
+
+        programStmtList.back().push_back(std::format(" tuple({}) ", argsListStr));
+    } else {
+        try {
+            auto argNum = std::stoi(std::string(aliasStr.begin() + 1, aliasStr.end()));
+
+            if (argNum > funcArgsVec.size()) {
+                std::cerr << std::format("ERROR: Function has {} arguments only, but the {}-ith argument is aliased.\n",
+                                         funcArgsVec.size(), argNum);
+            } else {
+                auto argIdx = argNum - 1;
+                programStmtList.back().push_back(std::format(" {} ",funcArgsVec.at(argIdx)));
+            }
+
+        } catch (const std::exception& e) {
+            LOG("Arg alias is not a number");
+            exit(-1);
+        }
+    }
+
+    return {};
+}
+
+std::any PreprocessorVisitor::visitTerminal(antlr4::tree::TerminalNode* ctx) {
     CHECK_NULL(ctx);
 
     if (ctx->getSymbol()->getType() != antlr4::Token::EOF) {
@@ -45,37 +125,37 @@ std::any ProgramRestoreVisitor::visitTerminal(antlr4::tree::TerminalNode* ctx) {
     return visitChildren(ctx);
 }
 
-std::any ProgramRestoreVisitor::visitTuple(prologParser::TupleContext* ctx) {
-
-    if (!emptyTuples.has_value()) {
-        return visitChildren(ctx);
-    }
-
-    CHECK_NULL(ctx);
-
-    if (emptyTuples.value().get(ctx)) {
-        programStmtList.back().push_back("()");
-        return {};
-    }
-
-    programStmtList.back().push_back("(");
-
-    std::vector<std::string> nonEmptyEntries;
-    for (auto* pEntry : ctx->tuple_entry()) {
-        // If its a term, or an non-empty tuple then add it.
-        if (!entryIsTuple(pEntry) || !emptyTuples.value().get(pEntry->expr()->tuple())) {
-            visit(pEntry);
-            programStmtList.back().push_back(",");
-        }
-    }
-
-    if (programStmtList.back().back() == ",") {
-        programStmtList.back().pop_back();
-    }
-
-    programStmtList.back().push_back(")");
-    return {};
-};
+// std::any ProgramRestoreVisitor::visitTuple(prologParser::TupleContext* ctx) {
+//
+//     if (!emptyTuples.has_value()) {
+//         return visitChildren(ctx);
+//     }
+//
+//     CHECK_NULL(ctx);
+//
+//     if (emptyTuples.value().get(ctx)) {
+//         programStmtList.back().push_back("()");
+//         return {};
+//     }
+//
+//     programStmtList.back().push_back("(");
+//
+//     std::vector<std::string> nonEmptyEntries;
+//     for (auto* pEntry : ctx->tuple_entry()) {
+//         // If its a term, or an non-empty tuple then add it.
+//         if (!entryIsTuple(pEntry) || !emptyTuples.value().get(pEntry->expr()->tuple())) {
+//             visit(pEntry);
+//             programStmtList.back().push_back(",");
+//         }
+//     }
+//
+//     if (programStmtList.back().back() == ",") {
+//         programStmtList.back().pop_back();
+//     }
+//
+//     programStmtList.back().push_back(")");
+//     return {};
+// };
 
 std::any MarkEmptyTuplesVisitor::visitTuple(prologParser::TupleContext* ctx) {
     CHECK_NULL(ctx);
