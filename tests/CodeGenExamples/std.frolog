@@ -1,0 +1,59 @@
+module std {
+
+pub ForEach(List,Func) :: (
+    if Length <- Size(List) | Length = 0 then (
+            []
+        ) else (
+            List <- [L | Ls];
+            Rs <- ForEach(Ls,Func);
+            R  <- Func(L);
+            [R | Rs]
+    )
+)
+.
+
+pub Size(List) :: (
+    if List = [] then (
+        0
+    ) else (
+        List <- [L | Ls];
+        X <- Size(Ls);
+        X + 1
+    )
+)
+.
+
+
+pub Exit() :: ( halt; ).
+
+pub Replace(List,Idx,NewVal) :: (
+    ListSize <- Size(List);
+
+    if Idx < 0 ; Idx > ListSize - 1 then (
+        write('Wrong Idx');
+        Exit();
+    );
+
+    if Idx = 0 then (
+        if ListSize = 0 then (
+            []
+        ) else (
+            List <- [L | Ls];
+            [NewVal | Ls]
+        )
+    ) else (
+        List <- [L | Ls]; 
+        NewSubList <- Replace(Ls,Idx - 1, NewVal);
+        [L | NewSubList]
+    )
+)
+.
+
+
+pub Max(X,Y) :: (
+    if #1 >= #2 then #1 else #2 
+)
+.
+
+
+}

@@ -69,7 +69,7 @@ public:
 
     std::any visitCompound_term(prologParser::Compound_termContext* ctx) override;
 
-    std::any visitAtom_term(prologParser::Atom_termContext* ctx) override;
+    std::any visitName(prologParser::NameContext* ctx) override;
 
     std::any visitLambda(prologParser::LambdaContext* ctx) override;
 

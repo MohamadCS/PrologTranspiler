@@ -1,0 +1,26 @@
+import {
+    'std'
+}
+
+
+module test {
+
+TestForEach() :: (
+    std:ForEach([1,2,3,4],(X) =>( #1 * #1))
+)
+.
+
+TestSize() :: (
+    std:Size([1,2,3]),
+    std:Size([]),
+    std:Size([1])
+)
+.
+
+TestReplace() :: (
+    std:Replace([1,2,3],1,100)
+)
+.
+
+}
+

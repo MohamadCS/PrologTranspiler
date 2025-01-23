@@ -35,3 +35,13 @@ test:testSize(_var0) :-
 	.
 
 
+test:testReplace(_var0) :- 
+	_var1 = [1,2,3],
+	_var2 is 1,
+	_var3 is 100,
+	std:replace(_var1,_var2,_var3,_var4),
+	_var5 = _var4,
+	_var0 = _var5
+	.
+
+

@@ -121,7 +121,7 @@ term
     | <assoc = right> term operator_ term # binary_operator
     | operator_ term                      # unary_operator
     | VARIABLE                            # variable
-    | '[' termlist ( '|' term)? ']'       # list_term
+    | '[' (termlist ( '|' term)? )? ']'   # list_term
     | '{' termlist '}'                    # curly_bracketed_term
     | atom                                # atom_term
     | arg_alias                           # arg_alias_term
@@ -178,8 +178,7 @@ operator_
     ;
 
 atom                                  // 6.4.2 and 6.1.2
-    : '[' ']'            # empty_list //NOTE [] is not atom anymore in swipl 7 and later
-    | '{' '}'            # empty_braces
+    : '{' '}'            # empty_braces
     | LETTER_DIGIT       # name
     | GRAPHIC_TOKEN      # graphic
     | QUOTED             # quoted_string

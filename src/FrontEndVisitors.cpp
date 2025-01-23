@@ -215,10 +215,10 @@ std::any FunctionSemanticsVisitor::visitFunc_def(prologParser::Func_defContext* 
 std::any FunctionSemanticsVisitor::visitBinding(prologParser::BindingContext* ctx) {
     CHECK_NULL(ctx);
 
-    const auto* targetVar = ctx->VARIABLE();
+    auto* targetVar =ctx->children[0];
     CHECK_NULL(targetVar);
 
-    const std::string& varName = targetVar->getSymbol()->getText();
+    const std::string& varName = targetVar->getText();
 
     // First binding
     if (auto it = bindedVars.back().find(varName); it != bindedVars.back().end()) [[likely]] {

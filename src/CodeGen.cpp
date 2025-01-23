@@ -225,6 +225,7 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
             if (value.isPredicate) {
                 emit(std::format("{},", child->getText()));
+                continue;
             }
         }
 
@@ -459,14 +460,14 @@ std::any CodeGenVisitor::visitCompound_term(prologParser::Compound_termContext* 
     return node;
 }
 
-std::any CodeGenVisitor::visitAtom_term(prologParser::Atom_termContext* ctx) {
+std::any CodeGenVisitor::visitName(prologParser::NameContext* ctx) {
     CHECK_NULL(ctx);
 
     Node node;
 
     node.var = genVar();
 
-    emit(std::format("{} = {},", node.var, ctx->getText()));
+    node.isPredicate = true;
 
     return node;
 }
