@@ -87,6 +87,8 @@ Foo(X,Y,Z) :: (
 .
 ```
 
+Note that argument aliasing is done at preprocessing time.
+
 ## Conditionals
 
 Conditionals are a tuple entry, and they have the following syntax
@@ -124,6 +126,51 @@ Y <- X(1,2)  % Y matches to 3
 Sort(List, (X,Y) => (X >= Y));
 
 ```
+
+## Modules
+
+Modules defines a namespace for a set of functions, they are translated
+to regular Prolog modules. However, there usage is much more intuitive.
+
+To define a module
+```cpp
+module my_module {
+
+pub Foo(X) :: ( 
+
+)
+.
+
+F(X) :: (
+)
+.
+
+
+}
+```
+Otherfiles can include that module
+
+```
+
+import {
+    'my_module'
+}
+
+Bar(X) :: (
+    my_module:Foo(X); % ok
+    my_module:F(X); % Error, F is a private function.
+)
+.
+```
+
+If the function does not specify a namespace, then its namespace is automatically interpreted as the module's so it must be an enternal function.
+
+Every function is private by default, unless it is declared as public using the keyword `pub`.
+
+
+
+
+- [ ] Modules can accept regular predicates
 
 
 ### Rules
