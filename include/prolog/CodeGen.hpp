@@ -8,8 +8,6 @@
 #include <deque>
 #include <optional>
 #include <string>
-#include <unordered_set>
-#include <list>
 #include <vector>
 
 namespace Prolog::CodeGen {
@@ -20,7 +18,7 @@ struct Node {
     bool isPredicate = false;
 };
 
-struct CodeGenVisitor : public prologBaseVisitor {
+class CodeGenVisitor : public prologBaseVisitor {
 public:
     explicit CodeGenVisitor(bool formatOutput = false)
         : prologBaseVisitor(),
@@ -28,15 +26,17 @@ public:
     }
 
     std::string genVar();
-    static std::string genPredName(std::string funcName);
 
-    std::string getModulesCode() const;
 
     std::vector<std::string> getCodeBuffer() const;
 
-    void emit(std::string&&);
+
+    void setFuncNames(const std::vector<std::string>& funcNames);
 
 public:
+
+    std::any visitImport_modules(prologParser::Import_modulesContext* ctx) override;
+
     std::any visitFunc_def(prologParser::Func_defContext* ctx) override;
 
     std::any visitBinding(prologParser::BindingContext* ctx) override;
@@ -75,6 +75,7 @@ public:
 
     std::any visitModule(prologParser::ModuleContext* ctx) override;
 
+    
     Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:
@@ -82,21 +83,28 @@ private:
     bool m_formatOutput = false;
     std::size_t m_currentTabs = 0;
     std::optional<Prolog::Predicate> m_currentPredicate;
+
+    std::set<std::string> m_funcNames;
     std::vector<std::string> m_codeBuffer;
     std::vector<std::string> m_lambdasBuffer;
+    std::vector<std::string> m_importedModules;
+
     std::set<std::string> m_lambdasNames;
+
     antlr4::tree::ParseTreeProperty<bool> emptyTuples;
-
-    // Function To Predicate name translation
-    std::map<std::string, std::string> m_funcToPred;
-
     std::map<std::string, std::deque<Predicate>> m_modules;
-
     std::optional<std::string> m_currentModule;
 
-private:
     static inline std::size_t m_varCtr = 0;
     static inline std::size_t m_lambdaCtr = 0;
+
+private:
+
+
+    static std::string genPredName(std::string funcName);
+    void emit(std::string&&);
+    std::string getModulesCode() const;
+    std::string getNameSpace(prologParser::InvocContext*) const;
 };
 
 } // namespace Prolog::CodeGen

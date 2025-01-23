@@ -44,10 +44,8 @@ grammar prolog;
 }
 
 p_text
-    : (func_def | directive | clause | module)* EOF
+    : import_modules? (func_def | directive | clause | module)* EOF
     ;
-
-
 
 directive
     : ':-' term '.'
@@ -59,7 +57,7 @@ clause
 
 // Abstract Syntax (6.3): terms formed from tokens
 
-    termlist
+termlist
     : term (',' term)*
     ;
 
@@ -67,8 +65,10 @@ clause
 
 namespace: atom;
 
+
 module: 'module' namespace '{' (func_def)* '}';
 
+import_modules: 'import' ('{' (QUOTED)+ '}' | (QUOTED));
 
 public: 'pub';
 
@@ -110,11 +110,11 @@ expr
 
 invoc : (namespace ':')? VARIABLE tuple ;
 
-arg_alias: '#' (NATURAL_NUM)?;
+arg_alias: '#' DECIMAL?;
 
 term
     : 
-      '(' term ')'                        # braced_term // I think that should reduce to tuple in our implemenation.
+     '(' term ')'                         # braced_term 
     | '-'? integer                        # integer_term //TODO: negative case should be covered by unary_operator
     | '-'? FLOAT                          # float
     | atom '(' termlist ')'               # compound_term
@@ -198,11 +198,6 @@ integer // 6.4.4
     ;
 
 // Lexer (6.4 & 6.5): Tokens formed from Characters
-
-NATURAL_NUM :
-    [1-9][0-9]*
-    ;
-
 
 LETTER_DIGIT // 6.4.2
     : SMALL_LETTER ALPHANUMERIC*

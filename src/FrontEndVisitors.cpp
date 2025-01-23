@@ -101,7 +101,7 @@ std::any PreprocessorVisitor::visitArg_alias(prologParser::Arg_aliasContext* ctx
         try {
             auto argNum = std::stoi(std::string(aliasStr.begin() + 1, aliasStr.end()));
 
-            if (argNum > funcArgsVec.size()) {
+            if (argNum > funcArgsVec.size() || argNum <= 0) {
                 std::cerr << std::format("ERROR: Function has {} arguments only, but the {}-ith argument is aliased.\n",
                                          funcArgsVec.size(), argNum);
             } else {

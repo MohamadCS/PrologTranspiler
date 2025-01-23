@@ -19,12 +19,17 @@ void Compiler::genProlog(prologParser& parser, bool formatOutput) {
     parser.reset();
     auto* programStartCtx = parser.p_text();
 
+    Visitors::FunctionSemanticsVisitor funcV;
+    funcV.visit(programStartCtx);
+    parser.reset();
+
     // CodeGen::CodeGenVisitor codeGenV(formatOutput);
     //
     // codeGenV.visit(programStartCtx);
     // auto progList = codeGenV.getCodeBuffer();
 
     Visitors::PreprocessorVisitor progV;
+    programStartCtx = parser.p_text();
 
     progV.visit(programStartCtx);
     auto progList = progV.programStmtList;
@@ -44,6 +49,8 @@ void Compiler::genProlog(prologParser& parser, bool formatOutput) {
 
     CodeGen::CodeGenVisitor codeGenV(formatOutput);
 
+    codeGenV.setFuncNames(funcV.functionNames);
+
     std::filesystem::path outputPath;
 
     programStartCtx = afterPreprocessingParser.pParser->p_text();
@@ -56,7 +63,7 @@ void Compiler::genProlog(prologParser& parser, bool formatOutput) {
         outputPath = m_outputPath.value();
     } else {
         outputPath = m_targetPath;
-        outputPath.replace_extension("").concat("_out.pl");
+        outputPath.replace_extension("").concat(".pl");
     }
 
     std::ofstream outputFile(outputPath);
@@ -64,8 +71,6 @@ void Compiler::genProlog(prologParser& parser, bool formatOutput) {
     if (!outputFile) {
         std::cerr << std::format("ERROR: can't open the file {}\n", outputPath.string());
     }
-
-    outputFile << codeGenV.getModulesCode();
 
     for (auto& stmtList : newProgList) {
         for (auto& stmt : stmtList) {

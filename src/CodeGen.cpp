@@ -22,7 +22,9 @@ static std::string addTabs(std::string str, std::size_t num) {
 
 std::vector<std::string> CodeGenVisitor::getCodeBuffer() const {
     std::vector<std::string> result;
-    result = m_lambdasBuffer;
+    result.push_back(getModulesCode());
+    result.insert(result.end(), m_importedModules.begin(), m_importedModules.end());
+    result.insert(result.end(), m_lambdasBuffer.begin(), m_lambdasBuffer.end());
     result.insert(result.end(), m_codeBuffer.begin(), m_codeBuffer.end());
     return result;
 }
@@ -52,7 +54,7 @@ std::string CodeGenVisitor::genVar() {
 };
 
 static std::string funcToPredCode(const std::string& predName, const std::vector<std::string>& argsNames,
-                                  const std::string& returnVar) {
+                                  const std::string& returnVar, std::optional<std::string> ns) {
     std::stringstream argsTuple;
     for (auto& argStr : argsNames) {
         argsTuple << argStr << ",";
@@ -60,7 +62,9 @@ static std::string funcToPredCode(const std::string& predName, const std::vector
 
     argsTuple << returnVar;
 
-    std::string result = std::format("{}({}) :- ", predName, argsTuple.str());
+    std::string nsStr = ns.has_value() ? std::format("{}:", ns.value()) : "";
+
+    std::string result = std::format("{}{}({}) :- ", std::move(nsStr), predName, argsTuple.str());
     return result;
 }
 
@@ -161,7 +165,7 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
 
     std::string funcName = ctx->VARIABLE()->getText();
 
-    bool isLambdaInvoc = m_funcToPred.find(funcName) == m_funcToPred.end();
+    bool isLambdaInvoc = m_funcNames.find(funcName) == m_funcNames.end() && !ctx->namespace_();
 
     // Evaluate arguments, and add them to the vector.
     std::vector<std::string> predicateArgs;
@@ -174,19 +178,27 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
 
     invocNode.var = genVar();
     predicateArgs.push_back(invocNode.var); // Result var
-                                            //
-    std::string namespaceStr = ctx->namespace_() ? std::format("{}:", ctx->namespace_()->getText()) : "";
 
-    std::string predicateName = (isLambdaInvoc) ? funcName : m_funcToPred.at(funcName);
+    std::string namespaceStr= getNameSpace(ctx);
+
+    std::string predicateName;
+    if (m_funcNames.find(funcName) != m_funcNames.end()) {
+        predicateName = genPredName(funcName);
+    } else if (ctx->namespace_()) {
+        predicateName = genPredName(ctx->VARIABLE()->getText());
+    } else {
+        predicateName = funcName;
+    }
 
     auto itemFormatFunc = [](decltype(predicateArgs.begin()) it) { return *it; };
     std::string args = Prolog::Utility::convertContainerToListStr<decltype(predicateArgs.begin())>(
         predicateArgs.begin(), predicateArgs.end(), itemFormatFunc);
     std::string predicateInvoc;
+
     if (isLambdaInvoc) {
         predicateInvoc = std::format("call({},{}),", predicateName, args);
     } else {
-        predicateInvoc = std::format("{}{}({}),",namespaceStr, predicateName, args);
+        predicateInvoc = std::format("{}{}({}),", namespaceStr, predicateName, args);
     }
 
     emit(std::move(predicateInvoc));
@@ -258,6 +270,10 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
     return tupleNode;
 }
 
+void CodeGenVisitor::setFuncNames(const std::vector<std::string>& vec) {
+    m_funcNames = std::set<std::string>(vec.begin(), vec.end());
+}
+
 std::any CodeGenVisitor::visitModule(prologParser::ModuleContext* ctx) {
     CHECK_NULL(ctx);
     std::string moduleName = ctx->namespace_()->getText();
@@ -281,8 +297,6 @@ std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
 
     currentPredicate.name = genPredName(funcName);
 
-    m_funcToPred.insert({funcName, currentPredicate.name});
-
     auto argsVec = ctx->func_args()->VARIABLE();
     for (auto* pVarCtx : argsVec) {
         currentPredicate.args.push_back(pVarCtx->getText());
@@ -298,7 +312,8 @@ std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
     /****/
 
     // Emit func(args) :-
-    emit(funcToPredCode(m_currentPredicate->name, m_currentPredicate->args, m_currentPredicate->returnVar));
+    emit(funcToPredCode(m_currentPredicate->name, m_currentPredicate->args, m_currentPredicate->returnVar,
+                        m_currentModule));
     m_currentTabs++;
 
     // Fill the predicate body.
@@ -482,7 +497,12 @@ std::any CodeGenVisitor::visitLambda(prologParser::LambdaContext* ctx) {
     auto oldTabs = m_currentTabs;
     m_currentTabs = 0;
 
-    std::string lambdaName = std::format("{}_lambda{}", m_currentPredicate->name, m_lambdaCtr);
+    std::string nsStr;
+    if (m_currentModule.has_value()) {
+        nsStr = std::format("{}:", m_currentModule.value());
+    }
+
+    std::string lambdaName = std::format("{}{}_lambda{}", nsStr, m_currentPredicate->name, m_lambdaCtr);
 
     std::stringstream argsStr;
 
@@ -536,4 +556,35 @@ std::string CodeGenVisitor::getModulesCode() const {
 
     return modulesCode.str();
 }
+
+std::any CodeGenVisitor::visitImport_modules(prologParser::Import_modulesContext* ctx) {
+    CHECK_NULL(ctx);
+    const auto& fileNameCtxVec = ctx->QUOTED();
+
+    m_importedModules.reserve(fileNameCtxVec.size());
+
+    auto generatePlFileName  = [](const std::string& name){
+        std::string result = "'";
+        result += name.substr(1,name.size() - 2); 
+        result +=  ".pl\'";
+        return result;
+    };
+
+    for (auto& pStringCtx : fileNameCtxVec) {
+        m_importedModules.push_back(std::format(":- use_module({}).", generatePlFileName(pStringCtx->getText())));
+    }
+
+    return {};
+}
+
+std::string CodeGenVisitor::getNameSpace(prologParser::InvocContext* ctx) const {
+    CHECK_NULL(ctx);
+
+    if (ctx->namespace_()) {// external / internal
+        return std::format("{}:", ctx->namespace_()->getText());
+    } else {
+        return m_currentModule.has_value() ? std::format("{}:",m_currentModule.value()) : "";
+    }
+}
+
 } // namespace Prolog::CodeGen
