@@ -1,10 +1,13 @@
-
-
-module hello {
-    pub type node :: ( number , node? , node? ) .
-    pub IsNode(X : std:node ) :: () .
-
+import {
+    'std'
 }
+
+
+
+Test() :: (
+    X :: std:vector <- std:vector([],2);
+)
+.
 
 
 

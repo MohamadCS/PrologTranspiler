@@ -2,6 +2,7 @@
 	std,
 	[
 
+		vector/1,
 		forEach/3,
 		size/2,
 		exit/1,
@@ -10,32 +11,39 @@
 )
 .
 
-forEach(List,Func,_var1) :- 
-	std:size(List,_var3),
+vector(_var0) :- 
+	_var0 = std:vector(_var1,_var2),
+	list(_var1),
+	number(_var2),
+	true
+	.
+vector(_) :- write("Type mismatch"),fail.
+forEach(List,Func,_var0) :- 
+	std:size(List,_var2),
+	Length = _var2,
 	
-	Length = _var3,
 	( Length=0 -> (
-		_var4 = [],
-		_var5 = _var4,
-		_var2 = _var5
+		_var3 = [],
+		_var4 = _var3,
+		_var1 = _var4
 	)
 	;(
-		_var6 = [L|Ls],
+		_var5 = [L|Ls],
+		List = _var5,
 		
-		List = _var6,
-		std:forEach(Ls,Func,_var7),
+		std:forEach(Ls,Func,_var6),
+		Rs = _var6,
 		
-		Rs = _var7,
-		call(Func,L,_var8),
+		call(Func,L,_var7),
+		R = _var7,
 		
-		R = _var8,
-		_var9 = [R|Rs],
-		_var10 = _var9,
-		_var2 = _var10
+		_var8 = [R|Rs],
+		_var9 = _var8,
+		_var1 = _var9
 	)
 	),
-	_var11 = _var2,
-	_var1 = _var11
+	_var10 = _var1,
+	_var0 = _var10
 	.
 
 
@@ -47,11 +55,11 @@ size(List,_var0) :-
 	)
 	;(
 		_var4 = [L|Ls],
-		
 		List = _var4,
-		std:size(Ls,_var5),
 		
+		std:size(Ls,_var5),
 		X = _var5,
+		
 		_var6 is X+1,
 		_var7 = _var6,
 		_var1 = _var7
@@ -88,8 +96,8 @@ exit(_var0) :-
 
 replace(List,Idx,NewVal,_var0) :- 
 	std:size(List,_var1),
-	
 	ListSize = _var1,
+	
 	( (Idx<0;Idx>ListSize-1 -> (
 		_var2 = write('Wrong Idx'),
 		write('Wrong Idx'),
@@ -105,8 +113,8 @@ replace(List,Idx,NewVal,_var0) :-
 		)
 		;(
 			_var9 = [L|Ls],
-			
 			List = _var9,
+			
 			_var10 = [NewVal|Ls],
 			_var11 = _var10,
 			_var6 = _var11
@@ -117,12 +125,12 @@ replace(List,Idx,NewVal,_var0) :-
 	)
 	;(
 		_var13 = [L|Ls],
-		
 		List = _var13,
+		
 		_var14 is Idx-1,
 		std:replace(Ls,_var14,NewVal,_var15),
-		
 		NewSubList = _var15,
+		
 		_var16 = [L|NewSubList],
 		_var17 = _var16,
 		_var5 = _var17
@@ -144,5 +152,8 @@ max(X,Y,_var0) :-
 	_var2 = _var1,
 	_var0 = _var2
 	.
+
+
+list(X):-is_list(X).
 
 

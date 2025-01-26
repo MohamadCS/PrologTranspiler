@@ -96,7 +96,6 @@ private:
 
     std::set<std::string> m_lambdasNames;
 
-    antlr4::tree::ParseTreeProperty<bool> emptyTuples;
     std::map<std::string, std::deque<Predicate>> m_modules;
     std::optional<std::string> m_currentModule;
 
@@ -108,6 +107,8 @@ private:
     void emit(std::string&&);
     std::string getModulesCode() const;
     std::string getNameSpace(prologParser::InvocContext*) const;
+
+    std::string genTypeCode(std::string varName, prologParser::TypeContext* pTypeCtx); 
 };
 
 } // namespace Prolog::CodeGen

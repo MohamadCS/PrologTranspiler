@@ -67,7 +67,7 @@ atomic_name : LETTER_DIGIT;
 
 namespace: atomic_name;
 
-var_decl: VARIABLE (':' type)?; 
+var_decl: VARIABLE ('::' type)?; 
 
 module: 'module' namespace '{' (func_def | type_def)* '}';
 
@@ -131,7 +131,7 @@ term
      '(' term ')'                         # braced_term 
     | '-'? integer                        # integer_term //TODO: negative case should be covered by unary_operator
     | '-'? FLOAT                          # float
-    | atom '(' termlist ')'               # compound_term
+    |  atom '(' termlist ')'               # compound_term
     | <assoc = right> term operator_ term # binary_operator
     | operator_ term                      # unary_operator
     | VARIABLE                            # variable
@@ -201,7 +201,7 @@ atom:
 atom_expr : 
      QUOTED             # quoted_string
     | DOUBLE_QUOTED_LIST # dq_string
-    | LETTER_DIGIT       # name
+    | (namespace ':')? LETTER_DIGIT       # name
     | '!'                # cut
     | BACK_QUOTED_STRING # backq_string
     ;

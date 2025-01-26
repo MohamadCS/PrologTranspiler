@@ -12,19 +12,18 @@
 
 namespace Prolog::CodeGen {
 
-static std::string genTypeCode(std::string varName, prologParser::TypeContext* pTypeCtx) {
+std::string CodeGenVisitor::genTypeCode(std::string varName, prologParser::TypeContext* pTypeCtx) {
     std::string nsStr;
 
-    if(pTypeCtx->namespace_()){
-        nsStr = pTypeCtx->namespace_()->getText()  + ":";
+    if (pTypeCtx->namespace_()) {
+        nsStr = pTypeCtx->namespace_()->getText() + ":";
     }
-
     std::string typeStr = pTypeCtx->atomic_name()->getText();
 
     if (pTypeCtx->getText()[pTypeCtx->getText().size() - 1] == '?') {
-        return std::format("({}{}({}) ; {} = nil),", nsStr,typeStr, varName, varName);
+        return std::format("({}{}({}) ; {} = nil),", nsStr, typeStr, varName, varName);
     } else {
-        return std::format("{}{}({}),",nsStr, typeStr, varName);
+        return std::format("{}{}({}),", nsStr, typeStr, varName);
     }
 }
 
@@ -97,12 +96,10 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
     emit(std::format("{}({}) :- ", typeName, targetVar));
     m_currentTabs++;
 
-
     std::vector<std::string> membersVec;
     membersVec.reserve(typeCtxVec.size());
 
-
-    for(int i = 0 ; i < typeCtxVec.size() ;++i){
+    for (int i = 0; i < typeCtxVec.size(); ++i) {
         membersVec.push_back(genVar());
     }
 
@@ -110,16 +107,20 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
     std::string membersStr = Utility::convertContainerToListStr<decltype(membersVec.begin())>(
         membersVec.begin(), membersVec.end(), itemFormatFunc);
 
-    emit(std::format("{} = {}({}),", targetVar, typeName, membersStr));
+    std::string nsStr;  
+
+    if(m_currentModule.has_value()){
+        nsStr = m_currentModule.value() + ":";
+    }
+
+    emit(std::format("{} = {}{}({}),", targetVar,nsStr, typeName, membersStr));
 
     for (const auto& [varName, pTypeCtx] : std::ranges::views::zip(membersVec, typeCtxVec)) {
         emit(genTypeCode(varName, pTypeCtx));
     }
 
     emit("true");
-
     emit(".");
-
 
 
     if (m_currentModule.has_value() && ctx->public_()) {
@@ -129,6 +130,9 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
     }
 
     m_currentTabs--;
+
+    emit(std::format("{}(_) :- write(\"Type mismatch\"),fail.", typeName));
+
     m_varCtr = 0;
     return {};
 }
@@ -220,8 +224,8 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
 
     std::string result = std::format("{} = {},", bindedVarName, node.var);
 
-    emit(std::move(typeDecl));
     emit(std::move(result));
+    emit(std::move(typeDecl));
 
     Node bindingNode;
     bindingNode.var = bindedVarName;

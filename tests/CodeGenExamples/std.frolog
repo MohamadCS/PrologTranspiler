@@ -1,5 +1,9 @@
 module std {
 
+
+pub type vector :: (list , number).
+
+
 pub ForEach(List,Func) :: (
     if Length <- Size(List) | Length = 0 then (
             []
@@ -69,3 +73,7 @@ pub Max(X,Y) :: (
 
 
 }
+
+list(X) :- is_list(X).
+
+
