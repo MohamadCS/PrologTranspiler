@@ -65,8 +65,28 @@ pub Replace(List,Idx,NewVal) :: (
 .
 
 
+
 pub Max(X,Y) :: (
     if #1 >= #2 then #1 else #2 
+)
+.
+
+pub MinMember(List : std:list, MinFunc) :: (
+    ListSize <- std:Size(List);
+
+    if ListSize = 0 then (
+        nil
+    ) else if ListSize = 1 then (
+        List <- [X];
+        X
+    ) else if ListSize = 2  then (
+        List <- [X,Y];
+        MinFunc(X,Y)
+    ) else (
+        List <- [ L | Ls];
+        CurrMin <- MinMember(Ls, MinFunc);
+        MinFunc(CurrMin,L)
+    )
 )
 .
 

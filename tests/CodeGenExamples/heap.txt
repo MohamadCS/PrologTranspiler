@@ -1,0 +1,182 @@
+import {
+    'std'
+}
+
+
+
+
+module bin_heap {
+
+MergeBt(Bt1, Bt2) :: (
+
+        Bt1 <- bt(Value1, List1);
+        Bt2 <- bt(Value2, List2);
+
+        if Value1 >= Value2 then (
+            R <- bt(Value2,[Bt1 | List2]);
+            R
+        ) else (
+            R <- bt(Value1,[Bt2 | List1]);
+            R
+        )
+)
+.
+
+
+AddBtAux(Bt , Heap : std:list, I : number) :: (
+    Bt <- bt(Value, Children);
+    Order <- std:Size(Children);
+    HeapSize <- std:Size(Heap);
+
+    if I = Order then (
+        if HeapSize = 0 then (
+            Result <- [Bt];
+        ) else if Heap <- [CurrentBt | HeapTail] | CurrentBt = empty then (
+            Result <- [Bt | HeapTail];
+        ) else (
+            NewBt <- MergeBt(CurrentBt,Bt);
+            NewHeapTail <- AddBtAux(NewBt,HeapTail,I+1);
+            Result <- [ empty | NewHeapTail];
+        );
+    ) else if HeapSize = 0 then (
+        std:PrintLn("Heap size does not match the binomial heap");
+        std:Exit();
+    ) else (
+        Heap <- [ H | HeapTail];
+        NewHeapTail <- AddBtAux(Bt,HeapTail, I + 1);
+        Result <- [H | NewHeapTail];
+    );
+
+    Result
+
+)
+.
+
+pub AddBt(Bt , Heap : std:list) :: (
+    AddBtAux(Bt,Heap,0)
+)
+.
+
+
+pub RemoveBt(Bt, Heap : std:list) :: (
+    Bt <- bt(Value, Children);
+    Order <- std:Size(Children);
+    HeapSize <- std:Size(Heap);
+
+    if HeapSize = 0 then (
+        []
+    ) else if Heap = [Bt] then (
+        []
+    ) else if Heap = [Bt | HeapTail] then (
+        [empty | HeapTail]
+    ) else (
+        Heap <- [H | HeapTail];
+        NewHeapTail <- RemoveBt(Bt,HeapTail);
+       [H | NewHeapTail]
+    )
+)
+.
+
+pub PopMin(Heap : std:list)  :: (
+    MinBt <- std:MinMember(Heap, (Bt1 ,Bt2 ) => (
+        if Bt1 = empty then (
+            Bt2
+        ) else if Bt2 = empty then (
+            Bt1
+        ) else (
+            Bt1 <- bt(Value1, _);
+            Bt2 <- bt(Value2, _);
+            if Value1 =< Value2 then (
+                Bt1 
+            ) else (
+                Bt2
+            )
+        )
+    ));
+
+    std:PrintLn(MinBt);
+    MinBt <- bt(Value,List);
+    Heap1 <- RemoveBt(MinBt,Heap);
+    std:PrintLn(Heap1);
+    ResultHeap <- AddList(List,Heap1);
+    std:PrintLn(ResultHeap);
+    MinBt,
+    ResultHeap
+)
+.
+
+Add(Num : number,Heap : std:list) :: (
+    Bt <- bt(Num, []);
+    AddBt(Bt,Heap)
+)
+.
+
+RemoveEmptyTail(List : std:list) :: (
+    ListSize <- std:Size(List);
+    if ListSize = 0 then (
+        []
+    ) else if maplist(=(empty),List) then (
+        []
+    ) else (
+        List <- [L | Ls];
+        NewList <- RemoveEmptyTail(Ls);
+        [L | NewList]
+    )
+).
+
+AddList(List : std:list,Heap) :: (
+    ListSize <- std:Size(List);
+    if ListSize = 0 then (
+        Heap
+    ) else (
+        List <- [Bt | ListTail];
+        NewHeap <- AddList(ListTail,Heap);
+        AddBt(Bt,NewHeap)
+    )
+)
+.
+
+
+ListToHeap(List : std:list) :: (
+    ListSize <- std:Size(List);
+    if ListSize = 0 then (
+        []
+    ) else (
+        List <- [L | Ls];
+        Heap <- ListToHeap(Ls);
+        Add(L,Heap)
+    )
+)
+.
+
+HeapToList(Heap : std:list) :: (
+    HeapSize <- std:Size(Heap);
+    if  HeapSize = 0 then (
+        []
+    ) else (
+        Result <- PopMin(Heap);
+        Result <- tuple(bt(Value,_), NewHeap);
+        Tail <- HeapToList(NewHeap);
+        [Value | Tail]
+    )
+)
+.
+
+HeapSort(List : std:list) :: (
+    Heap <- ListToHeap(List);
+    HeapToList(Heap)
+)
+.
+
+
+
+}
+
+bt(_, []).
+
+bt(Value , [bt(ChildValue,ChildList) | RootListTail] ) :- 
+    length(RootListTail, K), 
+    length(ChildList, K),
+    Value =< ChildValue,
+    bt(Value,RootListTail)
+    .

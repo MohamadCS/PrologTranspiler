@@ -7,7 +7,8 @@
 		size/2,
 		exit/1,
 		replace/4,
-		max/3	]
+		max/3,
+		minMember/3	]
 )
 .
 
@@ -15,10 +16,9 @@ vector(_var0) :-
 	_var0 = std:vector(_var1,_var2),
 	list(_var1),
 	number(_var2),
-	true
+	!
 	.
 vector(_) :- write("Type mismatch"),fail.
-
 forEach(List,Func,_var0) :- 
 	std:size(List,_var2),
 	Length = _var2,
@@ -152,6 +152,56 @@ max(X,Y,_var0) :-
 	),
 	_var2 = _var1,
 	_var0 = _var2
+	.
+
+
+minMember(List,MinFunc,_var0) :- 
+	std:list(List),
+	std:size(List,_var1),
+	ListSize = _var1,
+	
+	( ListSize=0 -> (
+		_var3 = nil,
+		_var4 = _var3,
+		_var2 = _var4
+	)
+	;(
+		( ListSize=1 -> (
+			_var6 = [X],
+			List = _var6,
+			
+			_var7 = X,
+			_var5 = _var7
+		)
+		;(
+			( ListSize=2 -> (
+				_var9 = [X,Y],
+				List = _var9,
+				
+				call(MinFunc,X,Y,_var10),
+				_var11 = _var10,
+				_var8 = _var11
+			)
+			;(
+				_var12 = [L|Ls],
+				List = _var12,
+				
+				std:minMember(Ls,MinFunc,_var13),
+				CurrMin = _var13,
+				
+				call(MinFunc,CurrMin,L,_var14),
+				_var15 = _var14,
+				_var8 = _var15
+			)
+			),
+			_var5 = _var8
+		)
+		),
+		_var2 = _var5
+	)
+	),
+	_var16 = _var2,
+	_var0 = _var16
 	.
 
 
