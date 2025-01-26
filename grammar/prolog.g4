@@ -63,11 +63,13 @@ termlist
 
 /**********************Grammar Extention**********************/
 
-namespace: atom;
+atomic_name : LETTER_DIGIT;
+
+namespace: atomic_name;
 
 var_decl: VARIABLE (':' type)?; 
 
-module: 'module' namespace '{' (func_def)* '}';
+module: 'module' namespace '{' (func_def | type_def)* '}';
 
 import_modules: 'import' ('{' QUOTED (',' QUOTED) *'}') ;
 
@@ -93,9 +95,9 @@ tuple_entry
     | return
     ;
 
-type: LETTER_DIGIT ('?')?;
+type: (namespace ':')? atomic_name ('?')?;
 
-type_def: 'type' LETTER_DIGIT '::' '(' type (',' type)* ')' '.';
+type_def: (public)? 'type' atomic_name '::' '(' type (',' type)* ')' '.';
 
 
 binding : (var_decl | arg_alias) '<-' expr ; 
@@ -189,16 +191,25 @@ operator_
     | '\\'
     ;
 
-atom                                  // 6.4.2 and 6.1.2
-    : '{' '}'            # empty_braces
-    | LETTER_DIGIT       # name
-    | GRAPHIC_TOKEN      # graphic
-    | QUOTED             # quoted_string
-    | DOUBLE_QUOTED_LIST # dq_string
-    | BACK_QUOTED_STRING # backq_string
-    | ';'                # semicolon
-    | '!'                # cut
+
+
+atom: 
+    atom_expr  
+    | atom_stmt
     ;
+
+atom_expr : 
+     QUOTED             # quoted_string
+    | DOUBLE_QUOTED_LIST # dq_string
+    | LETTER_DIGIT       # name
+    | '!'                # cut
+    | BACK_QUOTED_STRING # backq_string
+    ;
+
+atom_stmt:
+      ';'                # semicolon
+     | GRAPHIC_TOKEN      # graphic
+     ;
 
 integer // 6.4.4
     : DECIMAL

@@ -1,3 +1,11 @@
+:- module(
+	hello,
+	[
+
+		node/1,
+		isNode/2	]
+)
+.
 
 node(_var0) :- 
 	_var0 = node(_var1,_var2,_var3),
@@ -7,7 +15,7 @@ node(_var0) :-
 	true
 	.
 isNode(X,_var0) :- 
-	node(X),
+	std:node(X),
 	_var1 = tuple(  ),
 	_var0 = _var1
 	.

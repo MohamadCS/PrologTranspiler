@@ -12,6 +12,7 @@
 
 forEach(List,Func,_var1) :- 
 	std:size(List,_var3),
+	
 	Length = _var3,
 	( Length=0 -> (
 		_var4 = [],
@@ -20,10 +21,13 @@ forEach(List,Func,_var1) :-
 	)
 	;(
 		_var6 = [L|Ls],
+		
 		List = _var6,
 		std:forEach(Ls,Func,_var7),
+		
 		Rs = _var7,
 		call(Func,L,_var8),
+		
 		R = _var8,
 		_var9 = [R|Rs],
 		_var10 = _var9,
@@ -43,8 +47,10 @@ size(List,_var0) :-
 	)
 	;(
 		_var4 = [L|Ls],
+		
 		List = _var4,
 		std:size(Ls,_var5),
+		
 		X = _var5,
 		_var6 is X+1,
 		_var7 = _var6,
@@ -66,15 +72,15 @@ print(X,_var0) :-
 
 printLn(X,_var0) :- 
 	std:print(X,_var1),
-	Y="\n",
-	std:print(Y,_var2),
-	_var3 = tuple(  ),
-	_var0 = _var3
+	_var2 = "\n",
+	std:print(_var2,_var3),
+	_var4 = tuple(  ),
+	_var0 = _var4
 	.
 
 
 exit(_var0) :- 
-	halt,
+	_var1 = halt,
 	_var2 = tuple(  ),
 	_var0 = _var2
 	.
@@ -82,6 +88,7 @@ exit(_var0) :-
 
 replace(List,Idx,NewVal,_var0) :- 
 	std:size(List,_var1),
+	
 	ListSize = _var1,
 	( (Idx<0;Idx>ListSize-1 -> (
 		_var2 = write('Wrong Idx'),
@@ -90,7 +97,6 @@ replace(List,Idx,NewVal,_var0) :-
 		_var4 = tuple(  ),
 		true);true)
 	),
-
 	( Idx=0 -> (
 		( ListSize=0 -> (
 			_var7 = [],
@@ -99,6 +105,7 @@ replace(List,Idx,NewVal,_var0) :-
 		)
 		;(
 			_var9 = [L|Ls],
+			
 			List = _var9,
 			_var10 = [NewVal|Ls],
 			_var11 = _var10,
@@ -110,9 +117,11 @@ replace(List,Idx,NewVal,_var0) :-
 	)
 	;(
 		_var13 = [L|Ls],
+		
 		List = _var13,
 		_var14 is Idx-1,
 		std:replace(Ls,_var14,NewVal,_var15),
+		
 		NewSubList = _var15,
 		_var16 = [L|NewSubList],
 		_var17 = _var16,

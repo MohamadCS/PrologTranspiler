@@ -30,8 +30,7 @@ Print(X) :: (
 
 PrintLn(X) :: (
     Print(X);
-    Y = "\n";
-    Print(Y);
+    Print("\n");
 )
 .
 

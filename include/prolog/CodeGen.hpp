@@ -73,6 +73,8 @@ public:
 
     std::any visitModule(prologParser::ModuleContext* ctx) override;
 
+    std::any visitAtom_term(prologParser::Atom_termContext* ctx) override;
+
     std::any visitReturn(prologParser::ReturnContext* ctx) override;
 
     std::any visitType_def(prologParser::Type_defContext* ctx) override;

@@ -1,11 +1,14 @@
 
 
+module hello {
+    pub type node :: ( number , node? , node? ) .
+    pub IsNode(X : std:node ) :: () .
+
+}
 
 
 
 
-type node :: ( number , node? , node? ) .
 
 
-IsNode(X : ) :: () .
 
