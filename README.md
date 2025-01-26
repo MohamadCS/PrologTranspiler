@@ -110,7 +110,7 @@ We can use if else to evaluate one of the tuples
 .
 ```
 
-If the tuple has one entry, and its vanishing then thery is no need
+If the tuple has one entry, and its non-vanishing then there is no need
 to wrap it with parentheses, which allows for more readable syntax
 especially for the else if nested statements.
 
@@ -169,8 +169,32 @@ Every function is private by default, unless it is declared as public using the 
 
 
 
+## Types
 
-- [ ] Modules can accept regular predicates
+Syntax
+
+```
+type my_type :: (type1 ,type2 , ... , typeN).
+```
+
+such that `typei` is an atomic name, that can be chained with `?`, if it
+does then the type is nullable (`typei` or `nil`).
+
+We can declare the variable's type when binding, or in the function's arguments
+
+```
+import {
+    'std'
+}
+
+pub Foo::(X : node) :: (
+    Y : node <- X; // does not fail, since X is also a node 
+    L : std:vector <- std:vector([1,2,3],3);// True  the type std:vector is defined in the our standard library
+
+)
+```
+
+
 
 
 ### Rules
@@ -197,9 +221,11 @@ make
 - [x] #i the i-th arg.
 - [x] Delete Variable after evalutating predicate. 
 - [x] Write examples using the syntax sugar.
-- [ ] Add namespaces.
+- [x] Add namespaces.
+- [x] Add types and type checking.
 - [ ] Change `::` to `<-`.
 - [ ] Write a test program that build a binomaial tree of random size. 
+- [ ] Modules can accept regular predicates
 - [ ] Test delete min.
 - [ ] Rewrite with syntax sugar.
 - [ ] Add delayed/immediate defenition.

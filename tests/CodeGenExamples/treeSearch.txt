@@ -6,10 +6,9 @@
 
 type node :: (number, node?, node?).
 
-MaxTree(Root : node ) :: (
+MaxTree(Root : node) :: (
 
    Root <- node(V, LeftChild,RightChild);
-
 
    Max <- (X,Y) => (if X >= Y then X else Y);
 
