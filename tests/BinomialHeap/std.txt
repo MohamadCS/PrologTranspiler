@@ -1,0 +1,117 @@
+module std {
+
+
+pub type vector :: (list , number).
+
+pub ForEach(List,Func) :: (
+    if Length <- Size(List) | Length = 0 then (
+            []
+        ) else (
+            List <- [L | Ls];
+            Rs <- ForEach(Ls,Func);
+            R  <- Func(L);
+            [R | Rs]
+    )
+)
+.
+
+pub Size(List) :: (
+    if List = [] then (
+        0
+    ) else (
+        List <- [L | Ls];
+        X <- Size(Ls);
+        X + 1
+    )
+)
+.
+
+Print(X) :: (
+    write(X);
+)
+.
+
+PrintLn(X) :: (
+    Print(X);
+    Print("\n");
+)
+.
+
+
+
+pub Exit() :: ( halt; ).
+
+pub Replace(List,Idx,NewVal) :: (
+    ListSize <- Size(List);
+
+    if Idx < 0 ; Idx > ListSize - 1 then (
+        write('Wrong Idx');
+        Exit();
+    );
+
+    if Idx = 0 then (
+        if ListSize = 0 then (
+            []
+        ) else (
+            List <- [L | Ls];
+            [NewVal | Ls]
+        )
+    ) else (
+        List <- [L | Ls]; 
+        NewSubList <- Replace(Ls,Idx - 1, NewVal);
+        [L | NewSubList]
+    )
+)
+.
+
+
+
+pub Max(X,Y) :: (
+    if #1 >= #2 then #1 else #2 
+)
+.
+
+pub MinMember(List : std:list, MinFunc) :: (
+    ListSize <- std:Size(List);
+
+    if ListSize = 0 then (
+        nil
+    ) else if ListSize = 1 then (
+        List <- [X];
+        X
+    ) else if ListSize = 2  then (
+        List <- [X,Y];
+        MinFunc(X,Y)
+    ) else (
+        List <- [ L | Ls];
+        CurrMin <- MinMember(Ls, MinFunc);
+        MinFunc(CurrMin,L)
+    )
+)
+.
+
+pub RandomNum(Lower : number,Higher : number) :: (
+    random(Lower,Higher,X);
+    X
+)
+.
+
+pub MakeList(Length : number,Value : number) :: (
+    length(List,Length);
+    maplist(=(Value),List);
+    List
+)
+.
+
+pub SortList(List : std:list) :: (
+    sort(List,Result);
+    Result
+)
+.
+
+
+}
+
+list(X) :- is_list(X).
+
+

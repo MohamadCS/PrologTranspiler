@@ -1,0 +1,17 @@
+import {
+    'heap',
+    'std'
+}
+
+
+
+TestHeapSort() :: (
+    List <- std:MakeList(4000,0);
+    RandomList <- std:ForEach(List,(X) => ( std:RandomNum(1,100)));
+    BinHeapSort <- bin_heap:HeapSort(RandomList);
+    StdSort <- std:SortList(RandomList);
+    std:PrintLn(RandomList);
+    std:PrintLn(BinHeapSort);
+)
+.
+

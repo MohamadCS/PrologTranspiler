@@ -307,6 +307,7 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
             if (value.isPredicate) {
                 emit(std::format("{},", child->getText()));
+                ++i;
                 continue;
             }
         }

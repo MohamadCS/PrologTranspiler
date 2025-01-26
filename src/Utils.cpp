@@ -18,7 +18,6 @@ std::deque<bool> isVanishingEntryList(prologParser::TupleContext* ctx) {
             isVanishing.push_back(false);
         }
     }
-    DEBUG(print(isVanishing));
 
     // Last element does not specify ',' or ';' which means its non-vanishing
     if (isVanishing.size() < tupleEntriesVec.size()) {
