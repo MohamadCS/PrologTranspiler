@@ -1,0 +1,41 @@
+
+
+
+
+
+F(X)::(
+    if X == 1 then (
+        return 0; 
+    );
+   5 
+)
+.
+
+G(X) :: (
+    if X == 1 then (
+        return (1,2,3, (X,Y) => (X+Y));
+    );
+    1
+)
+.
+
+
+H(X,Y) :: (
+    if X == 1 then (
+        return 1;
+    );
+
+    if X == 1 then (
+        if Y == 1 then (
+            return 5;
+        );
+    );
+
+    if X + Y > 100 then (
+        return 100;
+    ) else (
+        return 10;
+    );
+    []
+)
+.

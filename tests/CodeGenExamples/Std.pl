@@ -10,7 +10,7 @@
 )
 .
 
-std:forEach(List,Func,_var1) :- 
+forEach(List,Func,_var1) :- 
 	std:size(List,_var3),
 	Length = _var3,
 	( Length=0 -> (
@@ -35,7 +35,7 @@ std:forEach(List,Func,_var1) :-
 	.
 
 
-std:size(List,_var0) :- 
+size(List,_var0) :- 
 	( List=[] -> (
 		_var2 is 0,
 		_var3 = _var2,
@@ -56,14 +56,31 @@ std:size(List,_var0) :-
 	.
 
 
-std:exit(_var0) :- 
+print(X,_var0) :- 
+	_var1 = write(X),
+	write(X),
+	_var2 = tuple(  ),
+	_var0 = _var2
+	.
+
+
+printLn(X,_var0) :- 
+	std:print(X,_var1),
+	Y="\n",
+	std:print(Y,_var2),
+	_var3 = tuple(  ),
+	_var0 = _var3
+	.
+
+
+exit(_var0) :- 
 	halt,
 	_var2 = tuple(  ),
 	_var0 = _var2
 	.
 
 
-std:replace(List,Idx,NewVal,_var0) :- 
+replace(List,Idx,NewVal,_var0) :- 
 	std:size(List,_var1),
 	ListSize = _var1,
 	( (Idx<0;Idx>ListSize-1 -> (
@@ -73,6 +90,7 @@ std:replace(List,Idx,NewVal,_var0) :-
 		_var4 = tuple(  ),
 		true);true)
 	),
+
 	( Idx=0 -> (
 		( ListSize=0 -> (
 			_var7 = [],
@@ -106,7 +124,7 @@ std:replace(List,Idx,NewVal,_var0) :-
 	.
 
 
-std:max(X,Y,_var0) :- 
+max(X,Y,_var0) :- 
 	( X>=Y -> (
 		_var1 = X
 	)

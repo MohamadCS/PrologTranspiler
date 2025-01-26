@@ -1,0 +1,13 @@
+import {
+    'a1',
+    'a2',
+    'std'
+}
+
+
+
+Main() :: (
+    std:PrintLn(a:Foo(1));
+    std:PrintLn(b:Foo(2));
+)
+.

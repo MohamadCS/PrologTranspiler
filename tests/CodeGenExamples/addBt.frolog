@@ -1,0 +1,18 @@
+import {
+    'std'
+}
+
+
+
+module binary_heap {
+
+AddBtAux(Bt,Heap,CurrOrder) :: (
+)
+.
+pub AddBt(Bt,Heap) :: (
+    AddBtAux(Bt,Heap,0)
+)
+.
+
+
+}

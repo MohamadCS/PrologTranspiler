@@ -23,6 +23,19 @@ pub Size(List) :: (
 )
 .
 
+Print(X) :: (
+    write(X);
+)
+.
+
+PrintLn(X) :: (
+    Print(X);
+    Y = "\n";
+    Print(Y);
+)
+.
+
+
 
 pub Exit() :: ( halt; ).
 

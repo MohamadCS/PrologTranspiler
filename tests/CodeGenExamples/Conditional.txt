@@ -1,4 +1,14 @@
 
 
 
-Max(X,Y) :: (if X >= Y then X else Y).
+Max(X : number,Y : number) :: (
+    if X >= Y then X else Y
+    )
+.
+
+
+
+F() :: (
+    (X : number , L : list) => (1)
+)
+.

@@ -1,0 +1,11 @@
+
+
+
+
+
+
+type node :: ( number , node? , node? ) .
+
+
+IsNode(X : ) :: () .
+

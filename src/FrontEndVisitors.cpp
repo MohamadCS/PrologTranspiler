@@ -29,10 +29,10 @@ std::any PreprocessorVisitor::visitFunc_def(prologParser::Func_defContext* ctx) 
     programStmtList.push_back({});
 
     funcArgsStack.push({});
-    funcArgsStack.top().reserve(ctx->func_args()->VARIABLE().size());
+    funcArgsStack.top().reserve(ctx->func_args()->var_decl().size());
 
-    for (auto* pArg : ctx->func_args()->VARIABLE()) {
-        funcArgsStack.top().push_back(pArg->getText());
+    for (auto* pArg : ctx->func_args()->var_decl()) {
+        funcArgsStack.top().push_back(pArg->VARIABLE()->getText());
     }
 
     std::any result  = visitChildren(ctx);
@@ -47,10 +47,10 @@ std::any PreprocessorVisitor::visitLambda(prologParser::LambdaContext* ctx) {
     programStmtList.push_back({});
 
     funcArgsStack.push({});
-    funcArgsStack.top().reserve(ctx->func_args()->VARIABLE().size());
+    funcArgsStack.top().reserve(ctx->func_args()->var_decl().size());
 
-    for (auto* pArg : ctx->func_args()->VARIABLE()) {
-        funcArgsStack.top().push_back(pArg->getText());
+    for (auto* pArg : ctx->func_args()->var_decl()) {
+        funcArgsStack.top().push_back(pArg->VARIABLE()->getText());
     }
 
     std::any result  = visitChildren(ctx);
@@ -196,7 +196,7 @@ std::any FunctionSemanticsVisitor::visitFunc_def(prologParser::Func_defContext* 
 
     functionNames.push_back(funcName);
 
-    const auto& argsVec = ctx->func_args()->VARIABLE();
+    const auto& argsVec = ctx->func_args()->var_decl();
     // Every argument variable is initialized.
     initializedVars.back().insert(ctx->VARIABLE()->getText());
     funcsVars.back().insert(ctx->VARIABLE()->getText());

@@ -44,7 +44,7 @@ grammar prolog;
 }
 
 p_text
-    : import_modules? (func_def | directive | clause | module)* EOF
+    : import_modules? (type_def |func_def | directive | clause | module)* EOF
     ;
 
 directive
@@ -65,16 +65,18 @@ termlist
 
 namespace: atom;
 
+var_decl: VARIABLE (':' type)?; 
 
 module: 'module' namespace '{' (func_def)* '}';
 
-import_modules: 'import' ('{' (QUOTED)+ '}' | (QUOTED));
+import_modules: 'import' ('{' QUOTED (',' QUOTED) *'}') ;
+
 
 public: 'pub';
 
 func_def : (public)? VARIABLE func_args '::' tuple '.' ; 
 
-func_args : '(' ( VARIABLE (',' VARIABLE)* )? ')' ;
+func_args : '(' ( var_decl (',' var_decl)* )? ')' ;
 
 tuple : <assoc = left> {++tupleCount;} 
                                  ('(' ( tuple_entry  ((',' | ';') tuple_entry)*  )?  (';')?  ')' )
@@ -88,18 +90,28 @@ tuple_entry
     | binding
     | if
     | if_else
+    | return
     ;
 
-binding : (VARIABLE | arg_alias) '<-' expr ; 
+type: LETTER_DIGIT ('?')?;
+
+type_def: 'type' LETTER_DIGIT '::' '(' type (',' type)* ')' '.';
+
+
+binding : (var_decl | arg_alias) '<-' expr ; 
 
 cond_tuple: tuple_entry | tuple;
 
 if_head : (binding (';' binding)*) '|';
 
-
 if: 'if' {enabledSep= true;} (if_head)? term {enabledSep = false;} 'then' cond_tuple;
 
-if_else: <assoc = right> 'if' {enabledSep= true;} (if_head)? term {enabledSep = false;} 'then'  cond_tuple  'else' cond_tuple;
+if_else: <assoc = right> 'if' {enabledSep= true;} (if_head)? term {enabledSep = false;} 'then' 
+                            cond_tuple
+                        'else' 
+                            cond_tuple;
+
+return: 'return' expr;
 
 expr 
     : tuple 
