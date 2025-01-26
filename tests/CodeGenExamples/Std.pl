@@ -18,6 +18,7 @@ vector(_var0) :-
 	true
 	.
 vector(_) :- write("Type mismatch"),fail.
+
 forEach(List,Func,_var0) :- 
 	std:size(List,_var2),
 	Length = _var2,

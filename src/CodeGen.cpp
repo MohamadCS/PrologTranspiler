@@ -21,7 +21,7 @@ std::string CodeGenVisitor::genTypeCode(std::string varName, prologParser::TypeC
     std::string typeStr = pTypeCtx->atomic_name()->getText();
 
     if (pTypeCtx->getText()[pTypeCtx->getText().size() - 1] == '?') {
-        return std::format("({}{}({}) ; {} = nil),", nsStr, typeStr, varName, varName);
+        return std::format("({} = nil ; {}{}({})),", varName, nsStr, typeStr, varName);
     } else {
         return std::format("{}{}({}),", nsStr, typeStr, varName);
     }
@@ -119,7 +119,7 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
         emit(genTypeCode(varName, pTypeCtx));
     }
 
-    emit("true");
+    emit("!");
     emit(".");
 
 

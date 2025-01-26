@@ -5,7 +5,7 @@ import {
 
 
 Test() :: (
-    X :: std:vector <- std:vector([],2);
+    X : std:vector <- std:vector([],2);
 )
 .
 

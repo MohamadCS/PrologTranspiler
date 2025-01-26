@@ -67,7 +67,7 @@ atomic_name : LETTER_DIGIT;
 
 namespace: atomic_name;
 
-var_decl: VARIABLE ('::' type)?; 
+var_decl: VARIABLE (':' type)?; 
 
 module: 'module' namespace '{' (func_def | type_def)* '}';
 

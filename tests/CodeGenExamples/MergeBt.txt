@@ -1,4 +1,10 @@
 
+
+
+
+
+
+
 bt(_, []).
 
 bt(Value , [bt(ChildValue,ChildList) | RootListTail] ) :- 
@@ -12,6 +18,7 @@ Bt(Value,List) :: (
     bt(Value,List)
 )
 .
+
 
 MergeBt(Bt1,  Bt2) :: (
 
