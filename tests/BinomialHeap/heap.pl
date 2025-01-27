@@ -93,9 +93,8 @@ addBtAux(Bt,Heap,I,_var0) :-
 			)
 			;(
 				bin_heap:mergeBt(CurrentBt,Bt,_var12),
-				NewBt = _var12,
 				_var13 is I+1,
-				bin_heap:addBtAux(NewBt,HeapTail,_var13,_var14),
+				bin_heap:addBtAux(_var12,HeapTail,_var13,_var14),
 				NewHeapTail = _var14,
 				_var15 = [empty|NewHeapTail],
 				Result = _var15,
@@ -200,8 +199,7 @@ popMin(Heap,_var0) :-
 	_var15 = bt(Value,List),
 	MinBt = _var15,
 	bin_heap:removeBt(MinBt,Heap,_var16),
-	Heap1 = _var16,
-	bin_heap:addList(List,Heap1,_var17),
+	bin_heap:addList(List,_var16,_var17),
 	ResultHeap = _var17,
 	_var18 = tuple( MinBt,ResultHeap ),
 	_var19 = _var18,
@@ -213,8 +211,7 @@ add(Num,Heap,_var0) :-
 	number(Num),
 	std:list(Heap),
 	_var1 = bt(Num,[]),
-	Bt = _var1,
-	bin_heap:addBt(Bt,Heap,_var2),
+	bin_heap:addBt(_var1,Heap,_var2),
 	_var3 = _var2,
 	_var0 = _var3
 	.
@@ -232,8 +229,7 @@ addList(List,Heap,_var0) :-
 		_var4 = [Bt|ListTail],
 		List = _var4,
 		bin_heap:addList(ListTail,Heap,_var5),
-		NewHeap = _var5,
-		bin_heap:addBt(Bt,NewHeap,_var6),
+		bin_heap:addBt(Bt,_var5,_var6),
 		_var7 = _var6,
 		_var2 = _var7
 	)
@@ -256,8 +252,7 @@ listToHeap(List,_var0) :-
 		_var5 = [L|Ls],
 		List = _var5,
 		bin_heap:listToHeap(Ls,_var6),
-		Heap = _var6,
-		bin_heap:add(L,Heap,_var7),
+		bin_heap:add(L,_var6,_var7),
 		_var8 = _var7,
 		_var2 = _var8
 	)
@@ -279,7 +274,6 @@ heapToList(Heap,_var0) :-
 	;(
 		bin_heap:popMin(Heap,_var5),
 		tuple(MinBt,NewHeap) = _var5,
-		std:list(NewHeap),
 		_var6 = bt(Value,_),
 		MinBt = _var6,
 		bin_heap:heapToList(NewHeap,_var7),

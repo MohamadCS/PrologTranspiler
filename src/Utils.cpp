@@ -24,7 +24,6 @@ std::deque<bool> isVanishingEntryList(prologParser::TupleContext* ctx) {
         LOG("Last does not specify operator");
         isVanishing.push_back(false);
     }
-    DEBUG(print(isVanishing));
 
     assert(isVanishing.size() == tupleEntriesVec.size());
 

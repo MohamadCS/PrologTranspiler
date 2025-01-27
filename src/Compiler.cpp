@@ -43,8 +43,6 @@ void Compiler::genProlog(prologParser& parser, bool formatOutput) {
         procSStr << '\n';
     }
 
-    std::cout << procSStr.str();
-
     ParsingManager afterPreprocessingParser(procSStr.str());
 
     CodeGen::CodeGenVisitor codeGenV(formatOutput);

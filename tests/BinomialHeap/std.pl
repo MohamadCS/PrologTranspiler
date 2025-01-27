@@ -5,6 +5,8 @@
 		vector/1,
 		forEach/3,
 		size/2,
+		print/2,
+		printLn/2,
 		exit/1,
 		replace/4,
 		max/3,

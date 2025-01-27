@@ -2,7 +2,7 @@
 
 module testing {
 
-EXPECT_EQ(X,Y) :: (
+pub EXPECT_EQ(X,Y) :: (
     if X = Y then (
         std:PrintLn("SUCCESS");
     ) else (
@@ -11,7 +11,7 @@ EXPECT_EQ(X,Y) :: (
 )
 .
 
-EXPECT_NEQ(X,Y) :: (
+pub EXPECT_NEQ(X,Y) :: (
     if X \= Y then (
         std:PrintLn("SUCCESS");
     ) else (

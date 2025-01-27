@@ -1,6 +1,6 @@
 #pragma once
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 
 #if defined(ENABLE_DEBUG) && ENABLE_DEBUG == 1
 #define DEBUG(line) line

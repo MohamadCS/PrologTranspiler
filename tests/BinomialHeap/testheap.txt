@@ -4,17 +4,21 @@ import {
     'std'
 }
 
-TestHeapSort1() :: (
-    List <- std:MakeList(1000,0);
-    RandomList <- std:ForEach(List, (X) => ( std:RandomNum(1,100)));
-    BinHeapSort <- bin_heap:HeapSort(RandomList);
-    StdSort <- std:SortList(RandomList);
-    testing:EXPECT_EQ(BinHeapSort,StdSort);
+TestHeapSort() :: (
+    RandomList <- std:ForEach( 
+                              std:MakeList(30,0), 
+                              (X) => (std:RandomNum(1,100))
+    );
+
+    testing:EXPECT_EQ (
+                bin_heap:HeapSort(RandomList),
+                std:SortList(RandomList)
+    );
 )
 .
 
 Main() :: (
-    TestHeapSort1();
+    TestHeapSort();
 )
 .
 

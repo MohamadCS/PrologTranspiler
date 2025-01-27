@@ -25,14 +25,14 @@ pub Size(List) :: (
 )
 .
 
-Print(X) :: (
+pub Print(X) :: (
     write(X);
 )
 .
 
-PrintLn(X) :: (
-    Print(X);
-    Print("\n");
+pub PrintLn(X) :: (
+    std:Print(X);
+    std:Print("\n");
 )
 .
 
@@ -98,7 +98,7 @@ pub RandomNum(Lower : number,Higher : number) :: (
 )
 .
 
-pub MakeList(Length : number,Value) :: (
+pub MakeList(Length : number, Value) :: (
     length(List,Length);
     maplist(=(Value),List);
     List
@@ -110,7 +110,6 @@ pub SortList(List : std:list) :: (
     Result
 )
 .
-
 
 
 

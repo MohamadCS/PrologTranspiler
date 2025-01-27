@@ -34,8 +34,7 @@ AddBtAux(Bt , Heap : std:list, I : number) :: (
         ) else if Heap <- [CurrentBt | HeapTail] | CurrentBt = empty then (
             Result <- [Bt | HeapTail];
         ) else (
-            NewBt <- MergeBt(CurrentBt,Bt);
-            NewHeapTail <- AddBtAux(NewBt,HeapTail,I+1);
+            NewHeapTail <- AddBtAux(MergeBt(CurrentBt,Bt),HeapTail,I+1);
             Result <- [ empty | NewHeapTail];
         );
     ) else if HeapSize = 0 then (
@@ -72,7 +71,7 @@ RemoveBt(Bt, Heap : std:list) :: (
     ) else (
         Heap <- [H | HeapTail];
         NewHeapTail <- RemoveBt(Bt,HeapTail);
-       [H | NewHeapTail]
+        [H | NewHeapTail]
     )
 )
 .
@@ -95,16 +94,14 @@ PopMin(Heap : std:list)  :: (
     ));
 
     MinBt <- bt(Value,List);
-    Heap1 <- RemoveBt(MinBt,Heap);
-    ResultHeap <- AddList(List,Heap1);
+    ResultHeap <- AddList(List,RemoveBt(MinBt,Heap));
 
     (MinBt,ResultHeap)
 )
 .
 
 Add(Num : number,Heap : std:list) :: (
-    Bt <- bt(Num, []);
-    AddBt(Bt,Heap)
+    AddBt(bt(Num, []),Heap)
 )
 .
 
@@ -114,8 +111,7 @@ AddList(List : std:list,Heap) :: (
         Heap
     ) else (
         List <- [Bt | ListTail];
-        NewHeap <- AddList(ListTail,Heap);
-        AddBt(Bt,NewHeap)
+        AddBt(Bt,AddList(ListTail,Heap))
     )
 )
 .
@@ -127,8 +123,7 @@ ListToHeap(List : std:list) :: (
         []
     ) else (
         List <- [L | Ls];
-        Heap <- ListToHeap(Ls);
-        Add(L,Heap)
+        Add(L,ListToHeap(Ls))
     )
 )
 .
@@ -138,7 +133,7 @@ HeapToList(Heap : std:list) :: (
     if  HeapSize = 0 then (
         []
     ) else (
-        (MinBt, NewHeap : std:list ) <- PopMin(Heap);
+        (MinBt, NewHeap) <- PopMin(Heap);
         MinBt <- bt(Value , _);
         Tail <- HeapToList(NewHeap);
         [Value | Tail]

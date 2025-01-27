@@ -235,12 +235,12 @@ make
 - [x] Write examples using the syntax sugar.
 - [x] Add namespaces.
 - [x] Add types and type checking.
-- [ ] Change `::` to `<-`.
-- [ ] Write a test program that build a binomaial tree of random size. 
-- [ ] Modules can accept regular predicates
-- [ ] Test delete min.
-- [ ] Rewrite with syntax sugar.
+- [x] Write a test program that build a binomaial tree of random size. 
+- [x] Modules can accept regular predicates
+- [x] Test delete min.
+- [x] Rewrite with syntax sugar.
 - [ ] Add delayed/immediate defenition.
+- [ ] Change `::` to `<-`.
 
 
 
