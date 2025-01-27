@@ -70,6 +70,18 @@ Evaluates to
 
 So if you want a binding only, be sure to pair the binding with `;`.
 
+### Tuple unpacking
+
+For tuples, and functions that returns tuple we can unpack there value using the syntax
+
+```
+(Min,Max) <- getMinMax(List);
+```
+
+In this case the tuple the function returns must be the same size as the number of variables. 
+
+
+
 ## Argument aliases
 
 We can refer to the `i`-th argument using `#i`, and we can refer
@@ -197,7 +209,7 @@ pub Foo::(X : node) :: (
 
 
 
-### Rules
+# Rules
 - In if else statement, both tuples must have the same effective size.
 - The function name is translated to the a predicate with the same name
 but with the first letter in lower case, it has an additional variable which will hold the result of the function, the variable type of the return value of the function, if the function's effective size is 1,
