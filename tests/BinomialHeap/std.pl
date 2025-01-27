@@ -8,6 +8,7 @@
 		exit/1,
 		replace/4,
 		max/3,
+		min/3,
 		minMember/3,
 		randomNum/3,
 		makeList/3,
@@ -25,7 +26,6 @@ vector(_) :- write("Type mismatch"),fail.
 forEach(List,Func,_var0) :- 
 	std:size(List,_var2),
 	Length = _var2,
-	
 	( Length=0 -> (
 		_var3 = [],
 		_var4 = _var3,
@@ -34,13 +34,10 @@ forEach(List,Func,_var0) :-
 	;(
 		_var5 = [L|Ls],
 		List = _var5,
-		
 		std:forEach(Ls,Func,_var6),
 		Rs = _var6,
-		
 		call(Func,L,_var7),
 		R = _var7,
-		
 		_var8 = [R|Rs],
 		_var9 = _var8,
 		_var1 = _var9
@@ -60,10 +57,8 @@ size(List,_var0) :-
 	;(
 		_var4 = [L|Ls],
 		List = _var4,
-		
 		std:size(Ls,_var5),
 		X = _var5,
-		
 		_var6 is X+1,
 		_var7 = _var6,
 		_var1 = _var7
@@ -101,7 +96,6 @@ exit(_var0) :-
 replace(List,Idx,NewVal,_var0) :- 
 	std:size(List,_var1),
 	ListSize = _var1,
-	
 	( (Idx<0;Idx>ListSize-1 -> (
 		_var2 = write('Wrong Idx'),
 		write('Wrong Idx'),
@@ -118,7 +112,6 @@ replace(List,Idx,NewVal,_var0) :-
 		;(
 			_var9 = [L|Ls],
 			List = _var9,
-			
 			_var10 = [NewVal|Ls],
 			_var11 = _var10,
 			_var6 = _var11
@@ -130,11 +123,9 @@ replace(List,Idx,NewVal,_var0) :-
 	;(
 		_var13 = [L|Ls],
 		List = _var13,
-		
 		_var14 is Idx-1,
 		std:replace(Ls,_var14,NewVal,_var15),
 		NewSubList = _var15,
-		
 		_var16 = [L|NewSubList],
 		_var17 = _var16,
 		_var5 = _var17
@@ -158,11 +149,23 @@ max(X,Y,_var0) :-
 	.
 
 
+min(X,Y,_var0) :- 
+	( Y>=X -> (
+		_var1 = X
+	)
+	;(
+		_var1 = Y
+	)
+	),
+	_var2 = _var1,
+	_var0 = _var2
+	.
+
+
 minMember(List,MinFunc,_var0) :- 
 	std:list(List),
 	std:size(List,_var1),
 	ListSize = _var1,
-	
 	( ListSize=0 -> (
 		_var3 = nil,
 		_var4 = _var3,
@@ -172,7 +175,6 @@ minMember(List,MinFunc,_var0) :-
 		( ListSize=1 -> (
 			_var6 = [X],
 			List = _var6,
-			
 			_var7 = X,
 			_var5 = _var7
 		)
@@ -180,7 +182,6 @@ minMember(List,MinFunc,_var0) :-
 			( ListSize=2 -> (
 				_var9 = [X,Y],
 				List = _var9,
-				
 				call(MinFunc,X,Y,_var10),
 				_var11 = _var10,
 				_var8 = _var11
@@ -188,10 +189,8 @@ minMember(List,MinFunc,_var0) :-
 			;(
 				_var12 = [L|Ls],
 				List = _var12,
-				
 				std:minMember(Ls,MinFunc,_var13),
 				CurrMin = _var13,
-				
 				call(MinFunc,CurrMin,L,_var14),
 				_var15 = _var14,
 				_var8 = _var15
@@ -220,7 +219,6 @@ randomNum(Lower,Higher,_var0) :-
 
 makeList(Length,Value,_var0) :- 
 	number(Length),
-	number(Value),
 	_var1 = length(List,Length),
 	length(List,Length),
 	_var2 = maplist(=(Value),List),

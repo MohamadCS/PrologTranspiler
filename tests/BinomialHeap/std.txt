@@ -1,6 +1,5 @@
 module std {
 
-
 pub type vector :: (list , number).
 
 pub ForEach(List,Func) :: (
@@ -37,8 +36,6 @@ PrintLn(X) :: (
 )
 .
 
-
-
 pub Exit() :: ( halt; ).
 
 pub Replace(List,Idx,NewVal) :: (
@@ -71,6 +68,11 @@ pub Max(X,Y) :: (
 )
 .
 
+pub Min(X,Y) :: (
+    if #2 >= #1 then #1 else #2 
+)
+.
+
 pub MinMember(List : std:list, MinFunc) :: (
     ListSize <- std:Size(List);
 
@@ -96,7 +98,7 @@ pub RandomNum(Lower : number,Higher : number) :: (
 )
 .
 
-pub MakeList(Length : number,Value : number) :: (
+pub MakeList(Length : number,Value) :: (
     length(List,Length);
     maplist(=(Value),List);
     List
@@ -108,6 +110,7 @@ pub SortList(List : std:list) :: (
     Result
 )
 .
+
 
 
 }

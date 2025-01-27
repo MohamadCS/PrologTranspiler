@@ -52,13 +52,13 @@ AddBtAux(Bt , Heap : std:list, I : number) :: (
 )
 .
 
-pub AddBt(Bt , Heap : std:list) :: (
+AddBt(Bt , Heap : std:list) :: (
     AddBtAux(Bt,Heap,0)
 )
 .
 
 
-pub RemoveBt(Bt, Heap : std:list) :: (
+RemoveBt(Bt, Heap : std:list) :: (
     Bt <- bt(Value, Children);
     Order <- std:Size(Children);
     HeapSize <- std:Size(Heap);
@@ -77,7 +77,7 @@ pub RemoveBt(Bt, Heap : std:list) :: (
 )
 .
 
-pub PopMin(Heap : std:list)  :: (
+PopMin(Heap : std:list)  :: (
     MinBt <- std:MinMember(Heap, (Bt1 ,Bt2 ) => (
         if Bt1 = empty then (
             Bt2
@@ -94,14 +94,11 @@ pub PopMin(Heap : std:list)  :: (
         )
     ));
 
-    std:PrintLn(MinBt);
     MinBt <- bt(Value,List);
     Heap1 <- RemoveBt(MinBt,Heap);
-    std:PrintLn(Heap1);
     ResultHeap <- AddList(List,Heap1);
-    std:PrintLn(ResultHeap);
-    MinBt,
-    ResultHeap
+
+    (MinBt,ResultHeap)
 )
 .
 
@@ -110,19 +107,6 @@ Add(Num : number,Heap : std:list) :: (
     AddBt(Bt,Heap)
 )
 .
-
-RemoveEmptyTail(List : std:list) :: (
-    ListSize <- std:Size(List);
-    if ListSize = 0 then (
-        []
-    ) else if maplist(=(empty),List) then (
-        []
-    ) else (
-        List <- [L | Ls];
-        NewList <- RemoveEmptyTail(Ls);
-        [L | NewList]
-    )
-).
 
 AddList(List : std:list,Heap) :: (
     ListSize <- std:Size(List);
@@ -154,17 +138,16 @@ HeapToList(Heap : std:list) :: (
     if  HeapSize = 0 then (
         []
     ) else (
-        Result <- PopMin(Heap);
-        Result <- tuple(bt(Value,_), NewHeap);
+        (MinBt, NewHeap : std:list ) <- PopMin(Heap);
+        MinBt <- bt(Value , _);
         Tail <- HeapToList(NewHeap);
         [Value | Tail]
     )
 )
 .
 
-HeapSort(List : std:list) :: (
-    Heap <- ListToHeap(List);
-    HeapToList(Heap)
+pub HeapSort(List : std:list) :: (
+    HeapToList(ListToHeap(List))
 )
 .
 

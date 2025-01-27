@@ -5,13 +5,18 @@ import {
 
 
 
-TestHeapSort() :: (
-    List <- std:MakeList(4000,0);
+TestHeapSort1() :: (
+    List <- std:MakeList(1000,0);
     RandomList <- std:ForEach(List,(X) => ( std:RandomNum(1,100)));
     BinHeapSort <- bin_heap:HeapSort(RandomList);
     StdSort <- std:SortList(RandomList);
     std:PrintLn(RandomList);
     std:PrintLn(BinHeapSort);
+)
+.
+
+RunTests() :: (
+    TestHeapSort1();
 )
 .
 

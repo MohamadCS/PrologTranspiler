@@ -99,8 +99,9 @@ type: (namespace ':')? atomic_name ('?')?;
 
 type_def: (public)? 'type' atomic_name '::' '(' type (',' type)* ')' '.';
 
+binding_var: (var_decl | arg_alias);
 
-binding : (var_decl | arg_alias) '<-' expr ; 
+binding : (('(' binding_var (',' binding_var)+ ')') | binding_var) '<-' expr ; 
 
 cond_tuple: tuple_entry | tuple;
 

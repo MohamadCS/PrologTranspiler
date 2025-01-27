@@ -107,13 +107,13 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
     std::string membersStr = Utility::convertContainerToListStr<decltype(membersVec.begin())>(
         membersVec.begin(), membersVec.end(), itemFormatFunc);
 
-    std::string nsStr;  
+    std::string nsStr;
 
-    if(m_currentModule.has_value()){
+    if (m_currentModule.has_value()) {
         nsStr = m_currentModule.value() + ":";
     }
 
-    emit(std::format("{} = {}{}({}),", targetVar,nsStr, typeName, membersStr));
+    emit(std::format("{} = {}{}({}),", targetVar, nsStr, typeName, membersStr));
 
     for (const auto& [varName, pTypeCtx] : std::ranges::views::zip(membersVec, typeCtxVec)) {
         emit(genTypeCode(varName, pTypeCtx));
@@ -121,7 +121,6 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
 
     emit("!");
     emit(".");
-
 
     if (m_currentModule.has_value() && ctx->public_()) {
         Predicate predicate;
@@ -213,19 +212,29 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
 
     std::string typeDecl;
 
-    if (ctx->var_decl()) {
-        bindedVarName = ctx->var_decl()->VARIABLE()->getText();
-        if (ctx->var_decl()->type()) {
-            typeDecl = genTypeCode(ctx->var_decl()->VARIABLE()->getText(), ctx->var_decl()->type());
-        }
-    } else {
-        bindedVarName = ctx->children[0]->getText();
+    std::vector<std::string> varNamesVec;
+
+    // note that alias arg is not an option here, we suppose that we've processed it before.
+    for (auto* pBindingVarCtx : ctx->binding_var()) {
+        varNamesVec.push_back(pBindingVarCtx->var_decl()->VARIABLE()->getText());
     }
 
-    std::string result = std::format("{} = {},", bindedVarName, node.var);
 
-    emit(std::move(result));
-    emit(std::move(typeDecl));
+    if (varNamesVec.size() == 1) {
+        emit(std::format("{} = {},", varNamesVec[0], node.var));
+    } else {
+        auto itemFormatFunc = [](decltype(varNamesVec.begin()) it) { return *it; };
+        std::string vecListStr = Prolog::Utility::convertContainerToListStr<decltype(varNamesVec.begin())>(
+            varNamesVec.begin(), varNamesVec.end(), itemFormatFunc);
+
+        emit(std::format("tuple({}) = {},", vecListStr, node.var));
+    }
+
+    for (auto* pBindingVarCtx : ctx->binding_var()) {
+        if (pBindingVarCtx->var_decl()->type()) {
+            emit(genTypeCode(pBindingVarCtx->var_decl()->VARIABLE()->getText(), pBindingVarCtx->var_decl()->type()));
+        }
+    }
 
     Node bindingNode;
     bindingNode.var = bindedVarName;
