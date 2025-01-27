@@ -1,0 +1,22 @@
+import {
+    'heap',
+    'testing',
+    'std'
+}
+
+TestHeapSort1() :: (
+    List <- std:MakeList(1000,0);
+    RandomList <- std:ForEach(List, (X) => ( std:RandomNum(1,100)));
+    BinHeapSort <- bin_heap:HeapSort(RandomList);
+    StdSort <- std:SortList(RandomList);
+    testing:EXPECT_EQ(BinHeapSort,StdSort);
+)
+.
+
+Main() :: (
+    TestHeapSort1();
+)
+.
+
+
+

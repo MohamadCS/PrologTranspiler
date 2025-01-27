@@ -83,7 +83,12 @@ static std::string funcToPredCode(const std::string& predName, const std::vector
 
     std::string nsStr = ns.has_value() ? std::format("{}:", ns.value()) : "";
 
-    std::string result = std::format("{}({}) :- ", predName, argsTuple.str());
+    std::string result;
+    if (predName != "main") {
+        result = std::format("{}({}) :- ", predName, argsTuple.str());
+    } else {
+        result = ":- ";
+    }
     return result;
 }
 
@@ -218,7 +223,6 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
     for (auto* pBindingVarCtx : ctx->binding_var()) {
         varNamesVec.push_back(pBindingVarCtx->var_decl()->VARIABLE()->getText());
     }
-
 
     if (varNamesVec.size() == 1) {
         emit(std::format("{} = {},", varNamesVec[0], node.var));

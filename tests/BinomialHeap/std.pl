@@ -230,8 +230,8 @@ makeList(Length,Value,_var0) :-
 
 sortList(List,_var0) :- 
 	std:list(List),
-	_var1 = sort(List,Result),
-	sort(List,Result),
+	_var1 = msort(List,Result),
+	msort(List,Result),
 	_var2 = Result,
 	_var0 = _var2
 	.

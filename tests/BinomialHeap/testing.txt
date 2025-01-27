@@ -1,0 +1,24 @@
+
+
+module testing {
+
+EXPECT_EQ(X,Y) :: (
+    if X = Y then (
+        std:PrintLn("SUCCESS");
+    ) else (
+        std:PrintLn("FAILED");
+    );
+)
+.
+
+EXPECT_NEQ(X,Y) :: (
+    if X \= Y then (
+        std:PrintLn("SUCCESS");
+    ) else (
+        std:PrintLn("FAILED");
+    );
+)
+.
+
+}
+

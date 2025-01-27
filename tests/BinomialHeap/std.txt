@@ -106,10 +106,11 @@ pub MakeList(Length : number,Value) :: (
 .
 
 pub SortList(List : std:list) :: (
-    sort(List,Result);
+    msort(List,Result);
     Result
 )
 .
+
 
 
 
