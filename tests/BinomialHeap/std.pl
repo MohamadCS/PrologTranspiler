@@ -7,6 +7,7 @@
 		size/2,
 		print/2,
 		printLn/2,
+		input/1,
 		exit/1,
 		replace/4,
 		max/3,
@@ -29,18 +30,18 @@ forEach(List,Func,_var0) :-
 	std:size(List,_var2),
 	Length = _var2,
 	( Length=0 -> (
-		_var3 = [],
+		_var3 = [  ],
 		_var4 = _var3,
 		_var1 = _var4
 	)
 	;(
-		_var5 = [L|Ls],
+		_var5 = [ L | Ls ],
 		List = _var5,
 		std:forEach(Ls,Func,_var6),
 		Rs = _var6,
 		call(Func,L,_var7),
 		R = _var7,
-		_var8 = [R|Rs],
+		_var8 = [ R | Rs ],
 		_var9 = _var8,
 		_var1 = _var9
 	)
@@ -57,7 +58,7 @@ size(List,_var0) :-
 		_var1 = _var3
 	)
 	;(
-		_var4 = [L|Ls],
+		_var4 = [ L | Ls ],
 		List = _var4,
 		std:size(Ls,_var5),
 		X = _var5,
@@ -88,6 +89,14 @@ printLn(X,_var0) :-
 	.
 
 
+input(_var0) :- 
+	_var1 = read(X),
+	read(X),
+	_var2 = X,
+	_var0 = _var2
+	.
+
+
 exit(_var0) :- 
 	_var1 = halt,
 	_var2 = tuple(  ),
@@ -107,14 +116,14 @@ replace(List,Idx,NewVal,_var0) :-
 	),
 	( Idx=0 -> (
 		( ListSize=0 -> (
-			_var7 = [],
+			_var7 = [  ],
 			_var8 = _var7,
 			_var6 = _var8
 		)
 		;(
-			_var9 = [L|Ls],
+			_var9 = [ L | Ls ],
 			List = _var9,
-			_var10 = [NewVal|Ls],
+			_var10 = [ NewVal | Ls ],
 			_var11 = _var10,
 			_var6 = _var11
 		)
@@ -123,12 +132,12 @@ replace(List,Idx,NewVal,_var0) :-
 		_var5 = _var12
 	)
 	;(
-		_var13 = [L|Ls],
+		_var13 = [ L | Ls ],
 		List = _var13,
 		_var14 is Idx-1,
 		std:replace(Ls,_var14,NewVal,_var15),
 		NewSubList = _var15,
-		_var16 = [L|NewSubList],
+		_var16 = [ L | NewSubList ],
 		_var17 = _var16,
 		_var5 = _var17
 	)
@@ -168,44 +177,31 @@ minMember(List,MinFunc,_var0) :-
 	std:list(List),
 	std:size(List,_var1),
 	ListSize = _var1,
-	( ListSize=0 -> (
-		_var3 = nil,
-		_var4 = _var3,
-		_var2 = _var4
-	)
-	;(
-		( ListSize=1 -> (
-			_var6 = [X],
-			List = _var6,
-			_var7 = X,
-			_var5 = _var7
-		)
-		;(
-			( ListSize=2 -> (
-				_var9 = [X,Y],
-				List = _var9,
-				call(MinFunc,X,Y,_var10),
-				_var11 = _var10,
-				_var8 = _var11
-			)
-			;(
-				_var12 = [L|Ls],
-				List = _var12,
-				std:minMember(Ls,MinFunc,_var13),
-				CurrMin = _var13,
-				call(MinFunc,CurrMin,L,_var14),
-				_var15 = _var14,
-				_var8 = _var15
-			)
-			),
-			_var5 = _var8
-		)
-		),
-		_var2 = _var5
-	)
+	_var3 = [  ],
+	_var4 = [ X ],
+	_var5 = [ X,Y ],
+	_var6 = [ L | Ls ],
+	(
+	List = _var3 -> 
+	_var7 = nil,
+	_var2 = _var7
+	;
+	List = _var4 -> 
+	_var2 = X
+	;
+	List = _var5 -> 
+	call(MinFunc,X,Y,_var8),
+	_var2 = _var8
+	;
+	List = _var6 -> 
+	std:minMember(Ls,MinFunc,_var9),
+	call(MinFunc,_var9,L,_var10),
+	_var2 = _var10
+	;
+	_var2 = nil
 	),
-	_var16 = _var2,
-	_var0 = _var16
+	_var11 = _var2,
+	_var0 = _var11
 	.
 
 

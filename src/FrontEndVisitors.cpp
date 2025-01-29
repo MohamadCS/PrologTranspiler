@@ -72,7 +72,7 @@ std::any PreprocessorVisitor::visitCompound_term(prologParser::Compound_termCont
     CHECK_NULL(ctx);
 
     programStmtList.back().push_back(std::format("{}(",ctx->atom()->getText()));
-    visit(ctx->termlist());
+    visit(ctx->expr_list());
     programStmtList.back().push_back(")");
 
     return {};

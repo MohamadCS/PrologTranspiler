@@ -320,7 +320,7 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
             Node value = std::any_cast<Node>(returnValue);
 
             if (value.isPredicate) {
-                emit(std::format("{},", child->getText()));
+                emit(std::format("{},", value.predicateText));
                 ++i;
                 continue;
             }
@@ -547,7 +547,46 @@ std::any CodeGenVisitor::visitList_term(prologParser::List_termContext* ctx) {
 
     node.var = genVar();
 
-    emit(std::format("{} = {},", node.var, ctx->getText()));
+    std::vector<std::string> entriesVec;
+
+    // Go over the list expr, if they are terms then generate the same code
+    // otherwise visit then add the returnes var instead of the expression.c
+    if (ctx->expr_list()) {
+        const auto& expCtxVec = ctx->expr_list()->expr();
+        entriesVec.reserve(expCtxVec.size());
+
+        for (auto* pExprCtx : ctx->expr_list()->expr()) {
+            if (pExprCtx->term()) {
+                entriesVec.push_back(pExprCtx->getText());
+            } else {
+                auto expResult = visit(pExprCtx);
+                if (expResult.has_value()) {
+                    entriesVec.push_back(std::any_cast<Node>(expResult).var);
+                }
+            }
+        }
+    }
+
+    std::string exprListStr = Prolog::Utility::convertContainerToListStr<decltype(entriesVec.begin())>(
+        entriesVec.begin(), entriesVec.end(), [](decltype(entriesVec.begin()) it) { return *it; });
+
+    if (auto* pExprCtx = ctx->expr(); pExprCtx != nullptr) {
+
+        std::string exprStr;
+
+        if (pExprCtx->term()) {
+            exprStr = pExprCtx->getText();
+        } else {
+            auto expResult = visit(pExprCtx);
+            if (expResult.has_value()) {
+                exprStr = std::any_cast<Node>(expResult).var;
+            }
+        }
+
+        exprListStr += std::format(" | {}", exprStr);
+    }
+
+    emit(std::format("{} = [ {} ],", node.var, exprListStr));
 
     return node;
 }
@@ -559,7 +598,35 @@ std::any CodeGenVisitor::visitCompound_term(prologParser::Compound_termContext* 
 
     node.var = genVar();
 
-    emit(std::format("{} = {},", node.var, ctx->getText()));
+    std::vector<std::string> entriesVec;
+
+    // Go over the list expr, if they are terms then generate the same code
+    // otherwise visit then add the returnes var instead of the expression.c
+    if (ctx->expr_list()) {
+        const auto& expCtxVec = ctx->expr_list()->expr();
+        entriesVec.reserve(expCtxVec.size());
+
+        for (auto* pExprCtx : ctx->expr_list()->expr()) {
+            if (pExprCtx->term()) {
+                entriesVec.push_back(pExprCtx->getText());
+            } else {
+                auto expResult = visit(pExprCtx);
+                if (expResult.has_value()) {
+                    entriesVec.push_back(std::any_cast<Node>(expResult).var);
+                }
+            }
+        }
+    }
+
+    std::string exprListStr = Prolog::Utility::convertContainerToListStr<decltype(entriesVec.begin())>(
+        entriesVec.begin(), entriesVec.end(), [](decltype(entriesVec.begin()) it) { return *it; });
+
+    std::string predicateStr = std::format("{}({})",ctx->atom()->getText(),exprListStr);
+
+    emit(std::format("{} = {},", node.var, predicateStr));
+
+    node.predicateText = std::move(predicateStr);
+
     node.isPredicate = true;
 
     return node;
@@ -573,6 +640,8 @@ std::any CodeGenVisitor::visitName(prologParser::NameContext* ctx) {
     node.var = genVar();
 
     node.isPredicate = true;
+
+    node.predicateText = ctx->getText();
 
     return node;
 }

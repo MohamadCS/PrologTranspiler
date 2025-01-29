@@ -26,28 +26,20 @@ MergeBt(Bt1, Bt2) :: (
 AddBtAux(Bt , Heap : std:list, I : number) :: (
     Bt <- bt(Value, Children);
     Order <- std:Size(Children);
-    HeapSize <- std:Size(Heap);
 
     if I = Order then (
-        if HeapSize = 0 then (
-            Result <- [Bt];
-        ) else if Heap <- [CurrentBt | HeapTail] | CurrentBt = empty then (
-            Result <- [Bt | HeapTail];
-        ) else (
-            NewHeapTail <- AddBtAux(MergeBt(CurrentBt,Bt),HeapTail,I+1);
-            Result <- [ empty | NewHeapTail];
-        );
-    ) else if HeapSize = 0 then (
-        std:PrintLn("Heap size does not match the binomial heap");
-        std:Exit();
+        % If the current index is the same as the bt order match according to
+        % the state of Heap
+        match Heap {
+            [] => [Bt],
+            [empty | HeapTail] => [Bt | HeapTail],
+            [CurrentBt | HeapTail] => [ empty | AddBtAux(MergeBt(CurrentBt,Bt),HeapTail,I+1)]
+        }
+
     ) else (
         Heap <- [ H | HeapTail];
-        NewHeapTail <- AddBtAux(Bt,HeapTail, I + 1);
-        Result <- [H | NewHeapTail];
-    );
-
-    Result
-
+        [H | AddBtAux(Bt,HeapTail, I + 1)]
+    )
 )
 .
 
@@ -58,18 +50,11 @@ AddBt(Bt , Heap : std:list) :: (
 
 
 RemoveBt(Bt, Heap : std:list) :: (
-    Bt <- bt(Value, Children);
-    Order <- std:Size(Children);
-    HeapSize <- std:Size(Heap);
-
     match Heap  {
         [] => [], 
         [Bt] => [],
         [Bt | HeapTail] => [empty | HeapTail],
-        [H | HeapTail] => (
-                NewHeapTail <- RemoveBt(Bt,HeapTail);
-                [H | NewHeapTail]
-        )
+        [H | HeapTail] => [H | RemoveBt(Bt,HeapTail)]
     }
 )
 .
@@ -104,14 +89,9 @@ Add(Num : number,Heap : std:list) :: (
 .
 
 AddList(List , Heap) :: (
-    ListSize <- std:Size(List);
-
-    match std:Size(List) {
-        0 => Heap,
-        else => (
-             List <- [Bt | ListTail];
-             AddBt(Bt,AddList(ListTail,Heap))
-        )
+    match List {
+        [] => Heap,
+        [Bt | ListTail] => AddBt(Bt,AddList(ListTail,Heap))
     }
 )
 .
@@ -135,8 +115,7 @@ HeapToList(Heap : std:list) :: (
     ) else (
         (MinBt, NewHeap) <- PopMin(Heap);
         MinBt <- bt(Value , _);
-        Tail <- HeapToList(NewHeap);
-        [Value | Tail]
+        [Value | HeapToList(NewHeap)]
     )
 )
 .

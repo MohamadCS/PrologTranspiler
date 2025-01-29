@@ -4,8 +4,24 @@ import {
 
 
 
+
+
+say(X,Y) :- write(X), write(Y).
+
+
+F() :: (
+    "hello"
+)
+.
+
+G() :: (
+    "world"
+)
+.
+
 Test() :: (
-    X : std:vector <- std:vector([],2);
+    say(F(),G());
+    true
 )
 .
 

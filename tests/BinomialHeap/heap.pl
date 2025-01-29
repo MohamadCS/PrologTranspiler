@@ -73,66 +73,43 @@ addBtAux(Bt,Heap,I,_var0) :-
 	Bt = _var1,
 	std:size(Children,_var2),
 	Order = _var2,
-	std:size(Heap,_var3),
-	HeapSize = _var3,
 	( I=Order -> (
-		( HeapSize=0 -> (
-			_var6 = [Bt],
-			Result = _var6,
-			_var7 = tuple(  ),
-			_var5 = _var7
-		)
-		;(
-			_var9 = [CurrentBt|HeapTail],
-			Heap = _var9,
-			( CurrentBt=empty -> (
-				_var10 = [Bt|HeapTail],
-				Result = _var10,
-				_var11 = tuple(  ),
-				_var8 = _var11
-			)
-			;(
-				bin_heap:mergeBt(CurrentBt,Bt,_var12),
-				_var13 is I+1,
-				bin_heap:addBtAux(_var12,HeapTail,_var13,_var14),
-				NewHeapTail = _var14,
-				_var15 = [empty|NewHeapTail],
-				Result = _var15,
-				_var16 = tuple(  ),
-				_var8 = _var16
-			)
-			),
-			_var5 = _var8
-		)
+		_var5 = [  ],
+		_var6 = [ empty | HeapTail ],
+		_var7 = [ CurrentBt | HeapTail ],
+		(
+		Heap = _var5 -> 
+		_var8 = [ Bt ],
+		_var4 = _var8
+		;
+		Heap = _var6 -> 
+		_var9 = [ Bt | HeapTail ],
+		_var4 = _var9
+		;
+		Heap = _var7 -> 
+		bin_heap:mergeBt(CurrentBt,Bt,_var11),
+		_var12 is I+1,
+		bin_heap:addBtAux(_var11,HeapTail,_var12,_var13),
+		_var10 = [ empty | _var13 ],
+		_var4 = _var10
+		;
+		_var4 = nil
 		),
-		_var17 = tuple(  ),
-		_var4 = _var17
+		_var14 = _var4,
+		_var3 = _var14
 	)
 	;(
-		( HeapSize=0 -> (
-			_var19 = "Heap size does not match the binomial heap",
-			std:printLn(_var19,_var20),
-			std:exit(_var21),
-			_var22 = tuple(  ),
-			_var18 = _var22
-		)
-		;(
-			_var23 = [H|HeapTail],
-			Heap = _var23,
-			_var24 is I+1,
-			bin_heap:addBtAux(Bt,HeapTail,_var24,_var25),
-			NewHeapTail = _var25,
-			_var26 = [H|NewHeapTail],
-			Result = _var26,
-			_var27 = tuple(  ),
-			_var18 = _var27
-		)
-		),
-		_var4 = _var18
+		_var15 = [ H | HeapTail ],
+		Heap = _var15,
+		_var17 is I+1,
+		bin_heap:addBtAux(Bt,HeapTail,_var17,_var18),
+		_var16 = [ H | _var18 ],
+		_var19 = _var16,
+		_var3 = _var19
 	)
 	),
-	_var28 = Result,
-	_var0 = _var28
+	_var20 = _var3,
+	_var0 = _var20
 	.
 
 
@@ -147,40 +124,32 @@ addBt(Bt,Heap,_var0) :-
 
 removeBt(Bt,Heap,_var0) :- 
 	std:list(Heap),
-	_var1 = bt(Value,Children),
-	Bt = _var1,
-	std:size(Children,_var2),
-	Order = _var2,
-	std:size(Heap,_var3),
-	HeapSize = _var3,
-	_var5 = [],
-	_var6 = [Bt],
-	_var7 = [Bt|HeapTail],
-	_var8 = [H|HeapTail],
+	_var2 = [  ],
+	_var3 = [ Bt ],
+	_var4 = [ Bt | HeapTail ],
+	_var5 = [ H | HeapTail ],
 	(
+	Heap = _var2 -> 
+	_var6 = [  ],
+	_var1 = _var6
+	;
+	Heap = _var3 -> 
+	_var7 = [  ],
+	_var1 = _var7
+	;
+	Heap = _var4 -> 
+	_var8 = [ empty | HeapTail ],
+	_var1 = _var8
+	;
 	Heap = _var5 -> 
-	_var9 = [],
-	_var4 = _var9
+	bin_heap:removeBt(Bt,HeapTail,_var10),
+	_var9 = [ H | _var10 ],
+	_var1 = _var9
 	;
-	Heap = _var6 -> 
-	_var10 = [],
-	_var4 = _var10
-	;
-	Heap = _var7 -> 
-	_var11 = [empty|HeapTail],
-	_var4 = _var11
-	;
-	Heap = _var8 -> 
-	bin_heap:removeBt(Bt,HeapTail,_var12),
-	NewHeapTail = _var12,
-	_var13 = [H|NewHeapTail],
-	_var14 = _var13,
-	_var4 = _var14
-	;
-	_var4 = nil
+	_var1 = nil
 	),
-	_var15 = _var4,
-	_var0 = _var15
+	_var11 = _var1,
+	_var0 = _var11
 	.
 
 
@@ -211,23 +180,21 @@ add(Num,Heap,_var0) :-
 
 
 addList(List,Heap,_var0) :- 
-	std:size(List,_var1),
-	ListSize = _var1,
-	std:size(List,_var3),
-	_var4 is 0,
+	_var2 = [  ],
+	_var3 = [ Bt | ListTail ],
 	(
-	_var3 = _var4 -> 
-	_var2 = Heap
+	List = _var2 -> 
+	_var1 = Heap
 	;
-	_var5 = [Bt|ListTail],
-	List = _var5,
-	bin_heap:addList(ListTail,Heap,_var6),
-	bin_heap:addBt(Bt,_var6,_var7),
-	_var8 = _var7,
-	_var2 = _var8
+	List = _var3 -> 
+	bin_heap:addList(ListTail,Heap,_var4),
+	bin_heap:addBt(Bt,_var4,_var5),
+	_var1 = _var5
+	;
+	_var1 = nil
 	),
-	_var9 = _var2,
-	_var0 = _var9
+	_var6 = _var1,
+	_var0 = _var6
 	.
 
 
@@ -237,10 +204,10 @@ listToHeap(List,_var0) :-
 	_var3 is 0,
 	(
 	_var2 = _var3 -> 
-	_var4 = [],
+	_var4 = [  ],
 	_var1 = _var4
 	;
-	_var5 = [L|Ls],
+	_var5 = [ L | Ls ],
 	List = _var5,
 	bin_heap:listToHeap(Ls,_var6),
 	bin_heap:add(L,_var6,_var7),
@@ -257,7 +224,7 @@ heapToList(Heap,_var0) :-
 	std:size(Heap,_var1),
 	HeapSize = _var1,
 	( HeapSize=0 -> (
-		_var3 = [],
+		_var3 = [  ],
 		_var4 = _var3,
 		_var2 = _var4
 	)
@@ -268,7 +235,7 @@ heapToList(Heap,_var0) :-
 		MinBt = _var6,
 		bin_heap:heapToList(NewHeap,_var7),
 		Tail = _var7,
-		_var8 = [Value|Tail],
+		_var8 = [ Value | Tail ],
 		_var9 = _var8,
 		_var2 = _var9
 	)

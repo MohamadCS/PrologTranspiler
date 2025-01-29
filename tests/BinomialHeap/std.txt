@@ -83,19 +83,13 @@ pub Min(X,Y) :: (
 pub MinMember(List : std:list, MinFunc) :: (
     ListSize <- std:Size(List);
 
-    if ListSize = 0 then (
-        nil
-    ) else if ListSize = 1 then (
-        List <- [X];
-        X
-    ) else if ListSize = 2  then (
-        List <- [X,Y];
-        MinFunc(X,Y)
-    ) else (
-        List <- [ L | Ls];
-        CurrMin <- MinMember(Ls, MinFunc);
-        MinFunc(CurrMin,L)
-    )
+    match List {
+        [] => nil,
+        [X] => X,
+        [X,Y] => MinFunc(X,Y),
+        [L | Ls] => MinFunc(MinMember(Ls,MinFunc),L)
+    }
+
 )
 .
 

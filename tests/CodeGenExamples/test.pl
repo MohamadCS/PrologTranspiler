@@ -1,11 +1,30 @@
 
 :- use_module('std.pl').
-test(_var0) :- 
-	_var1 = std:vector([],2),
-	X = _var1,
-	std:vector(X),
-	_var2 = tuple(  ),
+say(X,Y):-write(X),write(Y).
+
+
+f(_var0) :- 
+	_var1 = "hello",
+	_var2 = _var1,
 	_var0 = _var2
+	.
+
+
+g(_var0) :- 
+	_var1 = "world",
+	_var2 = _var1,
+	_var0 = _var2
+	.
+
+
+test(_var0) :- 
+	f(_var2),
+	g(_var3),
+	_var1 = say(_var2,_var3),
+	say(_var2,_var3),
+	_var4 = halt,
+	_var5 = _var4,
+	_var0 = _var5
 	.
 
 

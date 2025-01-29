@@ -121,6 +121,10 @@ if_else: <assoc = right> 'if' {enabledSep= true;} (if_head)? term {enabledSep = 
                         'else' 
                             cond_tuple;
 
+expr_list
+    : expr (',' expr)*
+    ;
+
 return: 'return' expr;
 
 expr 
@@ -138,13 +142,13 @@ arg_alias: '#' DECIMAL?;
 term
     : 
      '(' term ')'                         # braced_term 
-    | '-'? integer                        # integer_term //TODO: negative case should be covered by unary_operator
+    | '-'? integer                        # integer_term 
     | '-'? FLOAT                          # float
-    |  atom '(' termlist ')'               # compound_term
-    | <assoc = right> term operator_ term # binary_operator
+    |  atom '(' expr_list ')'              # compound_term
+    | <assoc = right>  term  operator_ term # binary_operator
     | operator_ term                      # unary_operator
     | VARIABLE                            # variable
-    | '[' (termlist ( '|' term)? )? ']'   # list_term
+    | '[' (expr_list ( '|' expr)? )? ']'  # list_term
     | '{' termlist '}'                    # curly_bracketed_term
     | atom                                # atom_term
     | arg_alias                           # arg_alias_term

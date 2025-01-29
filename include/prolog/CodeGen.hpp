@@ -17,6 +17,7 @@ struct Node {
     std::string var;
     bool isEmptyTuple = false;
     bool isPredicate = false;
+    std::string predicateText;
 };
 
 class CodeGenVisitor : public prologBaseVisitor {
@@ -80,6 +81,7 @@ public:
     std::any visitType_def(prologParser::Type_defContext* ctx) override;
 
     std::any visitMatch_stmt(prologParser::Match_stmtContext* ctx) override;
+
 
     Node generateArithCode(antlr4::RuleContext* ctx);
 
