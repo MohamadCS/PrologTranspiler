@@ -62,17 +62,15 @@ RemoveBt(Bt, Heap : std:list) :: (
     Order <- std:Size(Children);
     HeapSize <- std:Size(Heap);
 
-    if HeapSize = 0 then (
-        []
-    ) else if Heap = [Bt] then (
-        []
-    ) else if Heap = [Bt | HeapTail] then (
-        [empty | HeapTail]
-    ) else (
-        Heap <- [H | HeapTail];
-        NewHeapTail <- RemoveBt(Bt,HeapTail);
-        [H | NewHeapTail]
-    )
+    match Heap  {
+        [] => [], 
+        [Bt] => [],
+        [Bt | HeapTail] => [empty | HeapTail],
+        [H | HeapTail] => (
+                NewHeapTail <- RemoveBt(Bt,HeapTail);
+                [H | NewHeapTail]
+        )
+    }
 )
 .
 
@@ -107,24 +105,26 @@ Add(Num : number,Heap : std:list) :: (
 
 AddList(List , Heap) :: (
     ListSize <- std:Size(List);
-    if ListSize = 0 then (
-        Heap
-    ) else (
-        List <- [Bt | ListTail];
-        AddBt(Bt,AddList(ListTail,Heap))
-    )
+
+    match std:Size(List) {
+        0 => Heap,
+        else => (
+             List <- [Bt | ListTail];
+             AddBt(Bt,AddList(ListTail,Heap))
+        )
+    }
 )
 .
 
 
 ListToHeap(List : std:list) :: (
-    ListSize <- std:Size(List);
-    if ListSize = 0 then (
-        []
-    ) else (
-        List <- [L | Ls];
-        Add(L,ListToHeap(Ls))
-    )
+    match std:Size(List)  {
+        0 => [],
+        else => (
+                List <- [L | Ls];
+                Add(L,ListToHeap(Ls))
+        )
+    }
 )
 .
 

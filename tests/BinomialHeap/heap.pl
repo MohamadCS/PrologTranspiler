@@ -153,41 +153,34 @@ removeBt(Bt,Heap,_var0) :-
 	Order = _var2,
 	std:size(Heap,_var3),
 	HeapSize = _var3,
-	( HeapSize=0 -> (
-		_var5 = [],
-		_var6 = _var5,
-		_var4 = _var6
-	)
-	;(
-		( Heap=[Bt] -> (
-			_var8 = [],
-			_var9 = _var8,
-			_var7 = _var9
-		)
-		;(
-			( Heap=[Bt|HeapTail] -> (
-				_var11 = [empty|HeapTail],
-				_var12 = _var11,
-				_var10 = _var12
-			)
-			;(
-				_var13 = [H|HeapTail],
-				Heap = _var13,
-				bin_heap:removeBt(Bt,HeapTail,_var14),
-				NewHeapTail = _var14,
-				_var15 = [H|NewHeapTail],
-				_var16 = _var15,
-				_var10 = _var16
-			)
-			),
-			_var7 = _var10
-		)
-		),
-		_var4 = _var7
-	)
+	_var5 = [],
+	_var6 = [Bt],
+	_var7 = [Bt|HeapTail],
+	_var8 = [H|HeapTail],
+	(
+	Heap = _var5 -> 
+	_var9 = [],
+	_var4 = _var9
+	;
+	Heap = _var6 -> 
+	_var10 = [],
+	_var4 = _var10
+	;
+	Heap = _var7 -> 
+	_var11 = [empty|HeapTail],
+	_var4 = _var11
+	;
+	Heap = _var8 -> 
+	bin_heap:removeBt(Bt,HeapTail,_var12),
+	NewHeapTail = _var12,
+	_var13 = [H|NewHeapTail],
+	_var14 = _var13,
+	_var4 = _var14
+	;
+	_var4 = nil
 	),
-	_var17 = _var4,
-	_var0 = _var17
+	_var15 = _var4,
+	_var0 = _var15
 	.
 
 
@@ -218,46 +211,43 @@ add(Num,Heap,_var0) :-
 
 
 addList(List,Heap,_var0) :- 
-	std:list(List),
 	std:size(List,_var1),
 	ListSize = _var1,
-	( ListSize=0 -> (
-		_var3 = Heap,
-		_var2 = _var3
-	)
-	;(
-		_var4 = [Bt|ListTail],
-		List = _var4,
-		bin_heap:addList(ListTail,Heap,_var5),
-		bin_heap:addBt(Bt,_var5,_var6),
-		_var7 = _var6,
-		_var2 = _var7
-	)
+	std:size(List,_var3),
+	_var4 is 0,
+	(
+	_var3 = _var4 -> 
+	_var2 = Heap
+	;
+	_var5 = [Bt|ListTail],
+	List = _var5,
+	bin_heap:addList(ListTail,Heap,_var6),
+	bin_heap:addBt(Bt,_var6,_var7),
+	_var8 = _var7,
+	_var2 = _var8
 	),
-	_var8 = _var2,
-	_var0 = _var8
+	_var9 = _var2,
+	_var0 = _var9
 	.
 
 
 listToHeap(List,_var0) :- 
 	std:list(List),
-	std:size(List,_var1),
-	ListSize = _var1,
-	( ListSize=0 -> (
-		_var3 = [],
-		_var4 = _var3,
-		_var2 = _var4
-	)
-	;(
-		_var5 = [L|Ls],
-		List = _var5,
-		bin_heap:listToHeap(Ls,_var6),
-		bin_heap:add(L,_var6,_var7),
-		_var8 = _var7,
-		_var2 = _var8
-	)
+	std:size(List,_var2),
+	_var3 is 0,
+	(
+	_var2 = _var3 -> 
+	_var4 = [],
+	_var1 = _var4
+	;
+	_var5 = [L|Ls],
+	List = _var5,
+	bin_heap:listToHeap(Ls,_var6),
+	bin_heap:add(L,_var6,_var7),
+	_var8 = _var7,
+	_var1 = _var8
 	),
-	_var9 = _var2,
+	_var9 = _var1,
 	_var0 = _var9
 	.
 
