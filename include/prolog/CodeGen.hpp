@@ -79,6 +79,8 @@ public:
 
     std::any visitType_def(prologParser::Type_defContext* ctx) override;
 
+    std::any visitMatch_stmt(prologParser::Match_stmtContext* ctx) override;
+
     Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:
@@ -108,7 +110,7 @@ private:
     std::string getModulesCode() const;
     std::string getNameSpace(prologParser::InvocContext*) const;
 
-    std::string genTypeCode(std::string varName, prologParser::TypeContext* pTypeCtx); 
+    std::string genTypeCode(std::string varName, prologParser::TypeContext* pTypeCtx);
 };
 
 } // namespace Prolog::CodeGen

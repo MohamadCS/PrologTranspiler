@@ -105,7 +105,7 @@ Add(Num : number,Heap : std:list) :: (
 )
 .
 
-AddList(List : std:list,Heap) :: (
+AddList(List , Heap) :: (
     ListSize <- std:Size(List);
     if ListSize = 0 then (
         Heap
@@ -145,8 +145,6 @@ pub HeapSort(List : std:list) :: (
     HeapToList(ListToHeap(List))
 )
 .
-
-
 
 }
 

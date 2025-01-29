@@ -97,6 +97,13 @@ tuple_entry
 
 type: (namespace ':')? atomic_name ('?')?;
 
+
+match_entry: expr '=>' tuple_entry;
+
+match_else: 'else' '=>' tuple_entry ;
+
+match_stmt: 'match' expr '{' ( match_entry (',' match_entry)* )? (',' match_else)? '}';
+
 type_def: (public)? 'type' atomic_name '::' '(' type (',' type)* ')' '.';
 
 binding_var: (var_decl | arg_alias);
@@ -121,6 +128,7 @@ expr
     | invoc
     | term
     | lambda
+    | match_stmt
     ; 
 
 invoc : (namespace ':')? VARIABLE tuple ;

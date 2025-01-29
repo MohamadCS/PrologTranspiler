@@ -180,6 +180,25 @@ If the function does not specify a namespace, then its namespace is automaticall
 Every function is private by default, unless it is declared as public using the keyword `pub`.
 
 
+## Match
+
+Matches are expression, that given a value `A` , matches the first
+value that is matches `A`.
+
+We can match to any expression.
+
+If it matches none, and else is not defined, then it matches to `nil`.
+
+```
+Foo(List : std:list) :: (
+    match std:Size(List) {
+        1 => Max(1,2),
+        2 => Max(1,3),
+        else => 100
+    }
+)
+.
+```
 
 ## Types
 

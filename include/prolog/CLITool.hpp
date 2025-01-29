@@ -1,8 +1,5 @@
 #pragma once
 
-#include <optional>
-#include <filesystem>
-#include <string_view>
 #include <CLI.hpp>
 
 namespace Prolog {
@@ -20,6 +17,6 @@ private:
     inline static constexpr std::string RUN_TESTS_FLAG =  "--run-tests";
     inline static constexpr std::string DISABLE_SEMANTICS =  "--no-semantics";
     inline static constexpr std::string DISABLE_STD_ERR =  "--no-stderr";
-    inline static constexpr std::string FORMAT_OUTPUT =  "--format-output";
+    inline static constexpr std::string FORMAT_OUTPUT =  "--format";
 };
 }; // namespace Prolog

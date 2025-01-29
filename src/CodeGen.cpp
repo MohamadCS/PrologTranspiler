@@ -4,6 +4,7 @@
 #include <cctype>
 #include <format>
 #include <map>
+#include <memory>
 #include <optional>
 #include <ranges>
 #include <sstream>
@@ -667,6 +668,62 @@ std::any CodeGenVisitor::visitLambda(prologParser::LambdaContext* ctx) {
     m_predicateStack.pop();
 
     return lambdaNode;
+}
+
+std::any CodeGenVisitor::visitMatch_stmt(prologParser::Match_stmtContext* ctx) {
+    CHECK_NULL(ctx);
+
+    Node returnNode;
+    returnNode.var = genVar();
+
+    auto matchExpr = visit(ctx->expr());
+
+    if (!matchExpr.has_value()) {
+        std::cerr << "It must have a value" << '\n';
+    }
+
+    auto matchExprNode = std::any_cast<Node>(matchExpr);
+
+    const auto& matchEntryCtxVec = ctx->match_entry();
+
+    std::vector<std::string> varVec;
+    varVec.reserve(matchEntryCtxVec.size());
+
+    for (auto* matchEntryCtx : matchEntryCtxVec) {
+        auto matchExprEntryResult = std::any_cast<Node>(visit(matchEntryCtx->expr()));
+        varVec.push_back(matchExprEntryResult.var);
+    }
+
+    emit("("); // Start of match
+
+    for (const auto& [entryVar, matchEntryCtx] : std::ranges::views::zip(varVec, matchEntryCtxVec)) {
+        emit(std::format("{} = {} -> ", matchExprNode.var, entryVar));
+        auto matchExprEntryResult = visit(matchEntryCtx->tuple_entry());
+        if (matchExprEntryResult.has_value()) {
+            auto matchExprEntryNode = std::any_cast<Node>(matchExprEntryResult);
+            emit(std::format("{} = {}", returnNode.var, matchExprEntryNode.var));
+        }
+
+        emit(";");
+    }
+
+    // Deal with otherwise
+    //
+
+    if (ctx->match_else()) {
+        auto otherwiseResult = visit(ctx->match_else()->tuple_entry());
+
+        if (otherwiseResult.has_value()) {
+            auto otherwiseNode = std::any_cast<Node>(otherwiseResult);
+            emit(std::format("{} = {}", returnNode.var, otherwiseNode.var));
+        }
+    } else {
+        emit(std::format("{} = nil", returnNode.var));
+    }
+
+    emit("),"); // End of match
+
+    return returnNode;
 }
 
 std::string CodeGenVisitor::getModulesCode() const {

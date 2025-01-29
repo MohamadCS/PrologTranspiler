@@ -36,6 +36,13 @@ pub PrintLn(X) :: (
 )
 .
 
+pub Input() :: (
+    read(X);
+    X
+)
+.
+
+
 pub Exit() :: ( halt; ).
 
 pub Replace(List,Idx,NewVal) :: (
