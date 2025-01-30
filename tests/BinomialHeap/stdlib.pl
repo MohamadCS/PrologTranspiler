@@ -1,7 +1,6 @@
 :- module(
 	std,
 	[
-
 		vector/1,
 		forEach/3,
 		size/2,
@@ -15,7 +14,8 @@
 		minMember/3,
 		randomNum/3,
 		makeList/3,
-		sortList/2	]
+		sortList/2
+	]
 )
 .
 
@@ -27,45 +27,42 @@ vector(_var0) :-
 	.
 vector(_) :- write("Type mismatch"),fail.
 forEach(List,Func,_var0) :- 
-	std:size(List,_var2),
-	Length = _var2,
-	( Length=0 -> (
-		_var3 = [  ],
-		_var4 = _var3,
-		_var1 = _var4
-	)
-	;(
-		_var5 = [ L | Ls ],
-		List = _var5,
-		std:forEach(Ls,Func,_var6),
-		Rs = _var6,
-		call(Func,L,_var7),
-		R = _var7,
-		_var8 = [ R | Rs ],
-		_var9 = _var8,
-		_var1 = _var9
-	)
+	_var2 = [  ],
+	_var3 = [ L | Ls ],
+	(
+	List = _var2 -> 
+	_var4 = [  ],
+	_var1 = _var4
+	;
+	List = _var3 -> 
+	call(Func,L,_var6),
+	std:forEach(Ls,Func,_var7),
+	_var5 = [ _var6 | _var7 ],
+	_var1 = _var5
+	;
+	_var1 = nil
 	),
-	_var10 = _var1,
-	_var0 = _var10
+	_var8 = _var1,
+	_var0 = _var8
 	.
 
 
 size(List,_var0) :- 
-	( List=[] -> (
-		_var2 is 0,
-		_var3 = _var2,
-		_var1 = _var3
-	)
-	;(
-		_var4 = [ L | Ls ],
-		List = _var4,
-		std:size(Ls,_var5),
-		X = _var5,
-		_var6 is X+1,
-		_var7 = _var6,
-		_var1 = _var7
-	)
+	_var2 = [  ],
+	_var3 = [ _ | Ls ],
+	(
+	List = _var2 -> 
+	_var4 is 0,
+	_var1 = _var4
+	;
+	List = _var3 -> 
+	std:size(Ls,_var5),
+	ListSize = _var5,
+	_var6 is ListSize+1,
+	_var7 = _var6,
+	_var1 = _var7
+	;
+	_var1 = nil
 	),
 	_var8 = _var1,
 	_var0 = _var8
@@ -98,7 +95,7 @@ input(_var0) :-
 
 
 exit(_var0) :- 
-	_var1 = halt,
+	halt,
 	_var2 = tuple(  ),
 	_var0 = _var2
 	.
@@ -115,35 +112,34 @@ replace(List,Idx,NewVal,_var0) :-
 		true);true)
 	),
 	( Idx=0 -> (
-		( ListSize=0 -> (
-			_var7 = [  ],
-			_var8 = _var7,
-			_var6 = _var8
-		)
-		;(
-			_var9 = [ L | Ls ],
-			List = _var9,
-			_var10 = [ NewVal | Ls ],
-			_var11 = _var10,
-			_var6 = _var11
-		)
+		_var7 = [  ],
+		_var8 = [ L | Ls ],
+		(
+		List = _var7 -> 
+		_var9 = [  ],
+		_var6 = _var9
+		;
+		List = _var8 -> 
+		_var10 = [ NewVal | Ls ],
+		_var6 = _var10
+		;
+		_var6 = nil
 		),
-		_var12 = _var6,
-		_var5 = _var12
+		_var11 = _var6,
+		_var5 = _var11
 	)
 	;(
-		_var13 = [ L | Ls ],
-		List = _var13,
+		_var12 = [ L | Ls ],
+		List = _var12,
 		_var14 is Idx-1,
 		std:replace(Ls,_var14,NewVal,_var15),
-		NewSubList = _var15,
-		_var16 = [ L | NewSubList ],
-		_var17 = _var16,
-		_var5 = _var17
+		_var13 = [ L | _var15 ],
+		_var16 = _var13,
+		_var5 = _var16
 	)
 	),
-	_var18 = _var5,
-	_var0 = _var18
+	_var17 = _var5,
+	_var0 = _var17
 	.
 
 
@@ -175,33 +171,30 @@ min(X,Y,_var0) :-
 
 minMember(List,MinFunc,_var0) :- 
 	std:list(List),
-	std:size(List,_var1),
-	ListSize = _var1,
-	_var3 = [  ],
-	_var4 = [ X ],
-	_var5 = [ X,Y ],
-	_var6 = [ L | Ls ],
+	_var2 = [  ],
+	_var3 = [ X ],
+	_var4 = [ X,Y ],
+	_var5 = [ L | Ls ],
 	(
+	List = _var2 -> 
+	_var1 = _var6
+	;
 	List = _var3 -> 
-	_var7 = nil,
-	_var2 = _var7
+	_var1 = X
 	;
 	List = _var4 -> 
-	_var2 = X
+	call(MinFunc,X,Y,_var7),
+	_var1 = _var7
 	;
 	List = _var5 -> 
-	call(MinFunc,X,Y,_var8),
-	_var2 = _var8
+	std:minMember(Ls,MinFunc,_var8),
+	call(MinFunc,_var8,L,_var9),
+	_var1 = _var9
 	;
-	List = _var6 -> 
-	std:minMember(Ls,MinFunc,_var9),
-	call(MinFunc,_var9,L,_var10),
-	_var2 = _var10
-	;
-	_var2 = nil
+	_var1 = nil
 	),
-	_var11 = _var2,
-	_var0 = _var11
+	_var10 = _var1,
+	_var0 = _var10
 	.
 
 

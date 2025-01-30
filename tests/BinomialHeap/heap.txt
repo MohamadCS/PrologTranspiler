@@ -1,5 +1,5 @@
 import {
-    'std'
+    'stdlib'
 }
 
 
@@ -28,8 +28,6 @@ AddBtAux(Bt , Heap : std:list, I : number) :: (
     Order <- std:Size(Children);
 
     if I = Order then (
-        % If the current index is the same as the bt order match according to
-        % the state of Heap
         match Heap {
             [] => [Bt],
             [empty | HeapTail] => [Bt | HeapTail],

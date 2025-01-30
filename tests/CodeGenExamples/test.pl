@@ -22,8 +22,8 @@ test(_var0) :-
 	g(_var3),
 	_var1 = say(_var2,_var3),
 	say(_var2,_var3),
-	_var4 = halt,
-	_var5 = _var4,
+	true,
+	_var5 = tuple(  ),
 	_var0 = _var5
 	.
 

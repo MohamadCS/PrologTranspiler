@@ -1,7 +1,7 @@
 import {
     'heap',
-    'testing',
-    'std'
+    'testlib',
+    'stdlib'
 }
 
 TestHeapSort() :: (
@@ -14,6 +14,7 @@ TestHeapSort() :: (
                 bin_heap:HeapSort(RandomList),
                 std:SortList(RandomList)
     );
+    std:Print("Hello");
 )
 .
 

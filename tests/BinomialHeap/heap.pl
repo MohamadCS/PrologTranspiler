@@ -1,12 +1,12 @@
 :- module(
 	bin_heap,
 	[
-
-		heapSort/2	]
+		heapSort/2
+	]
 )
 .
 
-:- use_module('std.pl').
+:- use_module('stdlib.pl').
 bin_heap:popMin_lambda0(Bt1,Bt2,_var2) :- 
 	( Bt1=empty -> (
 		_var4 = Bt2,
@@ -233,10 +233,9 @@ heapToList(Heap,_var0) :-
 		tuple(MinBt,NewHeap) = _var5,
 		_var6 = bt(Value,_),
 		MinBt = _var6,
-		bin_heap:heapToList(NewHeap,_var7),
-		Tail = _var7,
-		_var8 = [ Value | Tail ],
-		_var9 = _var8,
+		bin_heap:heapToList(NewHeap,_var8),
+		_var7 = [ Value | _var8 ],
+		_var9 = _var7,
 		_var2 = _var9
 	)
 	),

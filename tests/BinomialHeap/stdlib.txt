@@ -2,26 +2,22 @@ module std {
 
 pub type vector :: (list , number).
 
-pub ForEach(List,Func) :: (
-    if Length <- Size(List) | Length = 0 then (
-            []
-        ) else (
-            List <- [L | Ls];
-            Rs <- ForEach(Ls,Func);
-            R  <- Func(L);
-            [R | Rs]
-    )
+pub ForEach(List,Func) :: ( 
+    match List {
+        [] => [],
+        [L | Ls] => [Func(L) | ForEach(Ls,Func)]
+    }
 )
 .
 
 pub Size(List) :: (
-    if List = [] then (
-        0
-    ) else (
-        List <- [L | Ls];
-        X <- Size(Ls);
-        X + 1
-    )
+    match List {
+        [] => 0,
+        [_ | Ls] => (
+            ListSize <- Size(Ls);
+            ListSize + 1
+        )
+    }
 )
 .
 
@@ -46,7 +42,7 @@ pub Input() :: (
 pub Exit() :: ( halt; ).
 
 pub Replace(List,Idx,NewVal) :: (
-    ListSize <- Size(List);
+    ListSize <- std:Size(List);
 
     if Idx < 0 ; Idx > ListSize - 1 then (
         write('Wrong Idx');
@@ -54,16 +50,13 @@ pub Replace(List,Idx,NewVal) :: (
     );
 
     if Idx = 0 then (
-        if ListSize = 0 then (
-            []
-        ) else (
-            List <- [L | Ls];
-            [NewVal | Ls]
-        )
+        match List {
+            [] => [],
+            [L | Ls] => [NewVal | Ls]
+        }
     ) else (
         List <- [L | Ls]; 
-        NewSubList <- Replace(Ls,Idx - 1, NewVal);
-        [L | NewSubList]
+        [L | Replace(Ls,Idx - 1, NewVal)]
     )
 )
 .
@@ -81,15 +74,12 @@ pub Min(X,Y) :: (
 .
 
 pub MinMember(List : std:list, MinFunc) :: (
-    ListSize <- std:Size(List);
-
     match List {
         [] => nil,
         [X] => X,
         [X,Y] => MinFunc(X,Y),
         [L | Ls] => MinFunc(MinMember(Ls,MinFunc),L)
     }
-
 )
 .
 

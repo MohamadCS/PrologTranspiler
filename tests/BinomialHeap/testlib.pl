@@ -1,7 +1,8 @@
 :- module(
 	testing,
 	[
-
+		eXPECT_EQ/3,
+		eXPECT_NEQ/3
 	]
 )
 .

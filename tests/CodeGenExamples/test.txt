@@ -3,9 +3,6 @@ import {
 }
 
 
-
-
-
 say(X,Y) :- write(X), write(Y).
 
 

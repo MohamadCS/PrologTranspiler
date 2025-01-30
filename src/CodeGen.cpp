@@ -4,7 +4,6 @@
 #include <cctype>
 #include <format>
 #include <map>
-#include <memory>
 #include <optional>
 #include <ranges>
 #include <sstream>
@@ -216,9 +215,9 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
     Node node = std::any_cast<Node>(visit(ctx->expr()));
     std::string bindedVarName;
 
-    std::string typeDecl;
-
     std::vector<std::string> varNamesVec;
+
+    varNamesVec.reserve(ctx->binding_var().size());
 
     // note that alias arg is not an option here, we suppose that we've processed it before.
     for (auto* pBindingVarCtx : ctx->binding_var()) {
@@ -621,7 +620,7 @@ std::any CodeGenVisitor::visitCompound_term(prologParser::Compound_termContext* 
     std::string exprListStr = Prolog::Utility::convertContainerToListStr<decltype(entriesVec.begin())>(
         entriesVec.begin(), entriesVec.end(), [](decltype(entriesVec.begin()) it) { return *it; });
 
-    std::string predicateStr = std::format("{}({})",ctx->atom()->getText(),exprListStr);
+    std::string predicateStr = std::format("{}({})", ctx->atom()->getText(), exprListStr);
 
     emit(std::format("{} = {},", node.var, predicateStr));
 
@@ -632,15 +631,32 @@ std::any CodeGenVisitor::visitCompound_term(prologParser::Compound_termContext* 
     return node;
 }
 
+std::any CodeGenVisitor::visitAtom_term(prologParser::Atom_termContext* ctx) {
+    CHECK_NULL(ctx);
+
+    if (auto* pAtomExprCtx = ctx->atom()->atom_expr(); pAtomExprCtx != nullptr) {
+
+        auto returnValue = visit(ctx->atom());
+        if (returnValue.has_value()) {
+            return returnValue;
+        } else {
+            Node node;
+            node.var = genVar();
+            emit(std::format("{} = {},", node.var, pAtomExprCtx->getText()));
+            return node;
+        }
+    } 
+
+    return {};
+}
+
 std::any CodeGenVisitor::visitName(prologParser::NameContext* ctx) {
     CHECK_NULL(ctx);
 
     Node node;
 
     node.var = genVar();
-
     node.isPredicate = true;
-
     node.predicateText = ctx->getText();
 
     return node;
@@ -661,19 +677,6 @@ std::any CodeGenVisitor::visitClause(prologParser::ClauseContext* ctx) {
     return {};
 }
 
-std::any CodeGenVisitor::visitAtom_term(prologParser::Atom_termContext* ctx) {
-    CHECK_NULL(ctx);
-
-    if (auto* pAtomExprCtx = ctx->atom()->atom_expr(); pAtomExprCtx != nullptr) {
-        Node node;
-        node.var = genVar();
-        emit(std::format("{} = {},", node.var, pAtomExprCtx->getText()));
-        return node;
-    } else {
-        return {};
-    }
-}
-
 std::any CodeGenVisitor::visitLambda(prologParser::LambdaContext* ctx) {
     CHECK_NULL(ctx);
     m_insideLambda = true;
@@ -691,13 +694,10 @@ std::any CodeGenVisitor::visitLambda(prologParser::LambdaContext* ctx) {
     }
 
     Predicate lambdaPredicate;
-
     std::string lambdaName = std::format("{}{}_lambda{}", nsStr, m_currentPredicate->name, m_lambdaCtr);
-
     lambdaPredicate.name = lambdaName;
 
     std::stringstream argsStr;
-
     std::string resultVar = genVar();
 
     for (auto* pArgCtx : ctx->func_args()->var_decl()) {
@@ -810,11 +810,11 @@ std::string CodeGenVisitor::getModulesCode() const {
         std::string funcStr = Prolog::Utility::convertContainerToListStr<decltype(funcList.begin())>(
             funcList.begin(), funcList.end(), itemFormatFunc, ",\n");
 
-        modulesCode << '\n';
         modulesCode << funcStr;
-        modulesCode << std::format("\t]\n");
-        modulesCode << std::format(")\n");
-        modulesCode << std::format(".\n");
+        modulesCode << '\n';
+        modulesCode << "\t]\n";
+        modulesCode << ")\n";
+        modulesCode << ".\n";
     }
 
     return modulesCode.str();
