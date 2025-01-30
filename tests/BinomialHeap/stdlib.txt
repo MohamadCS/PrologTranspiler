@@ -42,9 +42,8 @@ pub Input() :: (
 pub Exit() :: ( halt; ).
 
 pub Replace(List,Idx,NewVal) :: (
-    ListSize <- std:Size(List);
 
-    if Idx < 0 ; Idx > ListSize - 1 then (
+    if ListSize <- std:Size(List) | Idx < 0 ; Idx > ListSize - 1 then (
         write('Wrong Idx');
         Exit();
     );

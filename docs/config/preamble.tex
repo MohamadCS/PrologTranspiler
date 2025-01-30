@@ -1,0 +1,82 @@
+\documentclass[a4paper]{article}
+
+% Math
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm} % Theorems
+
+% Colors
+\usepackage{xcolor}
+\usepackage{color}
+
+% Figures
+\usepackage{graphicx} % Required for inserting images
+\usepackage{subfigure}
+
+% Page format
+\usepackage{fancyhdr} % for creating custom footer and header
+\usepackage[margin=1in]{geometry} %Defining the margin.
+
+% Algorithms packages
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{listings} % Regular code 
+
+% Drawing
+\usepackage{tikz}
+\usetikzlibrary{automata} % For initial state 
+
+% Provides begin\end comment block
+\usepackage{comment}
+
+% Adds \theauthor, \thetitle ...
+\usepackage{titling}
+
+% bibtex
+\usepackage{natbib}
+
+% Links
+\usepackage{bookmark}
+\usepackage{hyperref}
+
+
+% inline code settings
+\lstset{
+	showstringspaces=false,
+	basicstyle=\ttfamily,
+	keywordstyle=\color{blue},
+	commentstyle=\color[grey]{0.6},
+	stringstyle=\color[RGB]{255,150,75}
+}
+
+%%%%%%%%%Theorems%%%%%%%%%
+\newtheorem{claim}{Claim}[section]
+
+\newtheorem{lemma}{Lemma}[section]
+
+\newtheorem{theorem}{Theorem}[section]
+
+\theoremstyle{definition}
+\newtheorem{corollary}{Corollary}[section]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}[section]
+
+\theoremstyle{remark}
+\newtheorem{example}{Example}[section]
+
+\theoremstyle{remark}
+\newtheorem{question}{Question}[section]
+
+\theoremstyle{remark}
+\newtheorem{note}{Note}[section]
+
+\renewcommand\qedsymbol{$\blacksquare$} %makes the QED a black square.
+
+%%%%%%%%%Page Formating%%%%%%%%%
+\pagestyle{fancy} %Adding the header
+\fancyhead{} %Clearing the default header
+\fancyfoot{} %Clearing the default footer

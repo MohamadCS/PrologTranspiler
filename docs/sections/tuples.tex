@@ -1,0 +1,22 @@
+\section{Tuples}
+
+Tuples are simply lists of expressions, each expression is paired with
+a seperator with the following rules:
+\begin{itemize}
+    \item If the expression is paired with \texttt{,} then the expression is 
+        non-vanishing, that is its value is evaluated, and an entry in the final tuple.
+
+    \item If the expression is paired with \texttt{,} then the expression is 
+        vanishing, that is its value is evaluated, and its not an entry in the final tuple.
+
+    \item Last item can be without a pair, in this case its interpreted as a non-vanishing entry. 
+\end{itemize}
+
+
+\subsection{Examples}
+\begin{enumerate}
+    \item \texttt{(1,2)}.
+    \item \texttt{([3,4],Max(4,3),(1,2))}.
+    \item \texttt{([3,4];Max(4,3),(1,2);)}.
+\end{enumerate}
+

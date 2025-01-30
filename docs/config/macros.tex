@@ -1,0 +1,38 @@
+% Better | (such that)
+\newcommand{\st}{\;\ifnum\currentgrouptype=16 \middle\fi|\;}
+
+% Paired Delimiters, x is the prefix.
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+% Probabiliy
+\newcommand\dist[1]{\overset{#1}{\sim}}
+\newcommand\ex[1]{\mathbb{E}\left [#1\right]}
+\newcommand\var[1]{\text{Var}\left [#1\right]}
+\newcommand\pr[1]{\mathbb{P}\left[{#1}\right]}
+
+% inline code takes [language][code]
+\newcommand{\inlinecode}[2]{{\lstinline[language=#1]$#2$}}
+
+\NewDocumentCommand{\CustomHeader}{ O{\leftmark} O{} O{\thepage}}{
+	\fancyhead[L]{#1}
+	\fancyhead[C]{#2}
+	\fancyhead[R]{#3}
+}
+
+\NewDocumentCommand{\CustomFooter}{ O{} O{} O{}}{
+	\fancyfoot[L]{#1}
+	\fancyfoot[C]{#2}
+	\fancyfoot[R]{#3}
+}
+
+\newcommand{\AfterSetup}{
+	\hypersetup{
+		pdfauthor={\theauthor},
+		pdftitle={\thetitle},
+        pdfsubject={\thetitle},
+		linkcolor={blue!60!black},
+		citecolor={blue!60!black},
+		urlcolor={blue!60!black},
+		hidelinks,
+	}
+}
+

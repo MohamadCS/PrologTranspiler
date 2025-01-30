@@ -7,3 +7,4 @@ compile_commands.json
 *.o
 .project
 prog
+docs/.aux
