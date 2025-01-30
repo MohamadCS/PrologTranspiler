@@ -91,7 +91,6 @@ tuple_entry
     : expr 
     | binding
     | if
-    | if_else
     | return
     ;
 
@@ -131,6 +130,7 @@ expr
     : tuple 
     | invoc
     | term
+    | if_else
     | lambda
     | match_stmt
     ; 
