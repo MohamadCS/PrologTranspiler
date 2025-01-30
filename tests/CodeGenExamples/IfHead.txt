@@ -3,10 +3,7 @@
 
 
 F(X) ::(
-    if Y<- 3 | Y > X then (
-        write("X");
-    ) else (
-        write("Y");
-    ) ;
+    Y <- if X >= 3 then 10 else 20;
+    Y
 )
 .

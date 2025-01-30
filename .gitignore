@@ -8,3 +8,4 @@ compile_commands.json
 .project
 prog
 docs/.aux
+docs/.build
