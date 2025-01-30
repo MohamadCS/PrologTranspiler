@@ -1,22 +1,44 @@
 \section{Tuples}
 
-Tuples are simply lists of expressions, each expression is paired with
-a seperator with the following rules:
+Tuples are simply lists of 
+\begin{itemize}
+    \item Expressions
+    \item Bindings.
+    \item If statments (Without else).
+\end{itemize}
+
+\noindent Tuples follows the following rules
 \begin{itemize}
     \item If the expression is paired with \texttt{,} then the expression is 
         non-vanishing, that is its value is evaluated, and an entry in the final tuple.
 
-    \item If the expression is paired with \texttt{,} then the expression is 
+    \item If the expression is paired with \texttt{;} then the expression is 
         vanishing, that is its value is evaluated, and its not an entry in the final tuple.
 
     \item Last item can be without a pair, in this case its interpreted as a non-vanishing entry. 
+
+    \item If the tuple is empty then its a vanishing entry regardless of its pair.
+
+    \item If the tuple entry is a direct predicate call, then its acts like in regular predicates, that is,
+        if it evalutes to true then the execution of the function continues, otherwise it stopps. Regardless
+        of the result, the entry would always be vanishing.
 \end{itemize}
+
+Tuples are compiled to the predicate \texttt{tuple(...)} when \texttt{...} are the non-vanishing
+entries of the tuple.
 
 
 \subsection{Examples}
 \begin{enumerate}
     \item \texttt{(1,2)}.
-    \item \texttt{([3,4],Max(4,3),(1,2))}.
-    \item \texttt{([3,4];Max(4,3),(1,2);)}.
+    \item \texttt{([3,4],Max(4,3),(1,2))}, evalutes to \texttt{tuple([3,4],Max(4,3),(1,2))}.
+    \item \texttt{([3,4];Max(4,3),(1,2);)}, evalutes to \texttt{tuple(Max(4,3),(1,2))}.
 \end{enumerate}
+
+
+\begin{note}
+    The number of entries in the tuple's predicate is determined at compile time, for this reason,
+    an if statement (Without else) can only be a vanishing statement.
+\end{note}
+
 
