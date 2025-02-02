@@ -25,7 +25,7 @@ std::any PreprocessorVisitor::visitTest_func(prologParser::Test_funcContext* ctx
 
     std::string testFuncDef = std::format("Test{}() :: \n",testFunc.num);
     programStmtList.back().push_back(std::move(testFuncDef));
-    programStmtList.back().push_back(ctx->tuple()->getText());
+    visit(ctx->tuple());
     programStmtList.back().push_back(".");
 
     testFuncList.push_back(std::move(testFunc));

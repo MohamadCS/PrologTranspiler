@@ -23,12 +23,10 @@ test 'std:ForEach on empty list' (
 )
 .
 
-
 test 'std:ForEach on list with one element' (
     testing:EXPECT_EQ(std:ForEach([2],(X) => (X*X)),[4]);
 )
 .
-
 
 test 'std:ForEach on list with multiple elements' (
     testing:EXPECT_EQ(std:ForEach([1,2,3],(X) => (X*X)),[1,4,9]);
@@ -42,6 +40,12 @@ test 'std:Replace on list with one element' (
 
 test 'std:Replace on list with multiple elements' (
     testing:EXPECT_EQ(std:Replace([1,3,5],1,100),[1,100,5]);
+)
+.
+
+
+test 'std:MinMemeber on list with multiple elements' (
+    testing:EXPECT_EQ(std:MinMember([2,1,10],(X,Y) => (if X =< Y then X else Y)),1);
 )
 .
 

@@ -15,6 +15,19 @@ test4_lambda0(X,_var3) :-
 	.
 	
 
+test7_lambda0(X,Y,_var3) :- 
+	( X=<Y -> (
+		_var4 = X
+	)
+	;(
+		_var4 = Y
+	)
+	),
+	_var5 = _var4,
+	_var3 = _var5
+	.
+	
+
 test0(_var0) :- 
 	_var1 = [  ],
 	std:size(_var1,_var2),
@@ -91,6 +104,17 @@ test6(_var0) :-
 	.
 
 
+test7(_var0) :- 
+	_var1 = [ 2,1,10 ],
+	_var2 = test7_lambda0,
+	std:minMember(_var1,_var2,_var6),
+	_var7 is 1,
+	testing:eXPECT_EQ(_var6,_var7,_var8),
+	_var9 = tuple(  ),
+	_var0 = _var9
+	.
+
+
 main :- 
 	runTests(_var1),
 	_var2 = tuple(  ),
@@ -120,8 +144,11 @@ runTests(_var0) :-
 	_var13 = write("RUNNING TEST 6 : 'std:Replace on list with multiple elements'\n"),
 	write("RUNNING TEST 6 : 'std:Replace on list with multiple elements'\n"),
 	test6(_var14),
-	_var15 = tuple(  ),
-	_var0 = _var15
+	_var15 = write("RUNNING TEST 7 : 'std:MinMemeber on list with mutilple elemenst'\n"),
+	write("RUNNING TEST 7 : 'std:MinMemeber on list with mutilple elemenst'\n"),
+	test7(_var16),
+	_var17 = tuple(  ),
+	_var0 = _var17
 	.
 
 
