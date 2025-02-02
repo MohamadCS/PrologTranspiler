@@ -1,0 +1,45 @@
+\section{Conditionals}
+
+There are two types of conditionals if statements, and if-else
+expressions.
+
+If statements, evaluates the tuple in the if body if the condition is
+true, while if-else evalutes one of them according to the condition.
+
+The reason that \texttt{if} is a statement is that it must be always
+vanishing to avoid ambiguity, since if the condition is false the if
+must not evalute to a value, but a tuple entry must be known if its a
+vanishing or non-vanishing at compile time.
+
+In the otherhand, if-else provide us with a way to tell if the
+expression is vanishing or not.
+
+We can add some bindings at the head of the if condition in order for
+a more compact syntax, this is an optional.
+
+In order to allow for more readable nested if-else statements, if the tuple
+has one entry only, and its non-vanishing, then we can remove the parentheses.
+
+\subsection{Syntax}
+\begin{lstlisting}[language =Prolog]
+    if  optional(IfHead |)  Condition then 
+        tuple
+\end{lstlisting}
+
+\subsection{Syntax}
+\begin{lstlisting}[language =Prolog]
+    if optional(IfHead |) Condition then 
+        tuple
+    else 
+        tuple
+\end{lstlisting}
+
+\subsection{Examples}
+
+\begin{itemize}
+
+	\item  \begin{lstlisting}[language =Prolog]
+                if ListSize <- std:Size(List) | ListSize > 0 then ListSize * 10 else ListSize
+            \end{lstlisting}
+\end{itemize}
+

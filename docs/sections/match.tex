@@ -1,0 +1,18 @@
+\section{Matching}
+
+Matches are expression that evalutes to a value and they have the following syntax
+
+\begin{lstlisting}[language = Prolog]
+    match Expression {
+        Exp1 => Result1,
+        Exp2 => Result2,
+        ...
+        ExpN => ResultN,
+        else => Result
+    }
+\end{lstlisting}
+
+When \texttt{Resulti} are tuples or tuple entries.
+
+Note that the \texttt{else} is optional.
+

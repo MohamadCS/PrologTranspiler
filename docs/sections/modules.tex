@@ -1,0 +1,49 @@
+\section{Modules}
+
+Modules are a abstraction of the current modules system of Prolog, they contain
+functions or types, that can be marked as public using the keyword \texttt{pub}
+for other files to use when the import the module
+
+\subsection{Syntax}
+
+We can define a module using
+\begin{lstlisting}[language =Prolog]
+    module my_module {
+        pub Foo() :: (...).
+        pub type :: (...).
+    }
+\end{lstlisting}
+
+And we can import the file the contains the module by listing the file name
+without extenstion
+
+\begin{lstlisting}[language =Prolog]
+    import {
+        'stdlib',
+        'testlib',
+        'heap',
+    }
+\end{lstlisting}
+
+If we want to use a functions from a module we imported, we must declare 
+then module name before the function's
+
+
+\begin{lstlisting}[language =Prolog]
+    import {
+        'm1', % Defines Foo/0 that prints 'hello'
+        'm2'  % Defines Foo/0 that prints 'world'
+    }
+
+
+    Main() :: (
+        m1:Foo(); // Prints 'hello'
+        m2:Foo(); // Prints 'world'
+    )
+    .
+\end{lstlisting}
+
+
+
+
+
