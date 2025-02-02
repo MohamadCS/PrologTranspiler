@@ -3,26 +3,29 @@ import {
 }
 
 
-say(X,Y) :- write(X), write(Y).
 
-
-F() :: (
-    "hello"
-)
-.
-
-G() :: (
-    "world"
-)
-.
-
-Test() :: (
-    say(F(),G());
-    true
+test 'Hello' (
+    
 )
 .
 
 
+test 'Another one' (
+    
+)
+.
+
+test 'And another one' (
+    
+)
+.
+
+
+
+Main() :: (
+    RunTests();
+)
+.
 
 
 

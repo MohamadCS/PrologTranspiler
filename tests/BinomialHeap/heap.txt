@@ -3,14 +3,13 @@ import {
 }
 
 
-
-
 module bin_heap {
 
 MergeBt(Bt1, Bt2) :: (
 
         Bt1 <- bt(Value1, List1);
         Bt2 <- bt(Value2, List2);
+
 
         if Value1 >= Value2 then (
             R <- bt(Value2,[Bt1 | List2]);

@@ -44,7 +44,7 @@ grammar prolog;
 }
 
 p_text
-    : import_modules? (type_def |func_def | directive | clause | module)* EOF
+    : import_modules? (type_def |func_def | directive | test_func | clause | module)* EOF
     ;
 
 directive
@@ -69,10 +69,11 @@ namespace: atomic_name;
 
 var_decl: VARIABLE (':' type)?; 
 
-module: 'module' namespace '{' (func_def | type_def)* '}';
+test_func: 'test' QUOTED tuple '.';
+
+module: 'module' namespace '{' (func_def | type_def | test_func)* '}';
 
 import_modules: 'import' ('{' QUOTED (',' QUOTED) *'}') ;
-
 
 public: 'pub';
 
@@ -86,7 +87,6 @@ tuple : <assoc = left> {++tupleCount;}
 
 lambda: func_args '=>' tuple;
 
-
 tuple_entry 
     : expr 
     | binding
@@ -95,7 +95,6 @@ tuple_entry
     ;
 
 type: (namespace ':')? atomic_name ('?')?;
-
 
 match_entry: expr '=>' tuple_entry;
 

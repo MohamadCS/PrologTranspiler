@@ -77,6 +77,12 @@ struct MarkEmptyTuplesVisitor : public prologBaseVisitor {
     std::any visitTuple(prologParser::TupleContext* ctx) override;
 };
 
+struct TestFunc {
+    std::string desc;
+    std::size_t num;
+};
+
+
 struct PreprocessorVisitor : public prologBaseVisitor {
     /**
      * @brief Each element of the list represents a stmt
@@ -90,6 +96,12 @@ struct PreprocessorVisitor : public prologBaseVisitor {
     std::optional<antlr4::tree::ParseTreeProperty<bool>> emptyTuples;
 
     std::stack<std::vector<std::string>> funcArgsStack;
+
+    std::list<TestFunc> testFuncList;
+
+    bool mainDefined = false;
+
+    std::size_t testFuncCtr = 0;
 
     // NOTE: We can use std::variant for a cleaner code for clause/directive
     std::any visitClause(prologParser::ClauseContext* ctx) override;
@@ -106,6 +118,8 @@ struct PreprocessorVisitor : public prologBaseVisitor {
     std::any visitArg_alias(prologParser::Arg_aliasContext* ctx) override;
 
     std::any visitLambda(prologParser::LambdaContext* ctx) override;
+
+    std::any visitTest_func(prologParser::Test_funcContext* ctx) override;
 
     // std::any visitTuple(prologParser::TupleContext* ctx) override;
 };

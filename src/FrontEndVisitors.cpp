@@ -15,6 +15,23 @@
 namespace Prolog::Visitors {
 static bool entryIsTuple(prologParser::Tuple_entryContext* ctx);
 
+std::any PreprocessorVisitor::visitTest_func(prologParser::Test_funcContext* ctx){
+    CHECK_NULL(ctx);
+
+    TestFunc testFunc;
+
+    testFunc.desc = ctx->QUOTED()->getText();
+    testFunc.num = this->testFuncCtr++;
+
+    std::string testFuncDef = std::format("Test{}() :: \n",testFunc.num);
+    programStmtList.back().push_back(std::move(testFuncDef));
+    programStmtList.back().push_back(ctx->tuple()->getText());
+    programStmtList.back().push_back(".");
+
+    testFuncList.push_back(std::move(testFunc));
+    return {};
+}
+
 std::any PreprocessorVisitor::visitClause(prologParser::ClauseContext* ctx) {
     CHECK_NULL(ctx);
 
@@ -31,11 +48,16 @@ std::any PreprocessorVisitor::visitFunc_def(prologParser::Func_defContext* ctx) 
     funcArgsStack.push({});
     funcArgsStack.top().reserve(ctx->func_args()->var_decl().size());
 
+
+    if(ctx->VARIABLE()->getText() == "Main"){
+        mainDefined = true;
+    }
+
     for (auto* pArg : ctx->func_args()->var_decl()) {
         funcArgsStack.top().push_back(pArg->VARIABLE()->getText());
     }
 
-    std::any result  = visitChildren(ctx);
+    std::any result = visitChildren(ctx);
 
     funcArgsStack.pop();
     return result;
@@ -53,8 +75,7 @@ std::any PreprocessorVisitor::visitLambda(prologParser::LambdaContext* ctx) {
         funcArgsStack.top().push_back(pArg->VARIABLE()->getText());
     }
 
-    std::any result  = visitChildren(ctx);
-
+    std::any result = visitChildren(ctx);
 
     funcArgsStack.pop();
     return result;
@@ -71,7 +92,7 @@ std::any PreprocessorVisitor::visitDirective(prologParser::DirectiveContext* ctx
 std::any PreprocessorVisitor::visitCompound_term(prologParser::Compound_termContext* ctx) {
     CHECK_NULL(ctx);
 
-    programStmtList.back().push_back(std::format("{}(",ctx->atom()->getText()));
+    programStmtList.back().push_back(std::format("{}(", ctx->atom()->getText()));
     visit(ctx->expr_list());
     programStmtList.back().push_back(")");
 
@@ -106,7 +127,7 @@ std::any PreprocessorVisitor::visitArg_alias(prologParser::Arg_aliasContext* ctx
                                          funcArgsVec.size(), argNum);
             } else {
                 auto argIdx = argNum - 1;
-                programStmtList.back().push_back(std::format(" {} ",funcArgsVec.at(argIdx)));
+                programStmtList.back().push_back(std::format(" {} ", funcArgsVec.at(argIdx)));
             }
 
         } catch (const std::exception& e) {
@@ -215,7 +236,7 @@ std::any FunctionSemanticsVisitor::visitFunc_def(prologParser::Func_defContext* 
 std::any FunctionSemanticsVisitor::visitBinding(prologParser::BindingContext* ctx) {
     CHECK_NULL(ctx);
 
-    auto* targetVar =ctx->children[0];
+    auto* targetVar = ctx->children[0];
     CHECK_NULL(targetVar);
 
     const std::string& varName = targetVar->getText();

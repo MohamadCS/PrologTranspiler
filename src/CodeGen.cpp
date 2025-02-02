@@ -87,7 +87,7 @@ static std::string funcToPredCode(const std::string& predName, const std::vector
     if (predName != "main") {
         result = std::format("{}({}) :- ", predName, argsTuple.str());
     } else {
-        result = ":- ";
+        result = "main :- ";
     }
     return result;
 }
@@ -260,7 +260,7 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
 
     std::string funcName = ctx->VARIABLE()->getText();
 
-    bool isLambdaInvoc = m_funcNames.find(funcName) == m_funcNames.end() && !ctx->namespace_();
+    bool isLambdaInvoc = m_funcNames.find(funcName) == m_funcNames.end() && !ctx->namespace_() && (funcName != "RunTests");
 
     // Evaluate arguments, and add them to the vector.
     std::vector<std::string> predicateArgs;
@@ -277,7 +277,7 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
     std::string namespaceStr = getNameSpace(ctx);
 
     std::string predicateName;
-    if (m_funcNames.find(funcName) != m_funcNames.end()) {
+    if (m_funcNames.find(funcName) != m_funcNames.end() || funcName == "RunTests") {
         predicateName = genPredName(funcName);
     } else if (ctx->namespace_()) {
         predicateName = genPredName(ctx->VARIABLE()->getText());

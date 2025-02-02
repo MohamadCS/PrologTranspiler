@@ -3,6 +3,7 @@
 #include "ParsingManager.hpp"
 #include "SemanticChecker.hpp"
 #include "SyntaxChecker.hpp"
+#include "Preprocesser.hpp"
 #include "prologParser.h"
 
 #include <filesystem>
@@ -17,34 +18,21 @@ namespace Prolog {
 
 void Compiler::genProlog(prologParser& parser, bool formatOutput) {
     parser.reset();
-    auto* programStartCtx = parser.p_text();
 
+
+    // Preprocess
+    Preprocesser preprocessor;
+    ParsingManager afterPreprocessingParser(preprocessor.preprocess(parser));
+
+    // Get functions
     Visitors::FunctionSemanticsVisitor funcV;
+    auto* programStartCtx = afterPreprocessingParser.pParser->p_text();
+
     funcV.visit(programStartCtx);
-    parser.reset();
 
-    // CodeGen::CodeGenVisitor codeGenV(formatOutput);
-    //
-    // codeGenV.visit(programStartCtx);
-    // auto progList = codeGenV.getCodeBuffer();
+    afterPreprocessingParser.pParser->reset();
 
-    Visitors::PreprocessorVisitor progV;
-    programStartCtx = parser.p_text();
-
-    progV.visit(programStartCtx);
-    auto progList = progV.programStmtList;
-
-    std::stringstream procSStr;
-
-    for (auto& stmtList : progList) {
-        for (auto& stmt : stmtList) {
-            procSStr << stmt << " ";
-        }
-        procSStr << '\n';
-    }
-
-    ParsingManager afterPreprocessingParser(procSStr.str());
-
+    // Start CodeGen
     CodeGen::CodeGenVisitor codeGenV(formatOutput);
 
     codeGenV.setFuncNames(funcV.functionNames);

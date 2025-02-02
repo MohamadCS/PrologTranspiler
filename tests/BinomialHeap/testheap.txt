@@ -4,22 +4,22 @@ import {
     'stdlib'
 }
 
-TestHeapSort() :: (
+test 'HeapSort test on random list' (
+
     RandomList <- std:ForEach( 
-                              std:MakeList(30,0), 
+                              std:MakeList(100,0), 
                               (X) => (std:RandomNum(1,100))
     );
 
-    testing:EXPECT_EQ (
-                bin_heap:HeapSort(RandomList),
-                std:SortList(RandomList)
-    );
-    std:Print("Hello");
+    HeapSortResult <- bin_heap:HeapSort(RandomList);
+    StdSortResult <- std:SortList(RandomList);
+
+    testing:EXPECT_EQ(HeapSortResult, StdSortResult);
 )
 .
 
 Main() :: (
-    TestHeapSort();
+    RunTests();
 )
 .
 

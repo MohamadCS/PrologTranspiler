@@ -102,7 +102,6 @@ pub SortList(List : std:list) :: (
 .
 
 
-
 }
 
 list(X) :- is_list(X).
