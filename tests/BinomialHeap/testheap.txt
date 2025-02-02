@@ -18,6 +18,17 @@ test 'HeapSort test on random list' (
 )
 .
 
+test 'HeapSort test on empty list' (
+    testing:EXPECT_EQ(bin_heap:HeapSort([]),[]);
+)
+.
+
+test 'HeapSort test list with one element' (
+    testing:EXPECT_EQ(bin_heap:HeapSort([1]),[1]);
+)
+.
+
+
 Main() :: (
     RunTests();
 )

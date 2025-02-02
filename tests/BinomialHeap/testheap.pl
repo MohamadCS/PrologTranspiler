@@ -28,6 +28,26 @@ test0(_var0) :-
 	.
 
 
+test1(_var0) :- 
+	_var1 = [  ],
+	bin_heap:heapSort(_var1,_var2),
+	_var3 = [  ],
+	testing:eXPECT_EQ(_var2,_var3,_var4),
+	_var5 = tuple(  ),
+	_var0 = _var5
+	.
+
+
+test2(_var0) :- 
+	_var1 = [ 1 ],
+	bin_heap:heapSort(_var1,_var2),
+	_var3 = [ 1 ],
+	testing:eXPECT_EQ(_var2,_var3,_var4),
+	_var5 = tuple(  ),
+	_var0 = _var5
+	.
+
+
 main :- 
 	runTests(_var1),
 	_var2 = tuple(  ),
@@ -39,8 +59,14 @@ runTests(_var0) :-
 	_var1 = write("RUNNING TEST 0 : 'HeapSort test on random list'\n"),
 	write("RUNNING TEST 0 : 'HeapSort test on random list'\n"),
 	test0(_var2),
-	_var3 = tuple(  ),
-	_var0 = _var3
+	_var3 = write("RUNNING TEST 1 : 'HeapSort test on empty list'\n"),
+	write("RUNNING TEST 1 : 'HeapSort test on empty list'\n"),
+	test1(_var4),
+	_var5 = write("RUNNING TEST 2 : 'HeapSort test list with one element'\n"),
+	write("RUNNING TEST 2 : 'HeapSort test list with one element'\n"),
+	test2(_var6),
+	_var7 = tuple(  ),
+	_var0 = _var7
 	.
 
 
