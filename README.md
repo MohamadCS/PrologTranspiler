@@ -1,267 +1,271 @@
-# Prolog*
+# Introduction
 
-An extention to the Prolog langage, which adds support for functions. 
+`Prolog*` is a an extention to the Prolog programming language. It aims
+to combine the functional features of Prolog, with modern features found
+on other functional and oop programming languages.
 
+`Prolog*` introduces many features, from complete higher order
+functions, to intuitive syntactic sugar.
 
-## Functions
+# Compiler
 
+# Expressions
+
+Expressions in `Prolog*` are on of the following
+
+-   Tuples.
+
+-   Functions invocation.
+
+-   Extended Prolog term.
+
+-   Lambda.
+
+-   Matching statment.
+
+-   If-else statements.
+
+We will expand on each one of them later.
+
+# Tuples
+
+Tuples are simply lists of
+
+-   Expressions
+
+-   Bindings.
+
+-   If statments (Without else).
+
+Tuples follows the following rules
+
+-   If the expression is paired with `,` then the expression is
+    non-vanishing, that is its value is evaluated, and an entry in the
+    final tuple.
+
+-   If the expression is paired with `;` then the expression is
+    vanishing, that is its value is evaluated, and its not an entry in
+    the final tuple.
+
+-   Last item can be without a pair, in this case its interpreted as a
+    non-vanishing entry.
+
+-   If the tuple is empty then its a vanishing entry regardless of its
+    pair.
+
+-   If the tuple entry is a direct predicate call, then its acts like in
+    regular predicates, that is, if it evalutes to true then the
+    execution of the function continues, otherwise it stopps. Regardless
+    of the result, the entry would always be vanishing.
+
+Tuples are compiled to the predicate `tuple(...)` when `...` are the
+non-vanishing entries of the tuple.
+
+## Examples
+
+1.  `(1,2)`.
+
+2.  `([3,4],Max(4,3),(1,2))`, evalutes to `tuple([3,4],Max(4,3),(1,2))`.
+
+3.  `([3,4];Max(4,3),(1,2);)`, evalutes to `tuple(Max(4,3),(1,2))`.
+
+::: note
+*Note 1*. The number of entries in the tuple's predicate is determined
+at compile time, for this reason, an if statement (Without else) can
+only be a vanishing statement.
+:::
+
+# Binding
+
+Binding is used for matching a variable, or a tuple of variables to
+another expression. It does matching automatically, that is, if the
+expression is an arithmitic term, then it evalutes the term, and matches
+the variable with the value of the term (like `is` operator) otherwise
+it acts like `=` operator.
+
+It have the intuitive syntax `Var <- Expr`.
+
+## Tuple unpacking
+
+For convinence, the language allows you to unpack the tuple and match
+with named variables using the syntax `TupleOfVar <- Expr` when `Expr`
+is evaluted to a tuple with the same size as the tuple of variables.
+
+## Examples
+
+-   `X <- 3 * Y;`, evalues `3*Y` then matches it with `X`.
+
+-   `(X,Y) <- getMinMax(List);`, evalues `getMinMax(List)` to
+    `tuple(Min,Max)` then matches `X` with `Min` and `Max` with `Y`.
+
+-   `(X,Y) <- getMinMax(List);`, evalues `getMinMax(List)` to
+    `tuple(Min,Max)` then matches `X` with `Min` and `Max` with `Y`.
+
+# Conditionals
+
+There are two types of conditionals if statements, and if-else
+expressions.
+
+If statements, evaluates the tuple in the if body if the condition is
+true, while if-else evalutes one of them according to the condition.
+
+The reason that `if` is a statement is that it must be always vanishing
+to avoid ambiguity, since if the condition is false the if must not
+evalute to a value, but a tuple entry must be known if its a vanishing
+or non-vanishing at compile time.
+
+In the otherhand, if-else provide us with a way to tell if the
+expression is vanishing or not.
+
+We can add some bindings at the head of the if condition in order for a
+more compact syntax, this is an optional.
+
+In order to allow for more readable nested if-else statements, if the
+tuple has one entry only, and its non-vanishing, then we can remove the
+parentheses.
+
+## Syntax
+
+``` {.prolog language="Prolog"}
+if  optional(IfHead |)  Condition then 
+        tuple
 ```
-Foo(Arg1,Arg2, ... , ArgN) :: (
-    ...
-) 
-.
-```
 
-Such that `Arg1 ... ArgN` are variables, and the function body is a _tuple_.
+## Syntax
 
-A tuple is a list of expression, each expression can be a regular
-Prolog term or a _binding_ which has the syntax `(Entry1 sep1 Entry2 sep2 ...)`.
-
-Each entry is paired with `,` or `;`.
-
-If the entry has `,` then its a non-vanishing entry. 
-If the entry has `;` then its a vanishing entry. 
-
-A vanishing entry is evaluted, but is not an entry in the result tuple,
-and is not counted in _effective tuple size_.
-
-If the last entry is not paired, then its non-vanishing.
-
-## Invocation
-
-We can invoke the function by `Func(E1,E2, ... , EN)`.
-
-When `Ei` is one of the following:
-- Invocation.
-- Arithmetic expr.
-- Variable.
-- Predicate call.
-
-```
-Max(X,Y) % ok
-Max(1,Y) % ok
-Max(Max(3*5,X),Y) % ok
-```
-
-## Binding
-Used to bind variables with function invocations, it works on arithemtic 
-expr, lists, predicate and functions. This allows for a uniform binding 
-syntax 
-
-```
-X <- 1 % ok
-X <- Y * 100 % ok
-X <- Max(X,Y) % ok
-X <- Y = 10 % error
-```
-
-Note that `X <- Expr` assigns `Expr` to `X` then it evalutes to `X`  so
-something like
-
-```
-(X <- Expr, 1)
-```
-
-Evaluates to 
-
-```
-(X,1)
-```
-
-So if you want a binding only, be sure to pair the binding with `;`.
-
-### Tuple unpacking
-
-For tuples, and functions that returns tuple we can unpack there value using the syntax
-
-```
-(Min,Max) <- getMinMax(List);
-```
-
-In this case the tuple the function returns must be the same size as the number of variables. 
-
-
-
-## Argument aliases
-
-We can refer to the `i`-th argument using `#i`, and we can refer
-to the tuple that contains the function's arguments using `#`.
-
-Example
-```
-Foo(X,Y,Z) :: (
-    #1 <- 3; % Same as X <- 3;  
-    T <- #; % Same as T <- tuple(X,Y,Z); 
-    if List = [#3 | _] then (  % same as List = [Z | _]
-        write(#3); // same as write(Z).
-    );
-)
-.
-```
-
-Note that argument aliasing is done at preprocessing time.
-
-## Conditionals
-
-Conditionals are a tuple entry, and they have the following syntax
-
-```
-    if <Term> then tuple 
-.
-```
-
-The result of the satement is the tuple if and only if `Term` is true, otherwise its the empty tuple.
-
-We can use if else to evaluate one of the tuples
-
-```
-    if <Term> then
-        tuple 
+``` {.prolog language="Prolog"}
+if optional(IfHead |) Condition then 
+        tuple
     else 
         tuple
-.
 ```
 
-If the tuple has one entry, and its non-vanishing then there is no need
-to wrap it with parentheses, which allows for more readable syntax
-especially for the else if nested statements.
+## Examples
+
+-   ``` {.prolog language="Prolog"}
+    if ListSize <- std:Size(List) | ListSize > 0 then ListSize * 10 else ListSize
+    ```
+
+# Matching
+
+Matches are expression that evalutes to a value and they have the
+following syntax
+
+``` {.prolog language="Prolog"}
+match Expression {
+        Exp1 => Result1,
+        Exp2 => Result2,
+        ...
+        ExpN => ResultN,
+        else => Result
+    }
+```
+
+When `Resulti` are tuples or tuple entries.
+
+Note that the `else` is optional.
+
+# Functions
+
+A functions, takes arguments, and returns a result.
+
+A function result is a tuple of expressions, unless the tuple has one
+entry, then its the expresssion that the tuple contains.
+
+The functions name must be a valid variable's name.
+
+## Syntax
+
+``` {.prolog language="Prolog"}
+Func(Arg1, Arg2, ..., ArgN) :: (
+        Expr1,
+        ...
+        ExprN
+    )
+    .
+```
+
+## Arguments Alias
+
+We can refer to the i-th argument of the function with the synatx `#i`.
+
+`i` must be within the range of the function's arguments number.
+
+We can also refer to the tuple that contains all the function's
+arguments using `#`.
+
+Example:
+
+``` {.prolog language="Prolog"}
+Max(X,Y) :: (if #1 >= #2 then #1 else #2).
+```
 
 ## Lambdas
 
-Lambdas are expressions, they can bind to variables, or passed to
-functions.
+Lambdas are annonymos functions, and they are considered as expression,
+meaning they can be binded to variables, returned from functions, passed
+as an argument \...
 
+They have the following syntax
+
+``` {.prolog language="Prolog"}
+(Arg1, Arg2, ..., ArgN) => (stmts)
 ```
-X <- (X,Y) => (X + Y);
-Y <- X(1,2)  % Y matches to 3
 
-Sort(List, (X,Y) => (X >= Y));
+Example
 
+``` {.prolog language="Prolog"}
+Foo(X,Y) :: (
+        Max <- (X,Y) => (if #1 >= #2 then #1 else #2)
+        Max(X,Y)
+    )
+    .
 ```
 
-## Modules
+Note that `X,Y` are local to the lambdas.
 
-Modules defines a namespace for a set of functions, they are translated
-to regular Prolog modules. However, there usage is much more intuitive.
+# Modules
 
-To define a module
-```cpp
+Modules are a abstraction of the current modules system of Prolog, they
+contain functions or types, that can be marked as public using the
+keyword `pub` for other files to use when the import the module
+
+## Syntax
+
+We can define a module using
+
+``` {.prolog language="Prolog"}
 module my_module {
-
-pub Foo(X) :: ( 
-
-)
-.
-
-F(X) :: (
-)
-.
-
-
-}
-```
-Otherfiles can include that module
-
-```
-
-import {
-    'my_module'
-}
-
-Bar(X) :: (
-    my_module:Foo(X); % ok
-    my_module:F(X); % Error, F is a private function.
-)
-.
-```
-
-If the function does not specify a namespace, then its namespace is automatically interpreted as the module's so it must be an enternal function.
-
-Every function is private by default, unless it is declared as public using the keyword `pub`.
-
-
-## Match
-
-Matches are expression, that given a value `A` , matches the first
-value that is matches `A`.
-
-We can match to any expression.
-
-If it matches none, and else is not defined, then it matches to `nil`.
-
-```
-Foo(List : std:list) :: (
-    match std:Size(List) {
-        1 => Max(1,2),
-        2 => Max(1,3),
-        else => 100
+        pub Foo() :: (...).
+        pub type :: (...).
     }
-)
-.
 ```
 
-## Types
+And we can import the file the contains the module by listing the file
+name without extenstion
 
-Syntax
-
-```
-type my_type :: (type1 ,type2 , ... , typeN).
-```
-
-such that `typei` is an atomic name, that can be chained with `?`, if it
-does then the type is nullable (`typei` or `nil`).
-
-We can declare the variable's type when binding, or in the function's arguments
-
-```
+``` {.prolog language="Prolog"}
 import {
-    'std'
-}
-
-pub Foo::(X : node) :: (
-    Y : node <- X; // does not fail, since X is also a node 
-    L : std:vector <- std:vector([1,2,3],3);// True  the type std:vector is defined in the our standard library
-
-)
+        'stdlib',
+        'testlib',
+        'heap',
+    }
 ```
 
+If we want to use a functions from a module we imported, we must declare
+then module name before the function's
+
+``` {.prolog language="Prolog"}
+
+    import {
+        'm1', 
+        'm2' 
+    }
 
 
-
-# Rules
-- In if else statement, both tuples must have the same effective size.
-- The function name is translated to the a predicate with the same name
-but with the first letter in lower case, it has an additional variable which will hold the result of the function, the variable type of the return value of the function, if the function's effective size is 1,
-otherwise its `tuple(E1,E2 ,... ,EN)` when `E1,...,EN` are the non-vanishing entries.
-- If the function returns no value then its result is `tuple()`.
-- If the tuple's effiective size is 0, then the tuple is a vanishing statements, wither its paired with `,` or not.
-- Variables inside functions must not contain the prefix `_var`.
-
-More examples can be found under `tests/CodeGenExamples`.
-
-## Usage 
-```bash
-make 
-./prolog -i <input_file> -o <output_file> 
-./prolog --run_tests # to run the tests
-
+    Main() :: (
+        m1:Foo(); // Prints 'hello'
+        m2:Foo(); // Prints 'world'
+    )
+    .
 ```
-
-### TODO:
-- [x] # is a sytnax sugar that returns a tuple of the function's args.
-- [x] #i the i-th arg.
-- [x] Delete Variable after evalutating predicate. 
-- [x] Write examples using the syntax sugar.
-- [x] Add namespaces.
-- [x] Add types and type checking.
-- [x] Write a test program that build a binomaial tree of random size. 
-- [x] Modules can accept regular predicates
-- [x] Test delete min.
-- [x] Rewrite with syntax sugar.
-- [ ] Add delayed/immediate defenition.
-- [ ] Change `::` to `<-`.
-
-
-
-
-
