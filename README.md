@@ -4,8 +4,8 @@
 to combine the functional features of Prolog, with modern features found
 on other functional and oop programming languages.
 
-`Prolog*` introduces many features, from complete higher order
-functions, to intuitive syntactic sugar.
+`Prolog*` introduces many features, from complete functions, to
+intuitive syntactic sugar.
 
 # Compiler
 
