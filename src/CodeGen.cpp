@@ -108,9 +108,8 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
         membersVec.push_back(genVar());
     }
 
-    auto itemFormatFunc = [](decltype(membersVec.begin()) it) { return *it; };
     std::string membersStr = Utility::convertContainerToListStr<decltype(membersVec.begin())>(
-        membersVec.begin(), membersVec.end(), itemFormatFunc);
+        membersVec.begin(), membersVec.end(), [](decltype(membersVec.begin()) it) { return *it; });
 
     std::string nsStr;
 
@@ -227,9 +226,8 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
     if (varNamesVec.size() == 1) {
         emit(std::format("{} = {},", varNamesVec[0], node.var));
     } else {
-        auto itemFormatFunc = [](decltype(varNamesVec.begin()) it) { return *it; };
         std::string vecListStr = Prolog::Utility::convertContainerToListStr<decltype(varNamesVec.begin())>(
-            varNamesVec.begin(), varNamesVec.end(), itemFormatFunc);
+            varNamesVec.begin(), varNamesVec.end(), [](decltype(varNamesVec.begin()) it) { return *it; });
 
         emit(std::format("tuple({}) = {},", vecListStr, node.var));
     }
@@ -260,7 +258,8 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
 
     std::string funcName = ctx->VARIABLE()->getText();
 
-    bool isLambdaInvoc = m_funcNames.find(funcName) == m_funcNames.end() && !ctx->namespace_() && (funcName != "RunTests");
+    bool isLambdaInvoc =
+        m_funcNames.find(funcName) == m_funcNames.end() && !ctx->namespace_() && (funcName != "RunTests");
 
     // Evaluate arguments, and add them to the vector.
     std::vector<std::string> predicateArgs;
@@ -285,9 +284,8 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
         predicateName = funcName;
     }
 
-    auto itemFormatFunc = [](decltype(predicateArgs.begin()) it) { return *it; };
     std::string args = Prolog::Utility::convertContainerToListStr<decltype(predicateArgs.begin())>(
-        predicateArgs.begin(), predicateArgs.end(), itemFormatFunc);
+        predicateArgs.begin(), predicateArgs.end(), [](decltype(predicateArgs.begin()) it) { return *it; });
     std::string predicateInvoc;
 
     if (isLambdaInvoc) {
@@ -342,8 +340,6 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     tupleNode.var = genVar();
 
-    auto itemFormatFunc = [](decltype(varValuesVec.begin()) it) { return *it; };
-
     std::string resultStr;
 
     // If the tuple is empty then dont store it in a variable, and return an empty node.
@@ -354,9 +350,10 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
     if (varValuesVec.size() == 1) {
         resultStr = std::format("{} = {},", tupleNode.var, varValuesVec[0]);
     } else {
-        resultStr = std::format("{} = tuple( {} ),", tupleNode.var,
-                                Prolog::Utility::convertContainerToListStr<decltype(varValuesVec.begin())>(
-                                    varValuesVec.begin(), varValuesVec.end(), itemFormatFunc));
+        resultStr = std::format(
+            "{} = tuple( {} ),", tupleNode.var,
+            Prolog::Utility::convertContainerToListStr<decltype(varValuesVec.begin())>(
+                varValuesVec.begin(), varValuesVec.end(), [](decltype(varValuesVec.begin()) it) { return *it; }));
     }
 
     emit(std::move(resultStr));
@@ -645,7 +642,7 @@ std::any CodeGenVisitor::visitAtom_term(prologParser::Atom_termContext* ctx) {
             emit(std::format("{} = {},", node.var, pAtomExprCtx->getText()));
             return node;
         }
-    } 
+    }
 
     return {};
 }
@@ -802,13 +799,13 @@ std::string CodeGenVisitor::getModulesCode() const {
         modulesCode << std::format("\t{},\n", ns);
         modulesCode << std::format("\t[\n");
 
-        auto itemFormatFunc = [](decltype(funcList.begin()) it) {
-            std::string result = std::format("\t\t{}/{}", it->name, it->args.size() + 1);
-            return result;
-        };
-
         std::string funcStr = Prolog::Utility::convertContainerToListStr<decltype(funcList.begin())>(
-            funcList.begin(), funcList.end(), itemFormatFunc, ",\n");
+            funcList.begin(), funcList.end(),
+            [](decltype(funcList.begin()) it) {
+                std::string result = std::format("\t\t{}/{}", it->name, it->args.size() + 1);
+                return result;
+            },
+            ",\n");
 
         modulesCode << funcStr;
         modulesCode << '\n';

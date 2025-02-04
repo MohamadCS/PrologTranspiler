@@ -28,6 +28,25 @@ test7_lambda0(X,Y,_var3) :-
 	.
 	
 
+test9_lambda0(Node1,Node2,_var3) :- 
+	_var4 = node(V1,_),
+	Node1 = _var4,
+	_var5 = node(V2,_),
+	Node2 = _var5,
+	( V1>=V2 -> (
+		_var7 = Node2,
+		_var6 = _var7
+	)
+	;(
+		_var8 = Node1,
+		_var6 = _var8
+	)
+	),
+	_var9 = _var6,
+	_var3 = _var9
+	.
+	
+
 test0(_var0) :- 
 	_var1 = [  ],
 	std:size(_var1,_var2),
@@ -115,6 +134,27 @@ test7(_var0) :-
 	.
 
 
+test8(_var0) :- 
+	_var1 = [ 1 ],
+	std:minMember(_var1,_var2,_var3),
+	_var4 is 1,
+	testing:eXPECT_EQ(_var3,_var4,_var5),
+	_var6 = tuple(  ),
+	_var0 = _var6
+	.
+
+
+test9(_var0) :- 
+	_var1 = [ node(4,[]),node(1,[]),node(3,[]) ],
+	_var2 = test9_lambda0,
+	std:minMember(_var1,_var2,_var10),
+	_var11 = node(1,[]),
+	testing:eXPECT_EQ(_var10,_var11,_var12),
+	_var13 = tuple(  ),
+	_var0 = _var13
+	.
+
+
 main :- 
 	runTests(_var1),
 	_var2 = tuple(  ),
@@ -144,11 +184,17 @@ runTests(_var0) :-
 	_var13 = write("RUNNING TEST 6 : 'std:Replace on list with multiple elements'\n"),
 	write("RUNNING TEST 6 : 'std:Replace on list with multiple elements'\n"),
 	test6(_var14),
-	_var15 = write("RUNNING TEST 7 : 'std:MinMemeber on list with mutilple elemenst'\n"),
-	write("RUNNING TEST 7 : 'std:MinMemeber on list with mutilple elemenst'\n"),
+	_var15 = write("RUNNING TEST 7 : 'std:MinMemeber on list with multiple elements'\n"),
+	write("RUNNING TEST 7 : 'std:MinMemeber on list with multiple elements'\n"),
 	test7(_var16),
-	_var17 = tuple(  ),
-	_var0 = _var17
+	_var17 = write("RUNNING TEST 8 : 'std:MinMemeber with one element'\n"),
+	write("RUNNING TEST 8 : 'std:MinMemeber with one element'\n"),
+	test8(_var18),
+	_var19 = write("RUNNING TEST 9 : 'std:MinMemeber with none trivial min function'\n"),
+	write("RUNNING TEST 9 : 'std:MinMemeber with none trivial min function'\n"),
+	test9(_var20),
+	_var21 = tuple(  ),
+	_var0 = _var21
 	.
 
 

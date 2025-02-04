@@ -13,11 +13,11 @@ MergeBt(Bt1, Bt2) :: (
 
         if Value1 >= Value2 then (
             R <- bt(Value2,[Bt1 | List2]);
-            R
         ) else (
             R <- bt(Value1,[Bt2 | List1]);
-            R
-        )
+        );
+
+        R
 )
 .
 

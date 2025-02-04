@@ -1,2 +1,65 @@
 \section{Functions}
 
+
+A functions, takes arguments, and returns a result. 
+
+A function result is a tuple of expressions, unless
+the tuple has one entry, then its the expresssion 
+that the tuple contains.
+
+The functions name must be a valid variable's name.
+
+\subsection{Syntax}
+
+
+\begin{lstlisting}[language = Prolog]
+    Func(Arg1, Arg2, ..., ArgN) :: (
+        Expr1,
+        ...
+        ExprN
+    )
+    .
+\end{lstlisting}
+
+\subsection{Arguments Alias}
+
+We can refer to the i-th argument of the function with
+the synatx \texttt{#i}.
+
+\texttt{i} must be within the range of the function's arguments number.
+
+We can also refer to the tuple that contains all the function's 
+arguments using \texttt{#}.
+
+Example:
+
+\begin{lstlisting}[language = Prolog]
+    Max(X,Y) :: (if #1 >= #2 then #1 else #2).
+\end{lstlisting}
+
+
+
+\subsection{Lambdas}
+
+Lambdas are annonymos functions, and they are considered as 
+expression, meaning they can be binded to variables, returned 
+from functions, passed as an argument ...
+
+They have the following syntax
+
+
+\begin{lstlisting}[language = Prolog]
+    (Arg1, Arg2, ..., ArgN) => (stmts)
+\end{lstlisting}
+
+Example
+
+\begin{lstlisting}[language = Prolog]
+    Foo(X,Y) :: (
+        Max <- (X,Y) => (if #1 >= #2 then #1 else #2)
+        Max(X,Y)
+    )
+    .
+\end{lstlisting}
+
+Note that \texttt{X,Y} are local to the lambdas.

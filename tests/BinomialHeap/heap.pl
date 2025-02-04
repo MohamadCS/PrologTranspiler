@@ -51,17 +51,17 @@ mergeBt(Bt1,Bt2,_var0) :-
 	( Value1>=Value2 -> (
 		_var4 = bt(Value2,[Bt1|List2]),
 		R = _var4,
-		_var5 = R,
+		_var5 = tuple(  ),
 		_var3 = _var5
 	)
 	;(
 		_var6 = bt(Value1,[Bt2|List1]),
 		R = _var6,
-		_var7 = R,
+		_var7 = tuple(  ),
 		_var3 = _var7
 	)
 	),
-	_var8 = _var3,
+	_var8 = R,
 	_var0 = _var8
 	.
 

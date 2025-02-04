@@ -1,9 +1,7 @@
-
 import {
     'stdlib',
     'testlib'
 }
-
 
 
 test 'std:Size on empty list' (
@@ -11,12 +9,10 @@ test 'std:Size on empty list' (
 )
 .
 
-
 test 'std:Size on list with one element' (
     testing:EXPECT_EQ(std:Size([1]),1);
 )
 .
-
 
 test 'std:ForEach on empty list' (
     testing:EXPECT_EQ(std:ForEach([],_),[]);
@@ -43,12 +39,35 @@ test 'std:Replace on list with multiple elements' (
 )
 .
 
-
 test 'std:MinMemeber on list with multiple elements' (
     testing:EXPECT_EQ(std:MinMember([2,1,10],(X,Y) => (if X =< Y then X else Y)),1);
 )
 .
 
+test 'std:MinMemeber with one element' (
+    testing:EXPECT_EQ(std:MinMember([1],_),1);
+)
+.
+
+test 'std:MinMemeber with none trivial min function' (
+    testing:EXPECT_EQ(
+        std:MinMember(
+                [node(4,[]),node(1,[]),node(3,[])],
+                (Node1,Node2) => (
+                        Node1 <- node(V1,_);
+                        Node2 <- node(V2,_);
+
+                        if V1 >= V2 then(
+                            Node2
+                        ) else (
+                            Node1
+                        )
+                )
+          ),
+        node(1,[])
+     );
+)
+.
 
 Main() :: (
     RunTests();
