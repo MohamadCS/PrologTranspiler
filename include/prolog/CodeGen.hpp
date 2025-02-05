@@ -13,12 +13,6 @@
 
 namespace Prolog::CodeGen {
 
-struct Node {
-    std::string var;
-    bool isEmptyTuple = false;
-    bool isPredicate = false;
-    std::string predicateText;
-};
 
 class CodeGenVisitor : public prologBaseVisitor {
 public:
@@ -27,8 +21,10 @@ public:
           m_formatOutput(formatOutput) {
     }
 
-    std::string genVar();
 
+    /**
+     * @brief Orders the codebuffers and returns the final code buffer.
+     */
     std::vector<std::string> getCodeBuffer() const;
 
     void setFuncNames(const std::vector<std::string>& funcNames);
@@ -76,14 +72,11 @@ public:
 
     std::any visitAtom_term(prologParser::Atom_termContext* ctx) override;
 
-    std::any visitReturn(prologParser::ReturnContext* ctx) override;
-
     std::any visitType_def(prologParser::Type_defContext* ctx) override;
 
     std::any visitMatch_stmt(prologParser::Match_stmtContext* ctx) override;
 
 
-    Node generateArithCode(antlr4::RuleContext* ctx);
 
 private:
     bool m_insideLambda = false;
@@ -95,9 +88,9 @@ private:
 
     std::set<std::string> m_funcNames;
     std::vector<std::string> m_codeBuffer;
-    std::vector<std::string> m_lambdasBuffer;
     std::vector<std::string> m_importedModules;
 
+    std::vector<std::string> m_lambdasBuffer;
     std::set<std::string> m_lambdasNames;
 
     std::map<std::string, std::deque<Predicate>> m_modules;
@@ -108,11 +101,17 @@ private:
 
 private:
     static std::string genPredName(std::string funcName);
-    void emit(std::string&&);
+
+    /**
+     * @brief Adds the code the relevant buffer.
+     */
+    void emit(std::string&& code);
+
     std::string getModulesCode() const;
     std::string getNameSpace(prologParser::InvocContext*) const;
-
+    std::string genVar();
     std::string genTypeCode(std::string varName, prologParser::TypeContext* pTypeCtx);
+    Node genArithCode(antlr4::RuleContext* ctx);
 };
 
 } // namespace Prolog::CodeGen

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ParserRuleContext.h"
+#include "BaseStructs.hpp"
 #include "prologBaseVisitor.h"
 #include "prologParser.h"
 #include "tree/ParseTreeProperty.h"
@@ -67,20 +68,16 @@ private:
     bool m_withinFuncCtx = false;
 };
 
-struct MarkEmptyTuplesVisitor : public prologBaseVisitor {
-    /**
-     * @brief A property that gives wither a tuple is empty or not.
-     * An empty tuple is '()', or a tuple of empty tuples.
-     */
-    antlr4::tree::ParseTreeProperty<bool> emptyTuples;
+// struct MarkEmptyTuplesVisitor : public prologBaseVisitor {
+//     /**
+//      * @brief A property that gives wither a tuple is empty or not.
+//      * An empty tuple is '()', or a tuple of empty tuples.
+//      */
+//     antlr4::tree::ParseTreeProperty<bool> emptyTuples;
+//
+//     std::any visitTuple(prologParser::TupleContext* ctx) override;
+// };
 
-    std::any visitTuple(prologParser::TupleContext* ctx) override;
-};
-
-struct TestFunc {
-    std::string desc;
-    std::size_t num;
-};
 
 
 struct PreprocessorVisitor : public prologBaseVisitor {
@@ -95,8 +92,15 @@ struct PreprocessorVisitor : public prologBaseVisitor {
      */
     std::optional<antlr4::tree::ParseTreeProperty<bool>> emptyTuples;
 
+    /**
+     * @brief Used inside the visitor for keeping track of the current
+     * function scope args.
+     */
     std::stack<std::vector<std::string>> funcArgsStack;
 
+    /**
+     * @brief A list of the test functions in the current file
+     */
     std::list<TestFunc> testFuncList;
 
     bool mainDefined = false;
@@ -124,13 +128,4 @@ struct PreprocessorVisitor : public prologBaseVisitor {
     // std::any visitTuple(prologParser::TupleContext* ctx) override;
 };
 
-// TODO: Delete this class.
-//
-// struct VariableSemanticVisitor : public prologBaseVisitor {
-//     std::any visitVariable(prologParser::VariableContext* ctx) override;
-//
-//     std::map<std::string, std::uint8_t> varTbl;
-//     static constexpr std::size_t VAR_COUNT = 2;
-// };
-//
 } // namespace Prolog::Visitors

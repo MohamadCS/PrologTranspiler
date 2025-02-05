@@ -95,19 +95,15 @@ AddList(List , Heap) :: (
 
 
 ListToHeap(List : std:list) :: (
-    match std:Size(List)  {
-        0 => [],
-        else => (
-                List <- [L | Ls];
-                Add(L,ListToHeap(Ls))
-        )
+    match List  {
+        [] => [],
+        [L | Ls] => Add(L,ListToHeap(Ls))
     }
 )
 .
 
 HeapToList(Heap : std:list) :: (
-    HeapSize <- std:Size(Heap);
-    if  HeapSize = 0 then (
+    if HeapSize <- std:Size(Heap) | HeapSize = 0 then (
         []
     ) else (
         (MinBt, NewHeap) <- PopMin(Heap);

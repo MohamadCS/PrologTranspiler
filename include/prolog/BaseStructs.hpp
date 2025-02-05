@@ -6,6 +6,7 @@
 
 
 namespace Prolog{
+
 struct Tuple {
     std::vector<std::string> vanishingStmts;
     std::vector<std::string> nonVanishingStmts;
@@ -21,5 +22,18 @@ struct Predicate {
 struct TupleEntry {
     std::string var;
 };
+
+struct TestFunc {
+    std::string desc;
+    std::size_t num;
+};
+
+struct Node {
+    std::string var;
+    bool isEmptyTuple = false;
+    bool isPredicate = false;
+    std::string predicateText;
+};
+
 
 }

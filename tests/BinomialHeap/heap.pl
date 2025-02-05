@@ -200,33 +200,33 @@ addList(List,Heap,_var0) :-
 
 listToHeap(List,_var0) :- 
 	std:list(List),
-	std:size(List,_var2),
-	_var3 is 0,
+	_var2 = [  ],
+	_var3 = [ L | Ls ],
 	(
-	_var2 = _var3 -> 
+	List = _var2 -> 
 	_var4 = [  ],
 	_var1 = _var4
 	;
-	_var5 = [ L | Ls ],
-	List = _var5,
-	bin_heap:listToHeap(Ls,_var6),
-	bin_heap:add(L,_var6,_var7),
-	_var8 = _var7,
-	_var1 = _var8
+	List = _var3 -> 
+	bin_heap:listToHeap(Ls,_var5),
+	bin_heap:add(L,_var5,_var6),
+	_var1 = _var6
+	;
+	_var1 = nil
 	),
-	_var9 = _var1,
-	_var0 = _var9
+	_var7 = _var1,
+	_var0 = _var7
 	.
 
 
 heapToList(Heap,_var0) :- 
 	std:list(Heap),
-	std:size(Heap,_var1),
-	HeapSize = _var1,
+	std:size(Heap,_var2),
+	HeapSize = _var2,
 	( HeapSize=0 -> (
 		_var3 = [  ],
 		_var4 = _var3,
-		_var2 = _var4
+		_var1 = _var4
 	)
 	;(
 		bin_heap:popMin(Heap,_var5),
@@ -236,10 +236,10 @@ heapToList(Heap,_var0) :-
 		bin_heap:heapToList(NewHeap,_var8),
 		_var7 = [ Value | _var8 ],
 		_var9 = _var7,
-		_var2 = _var9
+		_var1 = _var9
 	)
 	),
-	_var10 = _var2,
+	_var10 = _var1,
 	_var0 = _var10
 	.
 

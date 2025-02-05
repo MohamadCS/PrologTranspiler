@@ -59,7 +59,6 @@ void CodeGenVisitor::emit(std::string&& line) {
 std::string CodeGenVisitor::genPredName(std::string funcName) {
     if (funcName.empty()) {
         // ERROR : EMPTY string;
-        LOG("Empty func name");
     }
     funcName[0] = std::tolower(funcName[0]);
     return funcName;
@@ -141,7 +140,6 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
 }
 
 std::any CodeGenVisitor::visitIf(prologParser::IfContext* ctx) {
-    LOG("If");
     CHECK_NULL(ctx);
 
     auto* conditionTerm = ctx->term();
@@ -167,7 +165,6 @@ std::any CodeGenVisitor::visitIf(prologParser::IfContext* ctx) {
 }
 
 std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
-    LOG("If else");
     CHECK_NULL(ctx);
 
     Node node;
@@ -208,7 +205,6 @@ std::any CodeGenVisitor::visitIf_else(prologParser::If_elseContext* ctx) {
 }
 
 std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
-    LOG("Binding");
     CHECK_NULL(ctx);
 
     Node node = std::any_cast<Node>(visit(ctx->expr()));
@@ -229,7 +225,7 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
         std::string vecListStr = Prolog::Utility::convertContainerToListStr<decltype(varNamesVec.begin())>(
             varNamesVec.begin(), varNamesVec.end(), [](decltype(varNamesVec.begin()) it) { return *it; });
 
-        emit(std::format("tuple({}) = {},", vecListStr, node.var));
+        emit(std::format("tuple({}) = {},", std::move(vecListStr), node.var));
     }
 
     for (auto* pBindingVarCtx : ctx->binding_var()) {
@@ -251,7 +247,6 @@ std::any CodeGenVisitor::visitBinding(prologParser::BindingContext* ctx) {
  *
  */
 std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
-    LOG("Invocation");
     CHECK_NULL(ctx);
 
     auto* tuple = ctx->tuple();
@@ -289,9 +284,9 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
     std::string predicateInvoc;
 
     if (isLambdaInvoc) {
-        predicateInvoc = std::format("call({},{}),", predicateName, args);
+        predicateInvoc = std::format("call({},{}),", predicateName, std::move(args));
     } else {
-        predicateInvoc = std::format("{}{}({}),", namespaceStr, predicateName, args);
+        predicateInvoc = std::format("{}{}({}),", namespaceStr, predicateName, std::move(args));
     }
 
     emit(std::move(predicateInvoc));
@@ -301,7 +296,6 @@ std::any CodeGenVisitor::visitInvoc(prologParser::InvocContext* ctx) {
 
 std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
     CHECK_NULL(ctx);
-    LOG("START TUPLE");
 
     const auto isVanishingList = Utility::isVanishingEntryList(ctx);
 
@@ -358,7 +352,6 @@ std::any CodeGenVisitor::visitTuple(prologParser::TupleContext* ctx) {
 
     emit(std::move(resultStr));
 
-    LOG("END TUPLE");
     return tupleNode;
 }
 
@@ -379,7 +372,6 @@ std::any CodeGenVisitor::visitModule(prologParser::ModuleContext* ctx) {
 }
 
 std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
-    LOG("Func def");
     CHECK_NULL(ctx);
 
     const std::string funcName = ctx->VARIABLE()->getText();
@@ -438,7 +430,6 @@ std::any CodeGenVisitor::visitFunc_def(prologParser::Func_defContext* ctx) {
 
 std::any CodeGenVisitor::visitVariable(prologParser::VariableContext* ctx) {
     CHECK_NULL(ctx);
-    LOG("Var");
 
     Node node;
 
@@ -461,7 +452,6 @@ static inline bool isArith(const std::string& op) {
 std::any CodeGenVisitor::visitBinary_operator(prologParser::Binary_operatorContext* ctx) {
     CHECK_NULL(ctx);
 
-    LOG("Bin op");
     std::string op = ctx->operator_()->getText();
 
     if (!isArith(op)) {
@@ -479,7 +469,7 @@ std::any CodeGenVisitor::visitBinary_operator(prologParser::Binary_operatorConte
     return node;
 }
 
-Node CodeGenVisitor::generateArithCode(antlr4::RuleContext* ctx) {
+Node CodeGenVisitor::genArithCode(antlr4::RuleContext* ctx) {
     Node node;
 
     node.var = genVar();
@@ -493,7 +483,6 @@ Node CodeGenVisitor::generateArithCode(antlr4::RuleContext* ctx) {
 
 std::any CodeGenVisitor::visitUnary_operator(prologParser::Unary_operatorContext* ctx) {
     CHECK_NULL(ctx);
-    LOG("Un op");
 
     std::string op = ctx->operator_()->getText();
 
@@ -501,34 +490,28 @@ std::any CodeGenVisitor::visitUnary_operator(prologParser::Unary_operatorContext
         return {};
     }
 
-    return generateArithCode(ctx);
+    return genArithCode(ctx);
 }
 
 std::any CodeGenVisitor::visitFloat(prologParser::FloatContext* ctx) {
     CHECK_NULL(ctx);
-    LOG("Float");
-    return generateArithCode(ctx);
+    return genArithCode(ctx);
 }
 
 std::any CodeGenVisitor::visitInteger_term(prologParser::Integer_termContext* ctx) {
     CHECK_NULL(ctx);
-    LOG("Int");
-    return generateArithCode(ctx);
+    return genArithCode(ctx);
 }
 
 std::any CodeGenVisitor::visitExpr(prologParser::ExprContext* ctx) {
     CHECK_NULL(ctx);
-    LOG("Expr");
 
     std::any value = visit(ctx->children[0]);
 
     // For now, if it does not have value, then its a term but not a variable.
     if (value.has_value()) {
-        LOG(ctx->getText());
-        LOG("END EXP");
         return value;
     } else if (ctx->tuple()) {
-        LOG(ctx->getText());
         return {};
     } else {
         emit(std::format("{},", ctx->getText()));
@@ -582,7 +565,7 @@ std::any CodeGenVisitor::visitList_term(prologParser::List_termContext* ctx) {
         exprListStr += std::format(" | {}", exprStr);
     }
 
-    emit(std::format("{} = [ {} ],", node.var, exprListStr));
+    emit(std::format("{} = [ {} ],", node.var, std::move(exprListStr)));
 
     return node;
 }
@@ -617,11 +600,9 @@ std::any CodeGenVisitor::visitCompound_term(prologParser::Compound_termContext* 
     std::string exprListStr = Prolog::Utility::convertContainerToListStr<decltype(entriesVec.begin())>(
         entriesVec.begin(), entriesVec.end(), [](decltype(entriesVec.begin()) it) { return *it; });
 
-    std::string predicateStr = std::format("{}({})", ctx->atom()->getText(), exprListStr);
+    node.predicateText = std::format("{}({})", ctx->atom()->getText(), std::move(exprListStr));
 
-    emit(std::format("{} = {},", node.var, predicateStr));
-
-    node.predicateText = std::move(predicateStr);
+    emit(std::format("{} = {},", node.var, node.predicateText));
 
     node.isPredicate = true;
 
@@ -682,8 +663,10 @@ std::any CodeGenVisitor::visitLambda(prologParser::LambdaContext* ctx) {
 
     lambdaNode.var = genVar();
 
+    ///// Tabs
     auto oldTabs = m_currentTabs;
     m_currentTabs = 0;
+    //////
 
     std::string nsStr;
     if (m_currentModule.has_value()) {
@@ -755,6 +738,7 @@ std::any CodeGenVisitor::visitMatch_stmt(prologParser::Match_stmtContext* ctx) {
     std::vector<std::string> varVec;
     varVec.reserve(matchEntryCtxVec.size());
 
+    // For each possible match, init the variable first.
     for (auto* matchEntryCtx : matchEntryCtxVec) {
         auto matchExprEntryResult = std::any_cast<Node>(visit(matchEntryCtx->expr()));
         varVec.push_back(matchExprEntryResult.var);
@@ -773,9 +757,8 @@ std::any CodeGenVisitor::visitMatch_stmt(prologParser::Match_stmtContext* ctx) {
         emit(";");
     }
 
-    // Deal with otherwise
-    //
 
+    // If else exists print its code
     if (ctx->match_else()) {
         auto otherwiseResult = visit(ctx->match_else()->tuple_entry());
 
@@ -807,7 +790,7 @@ std::string CodeGenVisitor::getModulesCode() const {
             },
             ",\n");
 
-        modulesCode << funcStr;
+        modulesCode << std::move(funcStr);
         modulesCode << '\n';
         modulesCode << "\t]\n";
         modulesCode << ")\n";
@@ -819,6 +802,7 @@ std::string CodeGenVisitor::getModulesCode() const {
 
 std::any CodeGenVisitor::visitImport_modules(prologParser::Import_modulesContext* ctx) {
     CHECK_NULL(ctx);
+
     const auto& fileNameCtxVec = ctx->QUOTED();
 
     m_importedModules.reserve(fileNameCtxVec.size());
@@ -833,24 +817,6 @@ std::any CodeGenVisitor::visitImport_modules(prologParser::Import_modulesContext
     for (auto& pStringCtx : fileNameCtxVec) {
         m_importedModules.push_back(std::format(":- use_module({}).", generatePlFileName(pStringCtx->getText())));
     }
-
-    return {};
-}
-
-std::any CodeGenVisitor::visitReturn(prologParser::ReturnContext* ctx) {
-    CHECK_NULL(ctx);
-    auto returnValue = visit(ctx->expr());
-
-    if (!returnValue.has_value()) {
-        LOG("It should have return value");
-    }
-
-    auto node = std::any_cast<Node>(returnValue);
-
-    const Predicate& currentPredicate = m_predicateStack.top();
-
-    emit(std::format("{} = {},", currentPredicate.returnVar, node.var)); // CurrentPredicate.ReturnVar =
-    emit("halt,");                                                       // CurrentPredicate.ReturnVar =
 
     return {};
 }

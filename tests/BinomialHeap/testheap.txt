@@ -11,10 +11,8 @@ test 'HeapSort test on random list' (
                               (X) => (std:RandomNum(1,100))
     );
 
-    HeapSortResult <- bin_heap:HeapSort(RandomList);
-    StdSortResult <- std:SortList(RandomList);
 
-    testing:EXPECT_EQ(HeapSortResult, StdSortResult);
+    testing:EXPECT_EQ(bin_heap:HeapSort(RandomList), std:SortList(RandomList));
 )
 .
 
@@ -25,6 +23,11 @@ test 'HeapSort test on empty list' (
 
 test 'HeapSort test list with one element' (
     testing:EXPECT_EQ(bin_heap:HeapSort([1]),[1]);
+)
+.
+
+test 'HeapSort on sorted list' (
+    testing:EXPECT_EQ(bin_heap:HeapSort([1,2,3]),[1,2,3]);
 )
 .
 

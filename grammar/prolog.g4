@@ -91,7 +91,6 @@ tuple_entry
     : expr 
     | binding
     | if
-    | return
     ;
 
 type: (namespace ':')? atomic_name ('?')?;
@@ -122,8 +121,6 @@ if_else: <assoc = right> 'if' {enabledSep= true;} (if_head)? term {enabledSep = 
 expr_list
     : expr (',' expr)*
     ;
-
-return: 'return' expr;
 
 expr 
     : tuple 
