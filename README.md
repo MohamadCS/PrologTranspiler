@@ -9,6 +9,31 @@ intuitive syntactic sugar.
 
 # Compiler
 
+## Usage
+
+In order to compile a `Prolog*` we can use
+
+``` {.bash language="bash"}
+prolog -i my_file.txt 
+```
+
+this will compile `my_file.txt` to the prolog file `my_file.pl`.
+
+We can add the following flags:
+
+-   `-i –input` : To specify the input `Prolog*` file.
+
+-   `-o –output` : Followed by the name of the prolog output file.
+
+-   `–format`: Formats the output file.
+
+-   `–no-semantics`: Disables the semantic checker.
+
+::: note
+*Note 1*. The output file must be interpreted using `swipl`, as its the
+only interpreter tested for this project.
+:::
+
 # Expressions
 
 Expressions in `Prolog*` are on of the following
@@ -27,6 +52,12 @@ Expressions in `Prolog*` are on of the following
 
 We will expand on each one of them later.
 
+## Extended Prolog Term
+
+You can expect each prolog term to work as it is in regular prolog,
+however `Prolog*` allows for new expressions that we defined above to be
+used inside lists and predicate calls.
+
 # Tuples
 
 Tuples are simply lists of
@@ -39,16 +70,16 @@ Tuples are simply lists of
 
 Tuples follows the following rules
 
--   If the expression is paired with `,` then the expression is
-    non-vanishing, that is its value is evaluated, and an entry in the
-    final tuple.
+-   If the expression is followed by the seperator `,` then the
+    expression is non-vanishing, that is its value is evaluated, and an
+    entry in the final tuple.
 
--   If the expression is paired with `;` then the expression is
-    vanishing, that is its value is evaluated, and its not an entry in
-    the final tuple.
+-   If the expression is is followed by the seperator `;` then the
+    expression is vanishing, that is its value is evaluated, and its not
+    an entry in the final tuple.
 
--   Last item can be without a pair, in this case its interpreted as a
-    non-vanishing entry.
+-   If the last item is not followed by a seperator, then it is treated
+    as a non-vanishing entry.
 
 -   If the tuple is empty then its a vanishing entry regardless of its
     pair.
@@ -70,7 +101,7 @@ non-vanishing entries of the tuple.
 3.  `([3,4];Max(4,3),(1,2);)`, evalutes to `tuple(Max(4,3),(1,2))`.
 
 ::: note
-*Note 1*. The number of entries in the tuple's predicate is determined
+*Note 2*. The number of entries in the tuple's predicate is determined
 at compile time, for this reason, an if statement (Without else) can
 only be a vanishing statement.
 :::
@@ -79,9 +110,9 @@ only be a vanishing statement.
 
 Binding is used for matching a variable, or a tuple of variables to
 another expression. It does matching automatically, that is, if the
-expression is an arithmitic term, then it evalutes the term, and matches
-the variable with the value of the term (like `is` operator) otherwise
-it acts like `=` operator.
+expression is an arithmitic term, it evalutes the term, and matches the
+variable with the value of the term (like `is` operator) otherwise it
+acts like `=` operator.
 
 It have the intuitive syntax `Var <- Expr`.
 
@@ -131,8 +162,6 @@ if  optional(IfHead |)  Condition then
         tuple
 ```
 
-## Syntax
-
 ``` {.prolog language="Prolog"}
 if optional(IfHead |) Condition then 
         tuple
@@ -140,11 +169,21 @@ if optional(IfHead |) Condition then
         tuple
 ```
 
-## Examples
+**Example**
 
--   ``` {.prolog language="Prolog"}
-    if ListSize <- std:Size(List) | ListSize > 0 then ListSize * 10 else ListSize
-    ```
+::: enumerate
+``` {.prolog language="Prolog"}
+if Idx = 0 then (
+        match List {
+            [] => [],
+            [L | Ls] => [NewVal | Ls]
+        }
+    ) else (
+        List <- [L | Ls]; 
+        [L | Replace(Ls,Idx - 1, NewVal)]
+    )
+```
+:::
 
 # Matching
 
@@ -172,17 +211,37 @@ A functions, takes arguments, and returns a result.
 A function result is a tuple of expressions, unless the tuple has one
 entry, then its the expresssion that the tuple contains.
 
-The functions name must be a valid variable's name.
+The functions name must be a valid variable's name that starts with a
+capital letter. The function will compile to a regular `Prolog`
+predicate but with the first letter being a small letter.
 
 ## Syntax
 
 ``` {.prolog language="Prolog"}
-Func(Arg1, Arg2, ..., ArgN) :: (
-        Expr1,
-        ...
-        ExprN
+Func(Arg1, Arg2, ..., ArgN) :: tuple .
+```
+
+**Example**
+
+``` {.prolog language="Prolog"}
+Replace(List,Idx,NewVal) :: (
+
+    if ListSize <- std:Size(List) | Idx < 0 ; Idx > ListSize - 1 then (
+        write('Wrong Idx');
+        Exit();
+    );
+
+    if Idx = 0 then (
+        match List {
+            [] => [],
+            [L | Ls] => [NewVal | Ls]
+        }
+    ) else (
+        List <- [L | Ls]; 
+        [L | Replace(Ls,Idx - 1, NewVal)]
     )
-    .
+)
+.
 ```
 
 ## Arguments Alias
@@ -200,6 +259,10 @@ Example:
 Max(X,Y) :: (if #1 >= #2 then #1 else #2).
 ```
 
+``` {.prolog language="Prolog"}
+F(X) :: (if tuple(X) = # then 1 else 0). // Evaluates to 1
+```
+
 ## Lambdas
 
 Lambdas are annonymos functions, and they are considered as expression,
@@ -212,7 +275,7 @@ They have the following syntax
 (Arg1, Arg2, ..., ArgN) => (stmts)
 ```
 
-Example
+**Example**
 
 ``` {.prolog language="Prolog"}
 Foo(X,Y) :: (
@@ -223,6 +286,22 @@ Foo(X,Y) :: (
 ```
 
 Note that `X,Y` are local to the lambdas.
+
+# The Main Function
+
+If the special function `Main/0` is defined, then prolog generates a
+predicate with no arguments that defines this function, and it generates
+a directive that runs the function automatically at the end of the file.
+
+``` {.prolog language="Prolog"}
+Main() :: (
+        std:PrintLn("Hello");
+    )
+    .
+```
+
+In this example, if we load the file that contains this function, it
+will print `Hello` without the need to call the predicate `main`.
 
 # Modules
 
@@ -258,8 +337,8 @@ then module name before the function's
 ``` {.prolog language="Prolog"}
 
     import {
-        'm1', 
-        'm2' 
+        'm1', // Has Foo/0 that prints 'hello'
+        'm2'  // Has Foo/0 that prints 'world'
     }
 
 
@@ -269,3 +348,91 @@ then module name before the function's
     )
     .
 ```
+
+# Types
+
+Types can be used for type checking, that is, inforcing the user to use
+a pass a specific type to the function.
+
+Function arguments and binding to a variable can declare the variable's
+type using the syntax `Var : type`, if the type is a part of a module
+then it must declare the module name before the type `Var : std:type`.
+
+If the type is nullable then we pair it with `?`.
+
+Example
+
+``` {.prolog language="Prolog"}
+
+    import {
+        'stdlib'
+    }
+
+    Sort(List : std:list, Func) :: (
+        ...
+    )
+    .
+
+    Main() :: (
+        Sort(1, _); // Type mismatch.
+        Sort([], Min); // ok.
+
+        X : std:list <- 1; // Type mismatch.
+    )
+    .
+```
+
+## Syntax
+
+We can define a type by
+
+``` {.prolog language="Prolog"}
+type node :: (number , node?, node?).
+
+
+    Foo(Node : node) :: (
+
+    )
+    .
+
+    Main() :: (
+        Foo(node(100,1,1)); // Type mismatch
+        Foo(node(100,nil,nil)); // ok
+        Foo(node(100,node(100,nil,nil),nil)); // ok
+    )
+    .
+```
+
+# Testing
+
+`Prolog*` provides a builtin testing features.
+
+A test function is defined like a regular function, but it has no name
+and no arguments, instead, a describtion string must be provided.
+
+## Syntax
+
+``` {.prolog language="Prolog"}
+test '<string of test desc>' tuple .
+```
+
+**Example**
+
+``` {.prolog language="Prolog"}
+test 'HeapSort test on random list' (
+
+    RandomList <- std:ForEach( 
+                              std:MakeList(100,0), 
+                              (X) => (std:RandomNum(1,100))
+    );
+
+    testing:EXPECT_EQ(bin_heap:HeapSort(RandomList),
+                      std:SortList(RandomList)
+    );
+)
+.
+```
+
+If at least one test is defined, `Prolog*` will define a new function
+called `RunTests/0`, which will run all tests, in the order of their
+definitions.
