@@ -1,1 +1,26 @@
 \section{Compiler}
+
+\subsection{Usage}
+
+In order to compile a \texttt{Prolog*} we can use 
+
+\begin{lstlisting}[language = bash]
+    prolog -i my_file.txt 
+\end{lstlisting}
+
+this will compile \texttt{my\_file.txt} to the prolog file \texttt{my\_file.pl}. 
+
+We can add the following flags:
+
+\begin{itemize}
+    \item \texttt{-i --input} : To specify the input \texttt{Prolog*} file.
+    \item \texttt{-o --output} : Followed by the name of the prolog output file.
+    \item \texttt{--format}: Formats the output file.
+    \item \texttt{--no-semantics}: Disables the semantic checker.
+\end{itemize}
+
+\begin{note}
+    The output file must be interpreted using \texttt{swipl}, as its the only interpreter tested
+    for this project.
+\end{note}
+

@@ -1,0 +1,33 @@
+\section{Testing}
+
+\texttt{Prolog*} provides a builtin testing features.
+
+A test function is defined like a regular function, but it has no
+name and no arguments, instead, a describtion string must be provided. 
+
+\subsection{Syntax}
+
+\begin{lstlisting}[language = Prolog]
+test '<string of test desc>' tuple .
+\end{lstlisting}
+
+\textbf{Example}
+
+\begin{lstlisting}[language = Prolog]
+test 'HeapSort test on random list' (
+
+    RandomList <- std:ForEach( 
+                              std:MakeList(100,0), 
+                              (X) => (std:RandomNum(1,100))
+    );
+
+    testing:EXPECT_EQ(bin_heap:HeapSort(RandomList),
+                      std:SortList(RandomList)
+    );
+)
+.
+\end{lstlisting}
+
+If at least one test is defined, \texttt{Prolog*} will define a new function called
+\texttt{RunTests/0}, which will run all tests, in the order of their definitions. 
+

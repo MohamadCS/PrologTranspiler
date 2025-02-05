@@ -1,1 +1,57 @@
 \section{Types}
+
+Types can be used for type checking, that is, inforcing the user
+to use a pass a specific type to the function.
+
+Function arguments and binding to a variable can declare the variable's type 
+using the syntax \texttt{Var : type}, if the type is a part of a module
+then it must declare the module name before the type \texttt{Var : std:type}.
+
+If the type is nullable then we pair it with \texttt{?}.
+
+Example
+
+\begin{lstlisting}[language = Prolog]
+
+    import {
+        'stdlib'
+    }
+
+    Sort(List : std:list, Func) :: (
+        ...
+    )
+    .
+
+    Main() :: (
+        Sort(1, _); // Type mismatch.
+        Sort([], Min); // ok.
+
+        X : std:list <- 1; // Type mismatch.
+    )
+    .
+
+\end{lstlisting}
+
+\subsection{Syntax}
+
+We can define a type by 
+
+\begin{lstlisting}[language = Prolog]
+    type node :: (number , node?, node?).
+
+
+    Foo(Node : node) :: (
+
+    )
+    .
+
+    Main() :: (
+        Foo(node(100,1,1)); // Type mismatch
+        Foo(node(100,nil,nil)); // ok
+        Foo(node(100,node(100,nil,nil),nil)); // ok
+    )
+    .
+
+\end{lstlisting}
+
+

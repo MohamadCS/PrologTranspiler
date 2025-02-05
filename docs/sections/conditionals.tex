@@ -17,16 +17,15 @@ expression is vanishing or not.
 We can add some bindings at the head of the if condition in order for
 a more compact syntax, this is an optional.
 
-In order to allow for more readable nested if-else statements, if the tuple
-has one entry only, and its non-vanishing, then we can remove the parentheses.
+In order to allow for more readable nested if-else statements, if the
+tuple has one entry only, and its non-vanishing, then we can remove
+the parentheses.
 
 \subsection{Syntax}
 \begin{lstlisting}[language =Prolog]
     if  optional(IfHead |)  Condition then 
         tuple
 \end{lstlisting}
-
-\subsection{Syntax}
 
 \begin{lstlisting}[language =Prolog]
     if optional(IfHead |) Condition then 
@@ -35,12 +34,19 @@ has one entry only, and its non-vanishing, then we can remove the parentheses.
         tuple
 \end{lstlisting}
 
-\subsection{Examples}
+\textbf{Example}
 
-\begin{itemize}
-
-	\item  \begin{lstlisting}[language =Prolog]
-                if ListSize <- std:Size(List) | ListSize > 0 then ListSize * 10 else ListSize
-            \end{lstlisting}
-\end{itemize}
+\begin{enumerate}
+	\begin{lstlisting}[language =Prolog]
+    if Idx = 0 then (
+        match List {
+            [] => [],
+            [L | Ls] => [NewVal | Ls]
+        }
+    ) else (
+        List <- [L | Ls]; 
+        [L | Replace(Ls,Idx - 1, NewVal)]
+    )
+    \end{lstlisting}
+\end{enumerate}
 

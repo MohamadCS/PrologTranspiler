@@ -7,19 +7,41 @@ A function result is a tuple of expressions, unless
 the tuple has one entry, then its the expresssion 
 that the tuple contains.
 
-The functions name must be a valid variable's name.
+The functions name must be a valid variable's name that starts with a capital letter.
+The function will compile to a regular \texttt{Prolog} predicate but with the
+first letter being a small letter.
 
 \subsection{Syntax}
 
+\begin{lstlisting}[language = Prolog]
+Func(Arg1, Arg2, ..., ArgN) :: tuple .
+\end{lstlisting}
+
+
+\noindent \textbf{Example}
 
 \begin{lstlisting}[language = Prolog]
-    Func(Arg1, Arg2, ..., ArgN) :: (
-        Expr1,
-        ...
-        ExprN
+Replace(List,Idx,NewVal) :: (
+
+    if ListSize <- std:Size(List) | Idx < 0 ; Idx > ListSize - 1 then (
+        write('Wrong Idx');
+        Exit();
+    );
+
+    if Idx = 0 then (
+        match List {
+            [] => [],
+            [L | Ls] => [NewVal | Ls]
+        }
+    ) else (
+        List <- [L | Ls]; 
+        [L | Replace(Ls,Idx - 1, NewVal)]
     )
-    .
+)
+.
 \end{lstlisting}
+
+
 
 \subsection{Arguments Alias}
 
@@ -37,6 +59,10 @@ Example:
     Max(X,Y) :: (if #1 >= #2 then #1 else #2).
 \end{lstlisting}
 
+\begin{lstlisting}[language = Prolog]
+    F(X) :: (if tuple(X) = # then 1 else 0). // Evaluates to 1
+\end{lstlisting}
+
 
 
 \subsection{Lambdas}
@@ -52,7 +78,7 @@ They have the following syntax
     (Arg1, Arg2, ..., ArgN) => (stmts)
 \end{lstlisting}
 
-Example
+\textbf{Example}
 
 \begin{lstlisting}[language = Prolog]
     Foo(X,Y) :: (
@@ -63,3 +89,21 @@ Example
 \end{lstlisting}
 
 Note that \texttt{X,Y} are local to the lambdas.
+
+
+\section{The Main Function}
+
+If the special function \texttt{Main/0} is defined, then prolog generates
+a predicate with no arguments that defines this function, and it generates 
+a directive that runs the function automatically at the end of the file. 
+
+
+\begin{lstlisting}[language = Prolog]
+    Main() :: (
+        std:PrintLn("Hello");
+    )
+    .
+\end{lstlisting}
+
+In this example, if we load the file that contains this function, it will print \texttt{Hello} without
+the need to call the predicate \texttt{main}.
