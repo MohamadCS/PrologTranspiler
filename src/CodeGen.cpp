@@ -133,7 +133,7 @@ std::any CodeGenVisitor::visitType_def(prologParser::Type_defContext* ctx) {
 
     m_currentTabs--;
 
-    emit(std::format("{}(_) :- write(\"Type mismatch\"),fail.", typeName));
+    emit(std::format("{}(_) :- write(\"Type mismatch (Expecting {})\\n\"),fail.", typeName,typeName));
 
     m_varCtr = 0;
     return {};

@@ -10,7 +10,6 @@
 #include <format>
 #include <fstream>
 #include <optional>
-#include <sstream>
 #include <util.h>
 
 namespace Prolog {

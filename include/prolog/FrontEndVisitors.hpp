@@ -12,8 +12,6 @@
 
 namespace Prolog::Visitors {
 
-// NOTE: Any functions that begins with "visit" is an ANTLR generated function.
-
 /**
  * @class FunctionSemanticsVisitor
  * @brief Provides data about the functions semantics.

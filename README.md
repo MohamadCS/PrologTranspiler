@@ -11,7 +11,7 @@ intuitive syntactic sugar.
 
 ## Usage
 
-In order to compile a `Prolog*` we can use
+In order to compile a `Prolog*` file we can use
 
 ``` {.bash language="bash"}
 prolog -i my_file.txt 
@@ -19,7 +19,7 @@ prolog -i my_file.txt
 
 this will compile `my_file.txt` to the prolog file `my_file.pl`.
 
-We can add the following flags:
+## Flags
 
 -   `-i –input` : To specify the input `Prolog*` file.
 
@@ -71,8 +71,8 @@ Tuples are simply lists of
 Tuples follows the following rules
 
 -   If the expression is followed by the seperator `,` then the
-    expression is non-vanishing, that is its value is evaluated, and an
-    entry in the final tuple.
+    expression is non-vanishing, that is its value is evaluated, and is
+    is an entry in the final tuple.
 
 -   If the expression is is followed by the seperator `;` then the
     expression is vanishing, that is its value is evaluated, and its not
@@ -81,13 +81,16 @@ Tuples follows the following rules
 -   If the last item is not followed by a seperator, then it is treated
     as a non-vanishing entry.
 
--   If the tuple is empty then its a vanishing entry regardless of its
-    pair.
+-   If the tuple is empty then its a vanishing entry regardless of the
+    following seperater.
 
--   If the tuple entry is a direct predicate call, then its acts like in
-    regular predicates, that is, if it evalutes to true then the
-    execution of the function continues, otherwise it stopps. Regardless
-    of the result, the entry would always be vanishing.
+-   If the tuple entry is a direct predicate call then it has a special
+    behavior: if the predicate call evaluates to true, then the
+    execution of function will continue as it its, otherwise it the
+    function will fail(like in regular predicates).
+
+    Regardeless of the predicate call result, the predicate call's entry
+    in the tuple is **always** vanishing.
 
 Tuples are compiled to the predicate `tuple(...)` when `...` are the
 non-vanishing entries of the tuple.
@@ -118,9 +121,10 @@ It have the intuitive syntax `Var <- Expr`.
 
 ## Tuple unpacking
 
-For convinence, the language allows you to unpack the tuple and match
-with named variables using the syntax `TupleOfVar <- Expr` when `Expr`
-is evaluted to a tuple with the same size as the tuple of variables.
+For convinence, the language allows you to unpack the tuple such that it
+entries match with named variables, using the syntax
+`TupleOfVar <- Expr` when `Expr` is evaluted to a tuple with the same
+size as the tuple of variables.
 
 ## Examples
 
@@ -128,62 +132,6 @@ is evaluted to a tuple with the same size as the tuple of variables.
 
 -   `(X,Y) <- getMinMax(List);`, evalues `getMinMax(List)` to
     `tuple(Min,Max)` then matches `X` with `Min` and `Max` with `Y`.
-
--   `(X,Y) <- getMinMax(List);`, evalues `getMinMax(List)` to
-    `tuple(Min,Max)` then matches `X` with `Min` and `Max` with `Y`.
-
-# Conditionals
-
-There are two types of conditionals if statements, and if-else
-expressions.
-
-If statements, evaluates the tuple in the if body if the condition is
-true, while if-else evalutes one of them according to the condition.
-
-The reason that `if` is a statement is that it must be always vanishing
-to avoid ambiguity, since if the condition is false the if must not
-evalute to a value, but a tuple entry must be known if its a vanishing
-or non-vanishing at compile time.
-
-In the otherhand, if-else provide us with a way to tell if the
-expression is vanishing or not.
-
-We can add some bindings at the head of the if condition in order for a
-more compact syntax, this is an optional.
-
-In order to allow for more readable nested if-else statements, if the
-tuple has one entry only, and its non-vanishing, then we can remove the
-parentheses.
-
-## Syntax
-
-``` {.prolog language="Prolog"}
-if  optional(IfHead |)  Condition then 
-        tuple
-```
-
-``` {.prolog language="Prolog"}
-if optional(IfHead |) Condition then 
-        tuple
-    else 
-        tuple
-```
-
-**Example**
-
-::: enumerate
-``` {.prolog language="Prolog"}
-if Idx = 0 then (
-        match List {
-            [] => [],
-            [L | Ls] => [NewVal | Ls]
-        }
-    ) else (
-        List <- [L | Ls]; 
-        [L | Replace(Ls,Idx - 1, NewVal)]
-    )
-```
-:::
 
 # Matching
 
@@ -204,16 +152,84 @@ When `Resulti` are tuples or tuple entries.
 
 Note that the `else` is optional.
 
+## Example
+
+``` {.prolog language="Prolog"}
+match List {
+            [] => [],
+            [L | Ls] => [1 | Ls]
+        }
+```
+
+# Conditionals
+
+There are two types of conditionals if statements, and if-else
+expressions.
+
+If statements evaluates the tuple in the `if` body if the condition is
+true, while if-else evalutes one of them according to the condition.
+
+The reason that `if` is a statement is that it must be always vanishing
+to avoid ambiguity, since if the condition is false the if must not
+evalute to a value, but a tuple entry must be known if its a vanishing
+or non-vanishing at compile time.
+
+In the otherhand, if-else provide us with a way to tell if the
+expression is vanishing or not.
+
+We can add some bindings at the head of the if condition in order for a
+more compact syntax, this is an optional.
+
+In order to allow for more readable nested if-else statements, if the
+tuple has one entry only, and its non-vanishing, then we can remove the
+parentheses.
+
+## Syntax
+
+``` {.prolog language="Prolog"}
+if  optional( if_head |)  Condition then 
+        tuple
+```
+
+``` {.prolog language="Prolog"}
+if optional(if_head |) Condition then 
+        tuple
+    else 
+        tuple
+```
+
+## Example
+
+``` {.prolog language="Prolog"}
+if ListSize <- std:Size(List) | Idx < 0 ; Idx > ListSize - 1 then (
+        write('Wrong Idx');
+        Exit();
+    );
+
+    if Idx = 0 then (
+        match List {
+            [] => [],
+            [L | Ls] => [NewVal | Ls]
+        }
+    ) else (
+        List <- [L | Ls]; 
+        [L | Replace(Ls,Idx - 1, NewVal)]
+    )
+```
+
 # Functions
 
-A functions, takes arguments, and returns a result.
+Functions takes arguments and returns a result.
 
-A function result is a tuple of expressions, unless the tuple has one
-entry, then its the expresssion that the tuple contains.
+A function's result is a tuple, unless the tuple has one entry, then the
+function returns the expression that the tuple contain's.
 
-The functions name must be a valid variable's name that starts with a
-capital letter. The function will compile to a regular `Prolog`
-predicate but with the first letter being a small letter.
+A function's name must be a valid variable's name that starts with a
+capital letter.
+
+The function will compile to a regular `Prolog` predicate but with the
+first letter being a small letter, and with an extra argument as the
+last arguments that stores the function's result.
 
 ## Syntax
 
@@ -269,13 +285,13 @@ Lambdas are annonymos functions, and they are considered as expression,
 meaning they can be binded to variables, returned from functions, passed
 as an argument \...
 
-They have the following syntax
+## Syntax
 
 ``` {.prolog language="Prolog"}
 (Arg1, Arg2, ..., ArgN) => (stmts)
 ```
 
-**Example**
+## Example
 
 ``` {.prolog language="Prolog"}
 Foo(X,Y) :: (
@@ -305,7 +321,7 @@ will print `Hello` without the need to call the predicate `main`.
 
 # Modules
 
-Modules are a abstraction of the current modules system of Prolog, they
+Modules are an abstraction of the current modules system of Prolog, they
 contain functions or types, that can be marked as public using the
 keyword `pub` for other files to use when the import the module
 
@@ -320,7 +336,7 @@ module my_module {
     }
 ```
 
-And we can import the file the contains the module by listing the file
+And we can import the file that contains the module by listing the file
 name without extenstion
 
 ``` {.prolog language="Prolog"}
@@ -331,12 +347,11 @@ import {
     }
 ```
 
-If we want to use a functions from a module we imported, we must declare
-then module name before the function's
+If we want to use a function from a module we've imported, we must
+declare the module name before the function's name.
 
 ``` {.prolog language="Prolog"}
-
-    import {
+import {
         'm1', // Has Foo/0 that prints 'hello'
         'm2'  // Has Foo/0 that prints 'world'
     }
@@ -349,7 +364,46 @@ then module name before the function's
     .
 ```
 
-# Types
+# Testing
+
+`Prolog*` provides a builtin testing features.
+
+A test function is defined like a regular function, but it has no name
+and no arguments, instead, a describtion string must be provided.
+
+## Syntax
+
+``` {.prolog language="Prolog"}
+test '<string of test desc>' tuple .
+```
+
+**Example**
+
+``` {.prolog language="Prolog"}
+test 'HeapSort test on random list' (
+
+    RandomList <- std:ForEach( 
+                              std:MakeList(100,0), 
+                              (X) => (std:RandomNum(1,100))
+    );
+
+    testing:EXPECT_EQ(bin_heap:HeapSort(RandomList),
+                      std:SortList(RandomList)
+    );
+)
+.
+```
+
+If at least one test is defined, `Prolog*` will define a new function
+called `RunTests/0`, which will run all tests, in the order of their
+definitions.
+
+# Types - deprecated
+
+::: note
+*Note 3*. This feature is deprecated for now, it needs a
+reimplementation.
+:::
 
 Types can be used for type checking, that is, inforcing the user to use
 a pass a specific type to the function.
@@ -403,36 +457,141 @@ type node :: (number , node?, node?).
     .
 ```
 
-# Testing
+# Implementing Heap Sort in `Prolog*`
 
-`Prolog*` provides a builtin testing features.
-
-A test function is defined like a regular function, but it has no name
-and no arguments, instead, a describtion string must be provided.
-
-## Syntax
+In this example, we are going to explore all of the language's features,
+by implementing `HeapSort/1` using binomial heaps.
 
 ``` {.prolog language="Prolog"}
-test '<string of test desc>' tuple .
-```
+import {
+    'stdlib'
+}
 
-**Example**
 
-``` {.prolog language="Prolog"}
-test 'HeapSort test on random list' (
+module bin_heap {
 
-    RandomList <- std:ForEach( 
-                              std:MakeList(100,0), 
-                              (X) => (std:RandomNum(1,100))
-    );
+MergeBt(Bt1, Bt2) :: (
 
-    testing:EXPECT_EQ(bin_heap:HeapSort(RandomList),
-                      std:SortList(RandomList)
-    );
+        Bt1 <- bt(Value1, List1);
+        Bt2 <- bt(Value2, List2);
+
+
+        if Value1 >= Value2 then (
+            R <- bt(Value2,[Bt1 | List2]);
+        ) else (
+            R <- bt(Value1,[Bt2 | List1]);
+        );
+
+        R
 )
 .
-```
 
-If at least one test is defined, `Prolog*` will define a new function
-called `RunTests/0`, which will run all tests, in the order of their
-definitions.
+
+AddBtAux(Bt , Heap : std:list, I : number) :: (
+    Bt <- bt(Value, Children);
+    Order <- std:Size(Children);
+
+    if I = Order then (
+        match Heap {
+            [] => [Bt],
+            [empty | HeapTail] => [Bt | HeapTail],
+            [CurrentBt | HeapTail] => 
+             [ empty | AddBtAux(MergeBt(CurrentBt,Bt),HeapTail,I+1)]
+        }
+
+    ) else (
+        Heap <- [ H | HeapTail];
+        [H | AddBtAux(Bt,HeapTail, I + 1)]
+    )
+)
+.
+
+AddBt(Bt , Heap : std:list) :: (
+    AddBtAux(Bt,Heap,0)
+)
+.
+
+
+RemoveBt(Bt, Heap : std:list) :: (
+    match Heap  {
+        [] => [], 
+        [Bt] => [],
+        [Bt | HeapTail] => [empty | HeapTail],
+        [H | HeapTail] => [H | RemoveBt(Bt,HeapTail)]
+    }
+)
+.
+
+PopMin(Heap : std:list)  :: (
+    MinBt <- std:MinMember(Heap, (Bt1 ,Bt2 ) => (
+        if Bt1 = empty then (
+            Bt2
+        ) else if Bt2 = empty then (
+            Bt1
+        ) else (
+            Bt1 <- bt(Value1, _);
+            Bt2 <- bt(Value2, _);
+            if Value1 =< Value2 then (
+                Bt1 
+            ) else (
+                Bt2
+            )
+        )
+    ));
+
+    MinBt <- bt(Value,List);
+    ResultHeap <- AddList(List,RemoveBt(MinBt,Heap));
+
+    (MinBt,ResultHeap)
+)
+.
+
+Add(Num : number,Heap : std:list) :: (
+    AddBt(bt(Num, []),Heap)
+)
+.
+
+AddList(List , Heap) :: (
+    match List {
+        [] => Heap,
+        [Bt | ListTail] => AddBt(Bt,AddList(ListTail,Heap))
+    }
+)
+.
+
+
+ListToHeap(List : std:list) :: (
+    match List  {
+        [] => [],
+        [L | Ls] => Add(L,ListToHeap(Ls))
+    }
+)
+.
+
+HeapToList(Heap : std:list) :: (
+    if HeapSize <- std:Size(Heap) | HeapSize = 0 then (
+        []
+    ) else (
+        (MinBt, NewHeap) <- PopMin(Heap);
+        MinBt <- bt(Value , _);
+        [Value | HeapToList(NewHeap)]
+    )
+)
+.
+
+pub HeapSort(List : std:list) :: (
+    HeapToList(ListToHeap(List))
+)
+.
+
+}
+
+bt(_, []).
+
+bt(Value , [bt(ChildValue,ChildList) | RootListTail] ) :- 
+    length(RootListTail, K), 
+    length(ChildList, K),
+    Value =< ChildValue,
+    bt(Value,RootListTail)
+    .
+```

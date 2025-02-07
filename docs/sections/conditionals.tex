@@ -3,8 +3,9 @@
 There are two types of conditionals if statements, and if-else
 expressions.
 
-If statements, evaluates the tuple in the if body if the condition is
-true, while if-else evalutes one of them according to the condition.
+If statements evaluates the tuple in the \texttt{if} body if the
+condition is true, while if-else evalutes one of them according to
+the condition.
 
 The reason that \texttt{if} is a statement is that it must be always
 vanishing to avoid ambiguity, since if the condition is false the if
@@ -23,21 +24,25 @@ the parentheses.
 
 \subsection{Syntax}
 \begin{lstlisting}[language =Prolog]
-    if  optional(IfHead |)  Condition then 
+    if  optional( if_head |)  Condition then 
         tuple
 \end{lstlisting}
 
 \begin{lstlisting}[language =Prolog]
-    if optional(IfHead |) Condition then 
+    if optional(if_head |) Condition then 
         tuple
     else 
         tuple
 \end{lstlisting}
 
-\textbf{Example}
+\subsection{Example}
 
-\begin{enumerate}
-	\begin{lstlisting}[language =Prolog]
+\begin{lstlisting}[language =Prolog]
+    if ListSize <- std:Size(List) | Idx < 0 ; Idx > ListSize - 1 then (
+        write('Wrong Idx');
+        Exit();
+    );
+
     if Idx = 0 then (
         match List {
             [] => [],
@@ -48,5 +53,4 @@ the parentheses.
         [L | Replace(Ls,Idx - 1, NewVal)]
     )
     \end{lstlisting}
-\end{enumerate}
 

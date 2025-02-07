@@ -1,8 +1,8 @@
 \section{Modules}
 
-Modules are a abstraction of the current modules system of Prolog, they contain
-functions or types, that can be marked as public using the keyword \texttt{pub}
-for other files to use when the import the module
+Modules are an abstraction of the current modules system of Prolog, they
+contain functions or types, that can be marked as public using the keyword
+\texttt{pub} for other files to use when the import the module
 
 \subsection{Syntax}
 
@@ -14,7 +14,7 @@ We can define a module using
     }
 \end{lstlisting}
 
-And we can import the file the contains the module by listing the file name
+And we can import the file that contains the module by listing the file name
 without extenstion
 
 \begin{lstlisting}[language =Prolog]
@@ -25,12 +25,11 @@ without extenstion
     }
 \end{lstlisting}
 
-If we want to use a functions from a module we imported, we must declare 
-then module name before the function's
+If we want to use a function from a module we've imported, we must declare 
+the module name before the function's name.
 
 
 \begin{lstlisting}[language =Prolog]
-
     import {
         'm1', // Has Foo/0 that prints 'hello'
         'm2'  // Has Foo/0 that prints 'world'

@@ -1,0 +1,142 @@
+\section{Implementing Heap Sort in \texttt{Prolog*}}
+
+In this example, we are going to explore all of the language's features, by 
+implementing \texttt{HeapSort/1} using binomial heaps.
+
+
+
+\begin{lstlisting}[language = Prolog]
+import {
+    'stdlib'
+}
+
+
+module bin_heap {
+
+MergeBt(Bt1, Bt2) :: (
+
+        Bt1 <- bt(Value1, List1);
+        Bt2 <- bt(Value2, List2);
+
+
+        if Value1 >= Value2 then (
+            R <- bt(Value2,[Bt1 | List2]);
+        ) else (
+            R <- bt(Value1,[Bt2 | List1]);
+        );
+
+        R
+)
+.
+
+
+AddBtAux(Bt , Heap : std:list, I : number) :: (
+    Bt <- bt(Value, Children);
+    Order <- std:Size(Children);
+
+    if I = Order then (
+        match Heap {
+            [] => [Bt],
+            [empty | HeapTail] => [Bt | HeapTail],
+            [CurrentBt | HeapTail] => 
+             [ empty | AddBtAux(MergeBt(CurrentBt,Bt),HeapTail,I+1)]
+        }
+
+    ) else (
+        Heap <- [ H | HeapTail];
+        [H | AddBtAux(Bt,HeapTail, I + 1)]
+    )
+)
+.
+
+AddBt(Bt , Heap : std:list) :: (
+    AddBtAux(Bt,Heap,0)
+)
+.
+
+
+RemoveBt(Bt, Heap : std:list) :: (
+    match Heap  {
+        [] => [], 
+        [Bt] => [],
+        [Bt | HeapTail] => [empty | HeapTail],
+        [H | HeapTail] => [H | RemoveBt(Bt,HeapTail)]
+    }
+)
+.
+
+PopMin(Heap : std:list)  :: (
+    MinBt <- std:MinMember(Heap, (Bt1 ,Bt2 ) => (
+        if Bt1 = empty then (
+            Bt2
+        ) else if Bt2 = empty then (
+            Bt1
+        ) else (
+            Bt1 <- bt(Value1, _);
+            Bt2 <- bt(Value2, _);
+            if Value1 =< Value2 then (
+                Bt1 
+            ) else (
+                Bt2
+            )
+        )
+    ));
+
+    MinBt <- bt(Value,List);
+    ResultHeap <- AddList(List,RemoveBt(MinBt,Heap));
+
+    (MinBt,ResultHeap)
+)
+.
+
+Add(Num : number,Heap : std:list) :: (
+    AddBt(bt(Num, []),Heap)
+)
+.
+
+AddList(List , Heap) :: (
+    match List {
+        [] => Heap,
+        [Bt | ListTail] => AddBt(Bt,AddList(ListTail,Heap))
+    }
+)
+.
+
+
+ListToHeap(List : std:list) :: (
+    match List  {
+        [] => [],
+        [L | Ls] => Add(L,ListToHeap(Ls))
+    }
+)
+.
+
+HeapToList(Heap : std:list) :: (
+    if HeapSize <- std:Size(Heap) | HeapSize = 0 then (
+        []
+    ) else (
+        (MinBt, NewHeap) <- PopMin(Heap);
+        MinBt <- bt(Value , _);
+        [Value | HeapToList(NewHeap)]
+    )
+)
+.
+
+pub HeapSort(List : std:list) :: (
+    HeapToList(ListToHeap(List))
+)
+.
+
+}
+
+bt(_, []).
+
+bt(Value , [bt(ChildValue,ChildList) | RootListTail] ) :- 
+    length(RootListTail, K), 
+    length(ChildList, K),
+    Value =< ChildValue,
+    bt(Value,RootListTail)
+    .
+\end{lstlisting}
+
+

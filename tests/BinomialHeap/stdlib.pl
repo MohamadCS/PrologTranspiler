@@ -1,7 +1,6 @@
 :- module(
 	std,
 	[
-		vector/1,
 		forEach/3,
 		size/2,
 		print/2,
@@ -19,14 +18,8 @@
 )
 .
 
-vector(_var0) :- 
-	_var0 = std:vector(_var1,_var2),
-	list(_var1),
-	number(_var2),
-	!
-	.
-vector(_) :- write("Type mismatch"),fail.
 forEach(List,Func,_var0) :- 
+	list(List),
 	_var2 = [  ],
 	_var3 = [ L | Ls ],
 	(
@@ -48,6 +41,7 @@ forEach(List,Func,_var0) :-
 
 
 size(List,_var0) :- 
+	list(List),
 	_var2 = [  ],
 	_var3 = [ _ | Ls ],
 	(
@@ -102,6 +96,8 @@ exit(_var0) :-
 
 
 replace(List,Idx,NewVal,_var0) :- 
+	list(List),
+	int(Idx),
 	std:size(List,_var1),
 	ListSize = _var1,
 	( (Idx<0;Idx>ListSize-1 -> (
@@ -144,6 +140,8 @@ replace(List,Idx,NewVal,_var0) :-
 
 
 max(X,Y,_var0) :- 
+	num(X),
+	num(Y),
 	( X>=Y -> (
 		_var1 = X
 	)
@@ -157,6 +155,8 @@ max(X,Y,_var0) :-
 
 
 min(X,Y,_var0) :- 
+	num(X),
+	num(Y),
 	( Y>=X -> (
 		_var1 = X
 	)
@@ -170,7 +170,7 @@ min(X,Y,_var0) :-
 
 
 minMember(List,MinFunc,_var0) :- 
-	std:list(List),
+	list(List),
 	_var2 = [  ],
 	_var3 = [ X ],
 	_var4 = [ X,Y ],
@@ -199,8 +199,8 @@ minMember(List,MinFunc,_var0) :-
 
 
 randomNum(Lower,Higher,_var0) :- 
-	number(Lower),
-	number(Higher),
+	num(Lower),
+	num(Higher),
 	_var1 = random(Lower,Higher,X),
 	random(Lower,Higher,X),
 	_var2 = X,
@@ -209,7 +209,7 @@ randomNum(Lower,Higher,_var0) :-
 
 
 makeList(Length,Value,_var0) :- 
-	number(Length),
+	int(Length),
 	_var1 = length(List,Length),
 	length(List,Length),
 	_var2 = maplist(=(Value),List),
@@ -229,5 +229,17 @@ sortList(List,_var0) :-
 
 
 list(X):-is_list(X).
+
+
+num(X):-number(X).
+
+
+int(X):-integer(X).
+
+
+double(X):-float(X).
+
+
+str(X):-string(X).
 
 

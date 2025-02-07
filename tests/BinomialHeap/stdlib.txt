@@ -1,8 +1,6 @@
 module std {
 
-pub type vector :: (list , number).
-
-pub ForEach(List,Func) :: ( 
+pub ForEach(List : list, Func) :: ( 
     match List {
         [] => [],
         [L | Ls] => [Func(L) | ForEach(Ls,Func)]
@@ -10,7 +8,7 @@ pub ForEach(List,Func) :: (
 )
 .
 
-pub Size(List) :: (
+pub Size(List : list) :: (
     match List {
         [] => 0,
         [_ | Ls] => (
@@ -41,7 +39,7 @@ pub Input() :: (
 
 pub Exit() :: ( halt; ).
 
-pub Replace(List,Idx,NewVal) :: (
+pub Replace(List : list ,Idx : int ,NewVal) :: (
 
     if ListSize <- std:Size(List) | Idx < 0 ; Idx > ListSize - 1 then (
         write('Wrong Idx');
@@ -62,17 +60,17 @@ pub Replace(List,Idx,NewVal) :: (
 
 
 
-pub Max(X,Y) :: (
+pub Max(X : num, Y : num) :: (
     if #1 >= #2 then #1 else #2 
 )
 .
 
-pub Min(X,Y) :: (
+pub Min(X : num, Y : num) :: (
     if #2 >= #1 then #1 else #2 
 )
 .
 
-pub MinMember(List : std:list, MinFunc) :: (
+pub MinMember(List : list, MinFunc) :: (
     match List {
         [] => nil,
         [X] => X,
@@ -82,13 +80,13 @@ pub MinMember(List : std:list, MinFunc) :: (
 )
 .
 
-pub RandomNum(Lower : number,Higher : number) :: (
+pub RandomNum(Lower : num, Higher : num) :: (
     random(Lower,Higher,X);
     X
 )
 .
 
-pub MakeList(Length : number, Value) :: (
+pub MakeList(Length : int, Value) :: (
     length(List,Length);
     maplist(=(Value),List);
     List
@@ -105,5 +103,9 @@ pub SortList(List : std:list) :: (
 }
 
 list(X) :- is_list(X).
+num(X) :- number(X).
+int(X) :- integer(X).
+double(X) :- float(X).
+str(X) :- string(X).
 
 

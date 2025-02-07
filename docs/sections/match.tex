@@ -1,6 +1,7 @@
 \section{Matching}
 
-Matches are expression that evalutes to a value and they have the following syntax
+Matches are expression that evalutes to a value and they have the
+following syntax
 
 \begin{lstlisting}[language = Prolog]
     match Expression {
@@ -15,4 +16,13 @@ Matches are expression that evalutes to a value and they have the following synt
 When \texttt{Resulti} are tuples or tuple entries.
 
 Note that the \texttt{else} is optional.
+
+\subsection{Example}
+
+\begin{lstlisting}[language =Prolog]
+        match List {
+            [] => [],
+            [L | Ls] => [1 | Ls]
+        }
+    \end{lstlisting}
 

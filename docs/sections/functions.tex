@@ -1,15 +1,17 @@
 \section{Functions}
 
 
-A functions, takes arguments, and returns a result. 
+Functions takes arguments and returns a result.
 
-A function result is a tuple of expressions, unless
-the tuple has one entry, then its the expresssion 
-that the tuple contains.
+A function's result is a tuple, unless the tuple has one entry, then
+the function returns the expression that the tuple contain's.
 
-The functions name must be a valid variable's name that starts with a capital letter.
-The function will compile to a regular \texttt{Prolog} predicate but with the
-first letter being a small letter.
+A function's name must be a valid variable's name that starts with a capital
+letter. 
+
+The function will compile to a regular \texttt{Prolog} predicate but
+with the first letter being a small letter, and with an extra
+argument as the last arguments that stores the function's result.
 
 \subsection{Syntax}
 
@@ -71,14 +73,12 @@ Lambdas are annonymos functions, and they are considered as
 expression, meaning they can be binded to variables, returned 
 from functions, passed as an argument ...
 
-They have the following syntax
-
-
+\subsection{Syntax}
 \begin{lstlisting}[language = Prolog]
     (Arg1, Arg2, ..., ArgN) => (stmts)
 \end{lstlisting}
 
-\textbf{Example}
+\subsection{Example}
 
 \begin{lstlisting}[language = Prolog]
     Foo(X,Y) :: (
@@ -89,7 +89,6 @@ They have the following syntax
 \end{lstlisting}
 
 Note that \texttt{X,Y} are local to the lambdas.
-
 
 \section{The Main Function}
 
